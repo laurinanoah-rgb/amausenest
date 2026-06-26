@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏠 Claudias Mäusenest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Secular+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#ECA108;--yellow:#F9E003;--brown:#875E0A;--brown-dk:#5a3e06;--cream:#FFF9EC;--gray:#f0f0f0;--text:#2d2006;--white:#ffffff;--radius:18px;--shadow:0 8px 32px rgba(135,94,10,0.13)}
+    html{scroll-behavior:smooth}
+    body{font-family:'Nunito',sans-serif;color:var(--text);background:var(--white);overflow-x:hidden}
+    header{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:70px;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:2px solid rgba(236,161,8,0.18);box-shadow:0 2px 18px rgba(135,94,10,0.08)}
+    .logo{font-family:'Chelsea Market',cursive;font-size:1.5rem;color:var(--brown);text-decoration:none;display:flex;align-items:center;gap:8px}
+    nav{display:flex;align-items:center;gap:6px}
+    nav a{font-family:'Secular One',sans-serif;font-size:0.88rem;color:var(--brown);text-decoration:none;padding:7px 14px;border-radius:30px;transition:background 0.2s,color 0.2s}
+    nav a:hover{background:var(--gold);color:var(--white)}
+    .btn-login{font-family:'Secular One',sans-serif;font-size:0.88rem;background:var(--gold);color:var(--white);border:none;border-radius:30px;padding:9px 22px;cursor:pointer;margin-left:10px;transition:background 0.2s;box-shadow:0 3px 12px rgba(236,161,8,0.35)}
+    .btn-login:hover{background:var(--brown)}
+    #hero{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:110px 5vw 60px;background:linear-gradient(160deg,var(--cream) 0%,#fff9e0 50%,var(--cream) 100%)}
+    .hero-title{font-family:'Chelsea Market',cursive;font-size:clamp(2.4rem,7vw,5.5rem);line-height:1.1;color:var(--brown);max-width:780px}
+    .hero-title em{font-style:normal;color:var(--gold)}
+    .hero-sub{margin-top:22px;font-size:1.15rem;color:var(--brown);max-width:520px;line-height:1.7;opacity:0.85}
+    .hero-cta{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+    .hero-mouse{margin-top:50px;font-size:5rem;animation:bounce 2.5s ease-in-out infinite}
+    .btn-primary{background:var(--gold);color:white;border:none;border-radius:30px;font-family:'Secular One',sans-serif;font-size:1rem;padding:14px 32px;cursor:pointer;box-shadow:0 4px 18px rgba(236,161,8,0.4);transition:all 0.2s;text-decoration:none;display:inline-block}
+    .btn-primary:hover{background:var(--brown)}
+    .btn-secondary{background:transparent;color:var(--brown);border:2px solid var(--gold);border-radius:30px;font-family:'Secular One',sans-serif;font-size:1rem;padding:12px 28px;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block}
+    .btn-secondary:hover{background:var(--gold);color:white}
+    section{padding:90px 5vw}
+    .section-label{font-family:'Secular One',sans-serif;font-size:0.8rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+    .section-title{font-family:'Chelsea Market',cursive;font-size:clamp(1.8rem,4vw,3rem);color:var(--brown);line-height:1.2;margin-bottom:16px}
+    .section-sub{font-size:1.05rem;color:#6b4c12;max-width:600px;line-height:1.75}
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    #neuigkeiten{background:var(--cream)}
+    .news-card{background:white;border-radius:var(--radius);padding:28px 30px;box-shadow:var(--shadow);max-width:680px;border-left:5px solid var(--gold);margin-top:36px}
+    .news-date{font-size:0.82rem;color:var(--gold);font-family:'Secular One',sans-serif;margin-bottom:8px}
+    .news-card h3{font-family:'Chelsea Market',cursive;font-size:1.3rem;color:var(--brown);margin-bottom:10px}
+    #nestbau{background:white}
+    .rooms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px;margin-top:50px}
+    .room-card{background:var(--cream);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform 0.28s}
+    .room-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--gold),var(--yellow))}
+    .room-card:hover{transform:translateY(-6px)}
+    .room-icon{font-size:2.8rem;margin-bottom:16px}
+    .room-card h3{font-family:'Chelsea Market',cursive;font-size:1.2rem;color:var(--brown);margin-bottom:12px}
+    .room-card p{font-size:0.93rem;color:#5a3e06;line-height:1.7}
+    #ueber{background:linear-gradient(135deg,#fff9e0 0%,var(--cream) 100%)}
+    .about-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1100px;margin:0 auto}
+    @media(max-width:760px){.about-inner,.kontakt-inner{grid-template-columns:1fr;gap:36px} nav{display:none}}
+    .about-img-frame{width:100%;max-width:420px;aspect-ratio:3/4;background:linear-gradient(160deg,var(--gold) 0%,var(--yellow) 100%);border-radius:30px 30px 120px 30px;display:flex;align-items:center;justify-content:center;font-size:9rem;box-shadow:0 12px 48px rgba(236,161,8,0.3)}
+    .values-list{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:10px}
+    .values-list li{display:flex;align-items:center;gap:12px;font-size:0.98rem;color:#5a3e06;background:white;padding:10px 16px;border-radius:12px;box-shadow:0 2px 10px rgba(135,94,10,0.07)}
+    #galerie{background:white}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:44px}
+    .gallery-item{aspect-ratio:1;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:4rem;box-shadow:var(--shadow);transition:transform 0.25s}
+    .gallery-item:hover{transform:scale(1.04)}
+    .gi-1{background:linear-gradient(135deg,#ffe599,#ffd04b)}.gi-2{background:linear-gradient(135deg,#d4edda,#a8d5b5)}.gi-3{background:linear-gradient(135deg,#ffd6cc,#ffb3a0)}.gi-4{background:linear-gradient(135deg,#cce5ff,#99caff)}.gi-5{background:linear-gradient(135deg,#f5ccff,#dba8ff)}.gi-6{background:linear-gradient(135deg,#ffe0b2,#ffca80)}
+    #kontakt{background:var(--cream)}
+    .kontakt-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:1000px;margin:0 auto}
+    .kontakt-info{display:flex;flex-direction:column;gap:18px;margin-top:30px}
+    .kontakt-item{display:flex;align-items:flex-start;gap:14px;background:white;padding:16px 20px;border-radius:14px;box-shadow:var(--shadow)}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-family:'Secular One',sans-serif;font-size:0.82rem;color:var(--brown);margin-bottom:6px}
+    .form-group input,.form-group textarea{width:100%;padding:12px 16px;border:2px solid rgba(236,161,8,0.25);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.95rem;outline:none;transition:border-color 0.2s}
+    .form-group input:focus,.form-group textarea:focus{border-color:var(--gold)}
+    .form-group textarea{resize:vertical;min-height:120px}
+    .btn-send{width:100%;padding:14px;background:var(--gold);color:white;border:none;border-radius:30px;font-family:'Secular One',sans-serif;font-size:1rem;cursor:pointer}
+    footer{background:var(--brown);color:rgba(255,255,255,0.85);text-align:center;padding:40px 5vw;font-size:0.9rem}
+    .footer-logo{font-family:'Chelsea Market',cursive;font-size:1.6rem;color:var(--yellow);margin-bottom:14px}
+    .modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(45,32,6,0.65);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+    .modal-overlay.active{display:flex}
+    .modal{background:white;border-radius:28px;padding:48px 44px;width:94vw;max-width:420px;box-shadow:0 24px 80px rgba(45,32,6,0.25);position:relative;animation:modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both}
+    .modal-close{position:absolute;top:18px;right:18px;background:var(--gray);border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;color:var(--brown);display:flex;align-items:center;justify-content:center}
+    .modal-close:hover{background:var(--gold);color:white}
+    .modal-title{font-family:'Chelsea Market',cursive;font-size:1.7rem;color:var(--brown);text-align:center;margin-bottom:6px}
+    .modal-desc{text-align:center;color:#875e0a;font-size:0.92rem;margin-bottom:28px}
+    .input-group{margin-bottom:16px;position:relative}
+    .input-group label{display:block;font-family:'Secular One',sans-serif;font-size:0.8rem;color:var(--brown);margin-bottom:7px}
+    .input-group input{width:100%;padding:13px 16px 13px 42px;border:2px solid rgba(236,161,8,0.3);border-radius:14px;font-size:0.97rem;outline:none;transition:border-color 0.2s}
+    .input-group input:focus{border-color:var(--gold)}
+    .input-icon{position:absolute;left:14px;top:38px;font-size:1rem;pointer-events:none}
+    .modal-error{background:#fff3cd;border:1px solid #ffc107;color:#856404;border-radius:10px;padding:10px 14px;font-size:0.88rem;margin-bottom:16px;display:none}
+    .modal-error.show{display:block}
+    .btn-loginsubmit{width:100%;padding:14px;background:var(--gold);color:white;border:none;border-radius:30px;font-family:'Secular One',sans-serif;font-size:1rem;cursor:pointer;margin-top:6px}
+    #elternportal{display:none;min-height:100vh;padding:100px 5vw 60px;background:var(--cream)}
+    #elternportal.active{display:block}
+    .portal-greeting{font-family:'Chelsea Market',cursive;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--brown)}
+    .portal-greeting em{color:var(--gold);font-style:normal}
+    .btn-logout{background:var(--gray);color:var(--brown);border:2px solid rgba(236,161,8,0.3);border-radius:30px;padding:9px 22px;font-family:'Secular One',sans-serif;font-size:0.88rem;cursor:pointer}
+    .portal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:32px}
+    .portal-card{background:white;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow)}
+    .portal-card-title{font-family:'Chelsea Market',cursive;font-size:1.15rem;color:var(--brown);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+    .cal-day-name{text-align:center;font-size:0.72rem;font-family:'Secular One',sans-serif;color:var(--gold);padding:4px 0}
+    .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:0.82rem;font-weight:600;color:#5a3e06}
+    .cal-day.present{background:#d4edda;color:#155724}.cal-day.absent{background:#f8d7da;color:#721c24}.cal-day.today{background:var(--gold);color:white;font-weight:700}
+    .doc-list{display:flex;flex-direction:column;gap:10px}
+    .doc-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:var(--cream);border:1px solid rgba(236,161,8,0.18);cursor:pointer}
+    .kind-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .kind-stat{background:var(--cream);border-radius:14px;padding:14px 16px;text-align:center}
+    .kind-stat .stat-val{font-family:'Chelsea Market',cursive;font-size:1.6rem;color:var(--gold)}
+    .kind-stat .stat-label{font-size:0.77rem;color:#875e0a;font-family:'Secular One',sans-serif}
+    .msg-item{padding:14px 16px;border-radius:14px;background:var(--cream);border-left:4px solid var(--gold);margin-bottom:10px}
+    .msg-from{font-family:'Secular One',sans-serif;font-size:0.82rem;color:var(--gold);margin-bottom:4px}
+    #main-content.hidden{display:none}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.85) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="#" class="logo" onclick="showMain()">🐭 Claudias Mäusenest</a>
+    <nav>
+      <a href="#neuigkeiten">🏠 Nest</a>
+      <a href="#nestbau">🪹 Nest-Bau</a>
+      <a href="#galerie">🖼️ Galerie</a>
+      <a href="#kontakt">📞 Kontakt</a>
+      <button class="btn-login" onclick="openLogin()">🔑 Eltern-Login</button>
+    </nav>
+  </header>
+  <div id="main-content">
+    <section id="hero">
+      <div style="display:inline-block;background:var(--yellow);color:var(--brown-dk);font-family:'Secular One',sans-serif;font-size:0.82rem;padding:5px 18px;border-radius:30px;margin-bottom:22px;animation:fadeDown 0.7s ease both">🐾 Herzlich Willkommen</div>
+      <h1 class="hero-title" style="animation:fadeDown 0.8s 0.1s ease both">Willkommen in<br/><em>Claudias Mäusenest</em></h1>
+      <p class="hero-sub" style="animation:fadeDown 0.9s 0.2s ease both">Ein liebevolles Zuhause auf Zeit – wo kleine Mäuse wachsen, lachen und die Welt entdecken. 💛</p>
+      <div class="hero-cta" style="animation:fadeDown 1s 0.35s ease both">
+        <a href="#nestbau" class="btn-primary">Unser Nest entdecken</a>
+        <a href="#kontakt" class="btn-secondary">Kontakt aufnehmen</a>
+      </div>
+      <div class="hero-mouse">🐭</div>
+    </section>
+    <section id="neuigkeiten">
+      <div class="reveal">
+        <div class="section-label">📰 Aktuelles</div>
+        <h2 class="section-title">Neuigkeiten</h2>
+        <p class="section-sub">Willkommen auf der offiziellen Webseite der Kindertagespflege Claudias Mäusenest.</p>
+        <div class="news-card">
+          <div class="news-date">📅 9. Februar 2025</div>
+          <h3>Willkommen auf meiner offiziellen Webseite 🎉</h3>
+          <p>Hier findest du alle Informationen rund um die Betreuung, unsere Räume und das tägliche Leben im Mäusenest.</p>
+        </div>
+      </div>
+    </section>
+    <section id="nestbau">
+      <div class="reveal" style="text-align:center;margin-bottom:10px">
+        <div class="section-label">🪹 Unsere Räume</div>
+        <h2 class="section-title">Das biete ich für unsere Mäuse</h2>
+      </div>
+      <div class="rooms-grid">
+        <div class="room-card reveal"><div class="room-icon">🛝</div><h3>Mäuse-Spielwiese</h3><p>Hier dürfen die kleinen Mäuse lachen, toben und ihrer Fantasie freien Lauf lassen. Alles ist weich, sicher und lädt zum Spielen ein.</p></div>
+        <div class="room-card reveal"><div class="room-icon">🍳</div><h3>Mäuse-Küche</h3><p>Hier wird gemeinsam geschnippelt, gekocht und probiert. Die Mäuse lernen spielerisch mit Lebensmitteln umzugehen.</p></div>
+        <div class="room-card reveal"><div class="room-icon">🛏️</div><h3>Traum-Nest</h3><p>Wenn die Mäuse müde sind, können sie sich hier ausruhen. Warm, leise und beschützt – wie ein echtes Nest.</p></div>
+        <div class="room-card reveal"><div class="room-icon">📚</div><h3>Geschichtenhöhle</h3><p>Bücher anschauen, Geschichten hören und träumen. Ein gemütlicher Ort zum Kuscheln und Abschalten.</p></div>
+        <div class="room-card reveal"><div class="room-icon">🚿</div><h3>Pfoten-Frischebad</h3><p>Hände, Gesicht und Pfoten waschen. Alles ist kindgerecht, sauber und hilft beim Wohlfühlen.</p></div>
+      </div>
+    </section>
+    <section id="ueber">
+      <div class="about-inner">
+        <div class="reveal"><div class="about-img-frame">🧑‍🍼</div></div>
+        <div class="reveal">
+          <span style="display:inline-block;background:var(--yellow);color:var(--brown-dk);font-family:'Secular One',sans-serif;font-size:0.78rem;padding:4px 14px;border-radius:30px;margin-bottom:18px">Das bin ich</span>
+          <h2 class="section-title">Claudia Giehl</h2>
+          <p class="section-sub">In meiner Kindertagespflege begleite ich dein Kind mit Geduld, Wärme und ganz viel Herz. Kleine Gruppen, feste Rituale und eine ruhige Umgebung geben Sicherheit.</p>
+          <ul class="values-list">
+            <li><span>💛</span><span>Liebevolle, individuelle Betreuung</span></li>
+            <li><span>💚</span><span>Zeit zum Ankommen &amp; Wohlfühlen</span></li>
+            <li><span>🎨</span><span>Spielen, Basteln &amp; Entdecken</span></li>
+            <li><span>🏠</span><span>Draußen sein &amp; Alltag erleben</span></li>
+            <li><span>🕰️</span><span>Klare Strukturen &amp; Rituale</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section id="galerie">
+      <div class="reveal" style="text-align:center;margin-bottom:10px">
+        <div class="section-label">🖼️ Impressionen</div>
+        <h2 class="section-title">Galerie</h2>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item gi-1">🛝</div><div class="gallery-item gi-2">🌿</div>
+        <div class="gallery-item gi-3">🍎</div><div class="gallery-item gi-4">📚</div>
+        <div class="gallery-item gi-5">🎨</div><div class="gallery-item gi-6">🐭</div>
+      </div>
+    </section>
+    <section id="kontakt">
+      <div class="kontakt-inner">
+        <div class="reveal">
+          <div class="section-label">📞 Schreib uns</div>
+          <h2 class="section-title">Kontakt</h2>
+          <div class="kontakt-info">
+            <div class="kontakt-item"><span style="font-size:1.5rem">📍</span><div><strong style="font-family:'Secular One',sans-serif;color:var(--brown)">Adresse</strong><br/><span>Kindertagespflege Claudias Mäusenest</span></div></div>
+            <div class="kontakt-item"><span style="font-size:1.5rem">📧</span><div><strong style="font-family:'Secular One',sans-serif;color:var(--brown)">E-Mail</strong><br/><span>claudia@mausenest.de</span></div></div>
+            <div class="kontakt-item"><span style="font-size:1.5rem">⏰</span><div><strong style="font-family:'Secular One',sans-serif;color:var(--brown)">Betreuungszeiten</strong><br/><span>Mo – Fr · 7:00 – 17:00 Uhr</span></div></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <h3 style="font-family:'Chelsea Market',cursive;font-size:1.5rem;color:var(--brown);margin-bottom:22px">Nachricht senden 💌</h3>
+          <div class="form-group"><label>NAME</label><input type="text" placeholder="Anna Müller"/></div>
+          <div class="form-group"><label>E-MAIL</label><input type="email" placeholder="anna@email.de"/></div>
+          <div class="form-group"><label>NACHRICHT</label><textarea placeholder="Hallo Claudia…"></textarea></div>
+          <button class="btn-send" onclick="alert('💛 Danke für deine Nachricht!')">Absenden 💛</button>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <div class="footer-logo">🐭 Claudias Mäusenest</div>
+      <p>Kindertagespflege mit Herz &amp; Wärme · Gemacht mit 💛 für unsere kleinen Mäuse</p>
+      <p style="margin-top:14px;font-size:0.8rem;opacity:0.6">&copy; 2025 Claudias Mäusenest</p>
+    </footer>
+  </div>
+  <div id="elternportal">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:40px">
+      <div>
+        <div style="font-family:'Secular One',sans-serif;font-size:0.82rem;color:var(--gold);margin-bottom:6px">🔐 ELTERNPORTAL</div>
+        <div class="portal-greeting">Hallo, <em id="portalChildName">Maus</em>s Eltern! 🐭</div>
+      </div>
+      <button class="btn-logout" onclick="logout()">← Abmelden</button>
+    </div>
+    <div class="portal-grid">
+      <div class="portal-card">
+        <div class="portal-card-title"><span>👶</span> Infos zu <span id="childNameCard" style="color:var(--gold);margin-left:4px">Kind</span></div>
+        <div class="kind-stats">
+          <div class="kind-stat"><div class="stat-val" id="statAnwesend">0</div><div class="stat-label">Tage Anwesend</div></div>
+          <div class="kind-stat"><div class="stat-val" id="statGefehlt">0</div><div class="stat-label">Tage Gefehlt</div></div>
+          <div class="kind-stat"><div class="stat-val">5</div><div class="stat-label">Kinder in Gruppe</div></div>
+          <div class="kind-stat"><div class="stat-val" id="statAlter">2</div><div class="stat-label">Alter (Jahre)</div></div>
+        </div>
+      </div>
+      <div class="portal-card">
+        <div class="portal-card-title"><span>💬</span> Nachrichten von Claudia</div>
+        <div id="msgList"></div>
+      </div>
+    </div>
+    <div class="portal-card" style="margin-bottom:24px">
+      <div class="portal-card-title"><span>📅</span> Anwesenheitskalender Juni 2025</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-family:'Secular One',sans-serif;font-size:0.9rem;color:var(--brown)"><span>Juni 2025</span></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div style="display:flex;gap:14px;margin-top:12px;font-size:0.77rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#d4edda;border:1px solid #b1dfbb"></div>Anwesend</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#f8d7da;border:1px solid #f5c6cb"></div>Gefehlt</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:var(--gold)"></div>Heute</div>
+      </div>
+    </div>
+    <div class="portal-card">
+      <div class="portal-card-title"><span>📄</span> Wichtige Dokumente</div>
+      <div class="doc-list" id="docList"></div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="loginModal" onclick="if(event.target===this)closeLogin()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeLogin()">✕</button>
+      <div style="font-size:3.5rem;text-align:center;margin-bottom:6px">🐭</div>
+      <div class="modal-title">Eltern-Login</div>
+      <div class="modal-desc">Melde dich mit deinen Zugangsdaten an.<br/>Diese erhältst du von Claudia nach Vertragsabschluss.</div>
+      <div class="modal-error" id="loginError">❌ Benutzername oder Passwort falsch.</div>
+      <div class="input-group"><label>BENUTZERNAME</label><span class="input-icon">👤</span><input type="text" id="loginUser" placeholder="eltern.mustermann" autocomplete="username"/></div>
+      <div class="input-group"><label>PASSWORT</label><span class="input-icon">🔒</span><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn-loginsubmit" onclick="doLogin()">Einloggen 🔑</button>
+      <div style="text-align:center;margin-top:18px;font-size:0.82rem;color:#a07828">🔐 Zugangsdaten vergessen? Bitte Claudia kontaktieren.</div>
+    </div>
+  </div>
+  <script>
+  const USERS={
+    'eltern.lena':{pass:'maus2024',child:'Lena',age:2,present:[2,3,4,5,9,10,11,12,13,16,17,18,19,23,24,25,26],absent:[6,20],msgs:[{from:'Claudia',text:'Lena hat heute wunderschön gebastelt! 🎨',date:'25. Jun 2025'},{from:'Claudia',text:'Bitte morgen Sonnencreme mitbringen ☀️',date:'24. Jun 2025'}]},
+    'eltern.max':{pass:'maus2024',child:'Max',age:3,present:[2,3,5,9,10,12,13,16,17,19,23,24,26],absent:[4,6,11,18,20,25],msgs:[{from:'Claudia',text:'Max hat beim Kochen super geholfen! 🍳',date:'25. Jun 2025'}]},
+    'eltern.emma':{pass:'maus2024',child:'Emma',age:1,present:[3,4,5,10,11,12,16,17,18,23,24,25,26],absent:[2,9,13,19,20],msgs:[{from:'Claudia',text:'Emma schläft gerade tief und fest 😴',date:'26. Jun 2025'}]},
+    'eltern.paul':{pass:'maus2024',child:'Paul',age:2,present:[2,3,4,5,6,9,10,11,12,13,17,18,19,20,23,25,26],absent:[16,24],msgs:[{from:'Claudia',text:'Paul war heute Gruppenführer beim Spielen! 👑',date:'24. Jun 2025'}]},
+    'eltern.mia':{pass:'maus2024',child:'Mia',age:2,present:[3,4,9,10,11,12,13,17,18,19,23,24,25],absent:[2,5,6,16,20,26],msgs:[{from:'Claudia',text:'Mia hat ein selbsterfundenes Lied gesungen! 🎵',date:'23. Jun 2025'}]}
+  };
+  function openLogin(){document.getElementById('loginModal').classList.add('active');setTimeout(()=>document.getElementById('loginUser').focus(),300)}
+  function closeLogin(){document.getElementById('loginModal').classList.remove('active');document.getElementById('loginError').classList.remove('show')}
+  function doLogin(){
+    const u=document.getElementById('loginUser').value.trim().toLowerCase();
+    const p=document.getElementById('loginPass').value;
+    const d=USERS[u];
+    if(d&&d.pass===p){closeLogin();showPortal(d)}
+    else{document.getElementById('loginError').classList.add('show');document.getElementById('loginPass').value=''}
+  }
+  function showPortal(data){
+    document.getElementById('main-content').classList.add('hidden');
+    document.getElementById('elternportal').style.display='block';
+    window.scrollTo(0,0);
+    document.getElementById('portalChildName').textContent=data.child;
+    document.getElementById('childNameCard').textContent=data.child;
+    document.getElementById('statAnwesend').textContent=data.present.length;
+    document.getElementById('statGefehlt').textContent=data.absent.length;
+    document.getElementById('statAlter').textContent=data.age;
+    document.getElementById('msgList').innerHTML=data.msgs.map(m=>'<div class="msg-item"><div class="msg-from">👩‍🏫 '+m.from+'</div><div style="font-size:0.9rem;line-height:1.6">'+m.text+'</div><div style="font-size:0.75rem;color:#a07828;margin-top:5px">'+m.date+'</div></div>').join('');
+    buildCal(data.present,data.absent);
+    document.getElementById('docList').innerHTML='<div class="doc-item" onclick="alert(\'📄 Betreuungsvertrag wird geöffnet\')"><span style="font-size:1.6rem">📋</span><div><strong>Betreuungsvertrag</strong><span style="font-size:0.78rem;color:#a07828;display:block">Jan 2025</span></div></div><div class="doc-item" onclick="alert(\'📝 Entwicklungsbericht\')"><span style="font-size:1.6rem">📝</span><div><strong>Entwicklungsbericht '+data.child+'</strong><span style="font-size:0.78rem;color:#a07828;display:block">Jun 2025 · NEU</span></div><span style="background:var(--gold);color:white;border-radius:8px;padding:2px 8px;font-size:0.7rem;font-weight:800;margin-left:auto">NEU</span></div><div class="doc-item"><span style="font-size:1.6rem">🍱</span><div><strong>Speiseplan Juni 2025</strong><span style="font-size:0.78rem;color:#a07828;display:block">Aktuelle Woche</span></div></div>';
+  }
+  function buildCal(p,a){
+    const g=document.getElementById('calGrid');
+    g.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>'<div class="cal-day-name">'+d+'</div>').join('');
+    for(let i=0;i<6;i++)g.innerHTML+='<div class="cal-day"></div>';
+    for(let d=1;d<=30;d++){let c='cal-day';if(d===26)c+=' today';else if(p.includes(d))c+=' present';else if(a.includes(d))c+=' absent';g.innerHTML+='<div class="'+c+'">'+d+'</div>'}
+  }
+  function logout(){document.getElementById('elternportal').style.display='none';document.getElementById('main-content').classList.remove('hidden');window.scrollTo(0,0)}
+  function showMain(){if(document.getElementById('elternportal').style.display==='block'){logout();return false}}
+  document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.12}).observe(el));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLogin()});
+  </script>
+</body>
+</html>
