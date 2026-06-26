@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Secular+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--gold:#ECA108;--yellow:#F9E003;--brown:#875E0A;--brown-dk:#5a3e06;--cream:#FFF9EC;--gray:#f0f0f0;--text:#2d2006;--white:#ffffff;--radius:18px;--shadow:0 8px 32px rgba(135,94,10,0.13)}
@@ -86,27 +87,38 @@
     .modal-error.show{display:block}
     .btn-loginsubmit{width:100%;padding:14px;background:var(--gold);color:white;border:none;border-radius:30px;font-family:'Secular One',sans-serif;font-size:1rem;cursor:pointer;margin-top:6px}
     #elternportal{display:none;min-height:100vh;padding:100px 5vw 60px;background:var(--cream)}
-    #elternportal.active{display:block}
     .portal-greeting{font-family:'Chelsea Market',cursive;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--brown)}
     .portal-greeting em{color:var(--gold);font-style:normal}
     .btn-logout{background:var(--gray);color:var(--brown);border:2px solid rgba(236,161,8,0.3);border-radius:30px;padding:9px 22px;font-family:'Secular One',sans-serif;font-size:0.88rem;cursor:pointer}
     .portal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:32px}
-    .portal-card{background:white;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow)}
+    .portal-card{background:white;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:24px}
     .portal-card-title{font-family:'Chelsea Market',cursive;font-size:1.15rem;color:var(--brown);margin-bottom:18px;display:flex;align-items:center;gap:10px}
     .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
     .cal-day-name{text-align:center;font-size:0.72rem;font-family:'Secular One',sans-serif;color:var(--gold);padding:4px 0}
     .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:0.82rem;font-weight:600;color:#5a3e06}
     .cal-day.present{background:#d4edda;color:#155724}.cal-day.absent{background:#f8d7da;color:#721c24}.cal-day.today{background:var(--gold);color:white;font-weight:700}
     .doc-list{display:flex;flex-direction:column;gap:10px}
-    .doc-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:var(--cream);border:1px solid rgba(236,161,8,0.18);cursor:pointer}
+    .doc-item-p{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:var(--cream);border:1px solid rgba(236,161,8,0.18)}
     .kind-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .kind-stat{background:var(--cream);border-radius:14px;padding:14px 16px;text-align:center}
     .kind-stat .stat-val{font-family:'Chelsea Market',cursive;font-size:1.6rem;color:var(--gold)}
     .kind-stat .stat-label{font-size:0.77rem;color:#875e0a;font-family:'Secular One',sans-serif}
-    .msg-item{padding:14px 16px;border-radius:14px;background:var(--cream);border-left:4px solid var(--gold);margin-bottom:10px}
+    .msg-item{padding:14px 16px;border-radius:14px;background:var(--cream);border-left:4px solid var(--gold);margin-bottom:10px;animation:fadeIn 0.4s ease}
     .msg-from{font-family:'Secular One',sans-serif;font-size:0.82rem;color:var(--gold);margin-bottom:4px}
+    .status-live-card{border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:14px;font-weight:700;font-size:1rem}
+    .status-anwesend{background:#d4edda;color:#155724;border:2px solid #b1dfbb}
+    .status-schlaeft{background:#cce5ff;color:#004085;border:2px solid #b8d4f5}
+    .status-gegangen{background:#f5f5f5;color:#555;border:2px solid #ddd}
+    .status-abwesend{background:#f8d7da;color:#721c24;border:2px solid #f5c6cb}
+    .live-badge{font-size:0.7rem;background:rgba(40,167,69,0.15);color:#28a745;border-radius:20px;padding:2px 8px;font-weight:700;margin-left:auto}
+    .doc-tag{padding:2px 8px;border-radius:8px;font-size:0.7rem;font-weight:700;margin-left:auto;flex-shrink:0}
+    .doc-tag-all{background:#d4edda;color:#155724}
+    .doc-tag-kind{background:#cce5ff;color:#004085}
+    .btn-download{background:var(--gold);color:white;border:none;border-radius:20px;padding:7px 16px;font-family:'Secular One',sans-serif;font-size:0.82rem;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .btn-download:hover{background:var(--brown)}
     #main-content.hidden{display:none}
     @keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
     @keyframes modalIn{from{opacity:0;transform:scale(0.85) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
   </style>
@@ -122,6 +134,7 @@
       <button class="btn-login" onclick="openLogin()">🔑 Eltern-Login</button>
     </nav>
   </header>
+
   <div id="main-content">
     <section id="hero">
       <div style="display:inline-block;background:var(--yellow);color:var(--brown-dk);font-family:'Secular One',sans-serif;font-size:0.82rem;padding:5px 18px;border-radius:30px;margin-bottom:22px;animation:fadeDown 0.7s ease both">🐾 Herzlich Willkommen</div>
@@ -133,6 +146,7 @@
       </div>
       <div class="hero-mouse">🐭</div>
     </section>
+
     <section id="neuigkeiten">
       <div class="reveal">
         <div class="section-label">📰 Aktuelles</div>
@@ -145,6 +159,7 @@
         </div>
       </div>
     </section>
+
     <section id="nestbau">
       <div class="reveal" style="text-align:center;margin-bottom:10px">
         <div class="section-label">🪹 Unsere Räume</div>
@@ -158,6 +173,7 @@
         <div class="room-card reveal"><div class="room-icon">🚿</div><h3>Pfoten-Frischebad</h3><p>Hände, Gesicht und Pfoten waschen. Alles ist kindgerecht, sauber und hilft beim Wohlfühlen.</p></div>
       </div>
     </section>
+
     <section id="ueber">
       <div class="about-inner">
         <div class="reveal"><div class="about-img-frame">🧑‍🍼</div></div>
@@ -175,6 +191,7 @@
         </div>
       </div>
     </section>
+
     <section id="galerie">
       <div class="reveal" style="text-align:center;margin-bottom:10px">
         <div class="section-label">🖼️ Impressionen</div>
@@ -186,6 +203,7 @@
         <div class="gallery-item gi-5">🎨</div><div class="gallery-item gi-6">🐭</div>
       </div>
     </section>
+
     <section id="kontakt">
       <div class="kontakt-inner">
         <div class="reveal">
@@ -206,38 +224,58 @@
         </div>
       </div>
     </section>
+
     <footer>
       <div class="footer-logo">🐭 Claudias Mäusenest</div>
       <p>Kindertagespflege mit Herz &amp; Wärme · Gemacht mit 💛 für unsere kleinen Mäuse</p>
       <p style="margin-top:14px;font-size:0.8rem;opacity:0.6">&copy; 2025 Claudias Mäusenest</p>
     </footer>
   </div>
+
+  <!-- ELTERNPORTAL -->
   <div id="elternportal">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:40px">
       <div>
-        <div style="font-family:'Secular One',sans-serif;font-size:0.82rem;color:var(--gold);margin-bottom:6px">🔐 ELTERNPORTAL</div>
+        <div style="font-family:'Secular One',sans-serif;font-size:0.82rem;color:var(--gold);margin-bottom:6px">🔐 ELTERNPORTAL · <span style="color:#28a745">● Live</span></div>
         <div class="portal-greeting">Hallo, <em id="portalChildName">Maus</em>s Eltern! 🐭</div>
       </div>
       <button class="btn-logout" onclick="logout()">← Abmelden</button>
     </div>
+
+    <!-- STATUS LIVE -->
+    <div id="statusLiveCard" class="status-abwesend status-live-card">
+      <span id="statusIcon">❓</span>
+      <div>
+        <div id="statusText" style="font-weight:700">Lade…</div>
+        <div id="statusTime" style="font-size:0.78rem;opacity:0.75;margin-top:2px"></div>
+      </div>
+      <span class="live-badge">🔴 Live</span>
+    </div>
+
     <div class="portal-grid">
-      <div class="portal-card">
+      <!-- KIND INFOS -->
+      <div class="portal-card" style="margin-bottom:0">
         <div class="portal-card-title"><span>👶</span> Infos zu <span id="childNameCard" style="color:var(--gold);margin-left:4px">Kind</span></div>
         <div class="kind-stats">
-          <div class="kind-stat"><div class="stat-val" id="statAnwesend">0</div><div class="stat-label">Tage Anwesend</div></div>
-          <div class="kind-stat"><div class="stat-val" id="statGefehlt">0</div><div class="stat-label">Tage Gefehlt</div></div>
+          <div class="kind-stat"><div class="stat-val" id="statAnwesend">–</div><div class="stat-label">Tage Anwesend</div></div>
+          <div class="kind-stat"><div class="stat-val" id="statGefehlt">–</div><div class="stat-label">Tage Gefehlt</div></div>
           <div class="kind-stat"><div class="stat-val">5</div><div class="stat-label">Kinder in Gruppe</div></div>
-          <div class="kind-stat"><div class="stat-val" id="statAlter">2</div><div class="stat-label">Alter (Jahre)</div></div>
+          <div class="kind-stat"><div class="stat-val" id="statAlter">–</div><div class="stat-label">Alter (Jahre)</div></div>
         </div>
       </div>
-      <div class="portal-card">
+      <!-- NACHRICHTEN -->
+      <div class="portal-card" style="margin-bottom:0">
         <div class="portal-card-title"><span>💬</span> Nachrichten von Claudia</div>
-        <div id="msgList"></div>
+        <div id="msgList"><div style="color:#a07828;font-size:0.88rem">Lade Nachrichten…</div></div>
       </div>
     </div>
-    <div class="portal-card" style="margin-bottom:24px">
-      <div class="portal-card-title"><span>📅</span> Anwesenheitskalender Juni 2025</div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-family:'Secular One',sans-serif;font-size:0.9rem;color:var(--brown)"><span>Juni 2025</span></div>
+
+    <!-- KALENDER -->
+    <div class="portal-card">
+      <div class="portal-card-title" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><span>📅</span> <span id="calTitle">Anwesenheitskalender</span></div>
+        <button class="btn-download" onclick="downloadCalendarExcel()">⬇️ Excel herunterladen</button>
+      </div>
       <div class="cal-grid" id="calGrid"></div>
       <div style="display:flex;gap:14px;margin-top:12px;font-size:0.77rem;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#d4edda;border:1px solid #b1dfbb"></div>Anwesend</div>
@@ -245,11 +283,15 @@
         <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:var(--gold)"></div>Heute</div>
       </div>
     </div>
+
+    <!-- DOKUMENTE -->
     <div class="portal-card">
-      <div class="portal-card-title"><span>📄</span> Wichtige Dokumente</div>
-      <div class="doc-list" id="docList"></div>
+      <div class="portal-card-title"><span>📄</span> Dokumente &amp; Dateien</div>
+      <div class="doc-list" id="docList"><div style="color:#a07828;font-size:0.88rem">Lade Dokumente…</div></div>
     </div>
   </div>
+
+  <!-- LOGIN MODAL -->
   <div class="modal-overlay" id="loginModal" onclick="if(event.target===this)closeLogin()">
     <div class="modal">
       <button class="modal-close" onclick="closeLogin()">✕</button>
@@ -258,51 +300,275 @@
       <div class="modal-desc">Melde dich mit deinen Zugangsdaten an.<br/>Diese erhältst du von Claudia nach Vertragsabschluss.</div>
       <div class="modal-error" id="loginError">❌ Benutzername oder Passwort falsch.</div>
       <div class="input-group"><label>BENUTZERNAME</label><span class="input-icon">👤</span><input type="text" id="loginUser" placeholder="eltern.mustermann" autocomplete="username"/></div>
-      <div class="input-group"><label>PASSWORT</label><span class="input-icon">🔒</span><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-      <button class="btn-loginsubmit" onclick="doLogin()">Einloggen 🔑</button>
+      <div class="input-group"><label>PASSWORT</label><span class="input-icon">🔒</span><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')window.doLogin()"/></div>
+      <button class="btn-loginsubmit" onclick="window.doLogin()">Einloggen 🔑</button>
       <div style="text-align:center;margin-top:18px;font-size:0.82rem;color:#a07828">🔐 Zugangsdaten vergessen? Bitte Claudia kontaktieren.</div>
     </div>
   </div>
-  <script>
-  const USERS={
-    'eltern.lena':{pass:'maus2024',child:'Lena',age:2,present:[2,3,4,5,9,10,11,12,13,16,17,18,19,23,24,25,26],absent:[6,20],msgs:[{from:'Claudia',text:'Lena hat heute wunderschön gebastelt! 🎨',date:'25. Jun 2025'},{from:'Claudia',text:'Bitte morgen Sonnencreme mitbringen ☀️',date:'24. Jun 2025'}]},
-    'eltern.max':{pass:'maus2024',child:'Max',age:3,present:[2,3,5,9,10,12,13,16,17,19,23,24,26],absent:[4,6,11,18,20,25],msgs:[{from:'Claudia',text:'Max hat beim Kochen super geholfen! 🍳',date:'25. Jun 2025'}]},
-    'eltern.emma':{pass:'maus2024',child:'Emma',age:1,present:[3,4,5,10,11,12,16,17,18,23,24,25,26],absent:[2,9,13,19,20],msgs:[{from:'Claudia',text:'Emma schläft gerade tief und fest 😴',date:'26. Jun 2025'}]},
-    'eltern.paul':{pass:'maus2024',child:'Paul',age:2,present:[2,3,4,5,6,9,10,11,12,13,17,18,19,20,23,25,26],absent:[16,24],msgs:[{from:'Claudia',text:'Paul war heute Gruppenführer beim Spielen! 👑',date:'24. Jun 2025'}]},
-    'eltern.mia':{pass:'maus2024',child:'Mia',age:2,present:[3,4,9,10,11,12,13,17,18,19,23,24,25],absent:[2,5,6,16,20,26],msgs:[{from:'Claudia',text:'Mia hat ein selbsterfundenes Lied gesungen! 🎵',date:'23. Jun 2025'}]}
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, collection, onSnapshot, query, where, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",
+    authDomain: "mausenest-49e4c.firebaseapp.com",
+    projectId: "mausenest-49e4c",
+    storageBucket: "mausenest-49e4c.firebasestorage.app",
+    messagingSenderId: "174479569482",
+    appId: "1:174479569482:web:f87f709c97aa030c312cb3"
   };
-  function openLogin(){document.getElementById('loginModal').classList.add('active');setTimeout(()=>document.getElementById('loginUser').focus(),300)}
-  function closeLogin(){document.getElementById('loginModal').classList.remove('active');document.getElementById('loginError').classList.remove('show')}
-  function doLogin(){
-    const u=document.getElementById('loginUser').value.trim().toLowerCase();
-    const p=document.getElementById('loginPass').value;
-    const d=USERS[u];
-    if(d&&d.pass===p){closeLogin();showPortal(d)}
-    else{document.getElementById('loginError').classList.add('show');document.getElementById('loginPass').value=''}
-  }
-  function showPortal(data){
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let currentKindId = null;
+  let currentChildData = {};
+  let currentKindName = '';
+  let unsubKind = null;
+  let unsubMsgs = null;
+  let unsubDocs = null;
+
+  // ── Login ──────────────────────────────────────────────────
+  window.doLogin = async function() {
+    const username = document.getElementById('loginUser').value.trim().toLowerCase();
+    const password = document.getElementById('loginPass').value;
+    const errEl = document.getElementById('loginError');
+    errEl.classList.remove('show');
+
+    try {
+      const elternDoc = await getDoc(doc(db, 'eltern', username));
+      if (!elternDoc.exists()) {
+        errEl.classList.add('show'); return;
+      }
+      const elternData = elternDoc.data();
+      if (elternData.pass !== password) {
+        errEl.classList.add('show');
+        document.getElementById('loginPass').value = '';
+        return;
+      }
+      currentKindId = elternData.kind;
+      closeLogin();
+      setupPortal(elternData);
+    } catch(e) {
+      // Fallback: offline demo
+      const DEMO = {
+        'eltern.lena':{pass:'maus2024',kind:'lena',name:'Lenas Eltern'},
+        'eltern.max':{pass:'maus2024',kind:'max',name:'Max\' Eltern'},
+        'eltern.emma':{pass:'maus2024',kind:'emma',name:'Emmas Eltern'},
+        'eltern.paul':{pass:'maus2024',kind:'paul',name:'Pauls Eltern'},
+        'eltern.mia':{pass:'maus2024',kind:'mia',name:'Mias Eltern'},
+      };
+      const d = DEMO[username];
+      if (d && d.pass === password) {
+        currentKindId = d.kind;
+        closeLogin();
+        setupPortal(d);
+      } else {
+        errEl.classList.add('show');
+        document.getElementById('loginPass').value = '';
+      }
+    }
+  };
+
+  function setupPortal(elternData) {
+    currentKindId = elternData.kind;
     document.getElementById('main-content').classList.add('hidden');
-    document.getElementById('elternportal').style.display='block';
-    window.scrollTo(0,0);
-    document.getElementById('portalChildName').textContent=data.child;
-    document.getElementById('childNameCard').textContent=data.child;
-    document.getElementById('statAnwesend').textContent=data.present.length;
-    document.getElementById('statGefehlt').textContent=data.absent.length;
-    document.getElementById('statAlter').textContent=data.age;
-    document.getElementById('msgList').innerHTML=data.msgs.map(m=>'<div class="msg-item"><div class="msg-from">👩‍🏫 '+m.from+'</div><div style="font-size:0.9rem;line-height:1.6">'+m.text+'</div><div style="font-size:0.75rem;color:#a07828;margin-top:5px">'+m.date+'</div></div>').join('');
-    buildCal(data.present,data.absent);
-    document.getElementById('docList').innerHTML='<div class="doc-item" onclick="alert(\'📄 Betreuungsvertrag wird geöffnet\')"><span style="font-size:1.6rem">📋</span><div><strong>Betreuungsvertrag</strong><span style="font-size:0.78rem;color:#a07828;display:block">Jan 2025</span></div></div><div class="doc-item" onclick="alert(\'📝 Entwicklungsbericht\')"><span style="font-size:1.6rem">📝</span><div><strong>Entwicklungsbericht '+data.child+'</strong><span style="font-size:0.78rem;color:#a07828;display:block">Jun 2025 · NEU</span></div><span style="background:var(--gold);color:white;border-radius:8px;padding:2px 8px;font-size:0.7rem;font-weight:800;margin-left:auto">NEU</span></div><div class="doc-item"><span style="font-size:1.6rem">🍱</span><div><strong>Speiseplan Juni 2025</strong><span style="font-size:0.78rem;color:#a07828;display:block">Aktuelle Woche</span></div></div>';
+    document.getElementById('elternportal').style.display = 'block';
+    window.scrollTo(0, 0);
+
+    // Monat/Jahr für Kalender
+    const now = new Date();
+    const monate = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    document.getElementById('calTitle').textContent = `Anwesenheitskalender ${monate[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Real-time: Kind-Daten
+    if (unsubKind) unsubKind();
+    unsubKind = onSnapshot(doc(db, 'kinder', currentKindId), snap => {
+      if (!snap.exists()) return;
+      const c = snap.data();
+      currentChildData = c;
+      currentKindName = c.name;
+
+      document.getElementById('portalChildName').textContent = c.name;
+      document.getElementById('childNameCard').textContent = c.name;
+      document.getElementById('statAlter').textContent = c.age || '–';
+      const present = c.present || [];
+      const absent = c.absent || [];
+      document.getElementById('statAnwesend').textContent = present.length;
+      document.getElementById('statGefehlt').textContent = absent.length;
+
+      // Live-Status
+      updateStatusCard(c);
+      // Kalender
+      buildCal(present, absent);
+    });
+
+    // Real-time: Nachrichten
+    if (unsubMsgs) unsubMsgs();
+    unsubMsgs = onSnapshot(
+      query(collection(db, 'nachrichten'), where('kind', '==', currentKindId)),
+      snap => {
+        const msgs = [];
+        snap.forEach(d => msgs.push(d.data()));
+        msgs.sort((a,b) => (b.ts||0) - (a.ts||0));
+        const claudiaMsgs = msgs.filter(m => m.dir === 'claudia');
+        const el = document.getElementById('msgList');
+        if (!claudiaMsgs.length) {
+          el.innerHTML = '<div style="color:#a07828;font-size:0.88rem">Noch keine Nachrichten</div>';
+          return;
+        }
+        el.innerHTML = claudiaMsgs.map(m => `
+          <div class="msg-item">
+            <div class="msg-from">👩‍🏫 ${m.from || 'Claudia'}</div>
+            <div style="font-size:0.9rem;line-height:1.6">${m.text}</div>
+            <div style="font-size:0.75rem;color:#a07828;margin-top:5px">${m.time || ''}</div>
+          </div>`).join('');
+      }
+    );
+
+    // Real-time: Dokumente
+    if (unsubDocs) unsubDocs();
+    unsubDocs = onSnapshot(collection(db, 'dokumente'), snap => {
+      const docs = [];
+      snap.forEach(d => docs.push({id: d.id, ...d.data()}));
+      // Zeige allgemeine Dokumente + Dokumente für dieses Kind
+      const filtered = docs.filter(d => d.recipient === 'allgemein' || d.recipient === currentKindId);
+      filtered.sort((a,b) => (b.ts||0) - (a.ts||0));
+      const el = document.getElementById('docList');
+      if (!filtered.length) {
+        el.innerHTML = '<div style="color:#a07828;font-size:0.88rem">Noch keine Dokumente vorhanden</div>';
+        return;
+      }
+      el.innerHTML = filtered.map(d => {
+        const tag = d.recipient === 'allgemein'
+          ? '<span class="doc-tag doc-tag-all">🌍 Allgemein</span>'
+          : `<span class="doc-tag doc-tag-kind">👶 Für dich</span>`;
+        return `<div class="doc-item-p">
+          <span style="font-size:1.6rem">${d.type || '📄'}</span>
+          <div style="flex:1;min-width:0">
+            <strong style="color:var(--brown)">${d.name}</strong>
+            <span style="font-size:0.78rem;color:#a07828;display:block">${d.date || ''} · ${d.size || ''}</span>
+          </div>
+          ${tag}
+        </div>`;
+      }).join('');
+    });
   }
-  function buildCal(p,a){
-    const g=document.getElementById('calGrid');
-    g.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>'<div class="cal-day-name">'+d+'</div>').join('');
-    for(let i=0;i<6;i++)g.innerHTML+='<div class="cal-day"></div>';
-    for(let d=1;d<=30;d++){let c='cal-day';if(d===26)c+=' today';else if(p.includes(d))c+=' present';else if(a.includes(d))c+=' absent';g.innerHTML+='<div class="'+c+'">'+d+'</div>'}
+
+  function updateStatusCard(c) {
+    const card = document.getElementById('statusLiveCard');
+    const icon = document.getElementById('statusIcon');
+    const text = document.getElementById('statusText');
+    const time = document.getElementById('statusTime');
+    card.className = 'status-live-card';
+    if (c.status === 'anwesend') {
+      card.classList.add('status-anwesend');
+      icon.textContent = '✅';
+      text.textContent = `${c.name} ist heute da!`;
+      time.textContent = c.arrivedAt ? `Angekommen um ${c.arrivedAt} Uhr` : '';
+    } else if (c.status === 'schlaeft') {
+      card.classList.add('status-schlaeft');
+      icon.textContent = '😴';
+      text.textContent = `${c.name} schläft gerade`;
+      time.textContent = c.sleepAt ? `Schläft seit ${c.sleepAt} Uhr` : '';
+    } else if (c.status === 'gegangen') {
+      card.classList.add('status-gegangen');
+      icon.textContent = '🏠';
+      text.textContent = `${c.name} ist nach Hause gegangen`;
+      time.textContent = c.goneAt ? `Abgeholt um ${c.goneAt} Uhr` : '';
+    } else {
+      card.classList.add('status-abwesend');
+      icon.textContent = '❌';
+      text.textContent = `${c.name} ist heute abwesend`;
+      time.textContent = '';
+    }
   }
-  function logout(){document.getElementById('elternportal').style.display='none';document.getElementById('main-content').classList.remove('hidden');window.scrollTo(0,0)}
-  function showMain(){if(document.getElementById('elternportal').style.display==='block'){logout();return false}}
-  document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.12}).observe(el));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLogin()});
+
+  function buildCal(present, absent) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const today = now.getDate();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    // Wochentag des 1. (0=So,1=Mo..6=Sa) → umrechnen auf Mo=0
+    let firstDay = new Date(year, month, 1).getDay();
+    firstDay = (firstDay === 0) ? 6 : firstDay - 1;
+
+    const g = document.getElementById('calGrid');
+    g.innerHTML = ['Mo','Di','Mi','Do','Fr','Sa','So'].map(d => `<div class="cal-day-name">${d}</div>`).join('');
+    for (let i = 0; i < firstDay; i++) g.innerHTML += '<div class="cal-day"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+      let cls = 'cal-day';
+      if (d === today) cls += ' today';
+      else if (present.includes(d)) cls += ' present';
+      else if (absent.includes(d)) cls += ' absent';
+      g.innerHTML += `<div class="${cls}">${d}</div>`;
+    }
+  }
+
+  // ── Excel Download ──────────────────────────────────────────
+  window.downloadCalendarExcel = function() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const monate = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    const wochentage = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const present = currentChildData.present || [];
+    const absent = currentChildData.absent || [];
+
+    const rows = [['Tag', 'Wochentag', 'Status']];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const wd = wochentage[date.getDay()];
+      let status = '–';
+      if (present.includes(d)) status = '✅ Anwesend';
+      else if (absent.includes(d)) status = '❌ Gefehlt';
+      rows.push([d, wd, status]);
+    }
+    rows.push([]);
+    rows.push(['', 'Anwesend:', present.length]);
+    rows.push(['', 'Gefehlt:', absent.length]);
+
+    const ws = window.XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:6},{wch:12},{wch:16}];
+    const wb = window.XLSX.utils.book_new();
+    window.XLSX.utils.book_append_sheet(wb, ws, `${monate[month]} ${year}`);
+    window.XLSX.writeFile(wb, `Anwesenheit_${currentKindName}_${monate[month]}_${year}.xlsx`);
+  };
+
+  // ── Logout ──────────────────────────────────────────────────
+  window.logout = function() {
+    if (unsubKind) { unsubKind(); unsubKind = null; }
+    if (unsubMsgs) { unsubMsgs(); unsubMsgs = null; }
+    if (unsubDocs) { unsubDocs(); unsubDocs = null; }
+    document.getElementById('elternportal').style.display = 'none';
+    document.getElementById('main-content').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+
+  // ── Modal Helpers ───────────────────────────────────────────
+  window.openLogin = function() {
+    document.getElementById('loginModal').classList.add('active');
+    setTimeout(() => document.getElementById('loginUser').focus(), 300);
+  };
+  window.closeLogin = function() {
+    document.getElementById('loginModal').classList.remove('active');
+    document.getElementById('loginError').classList.remove('show');
+  };
+  window.showMain = function() {
+    if (document.getElementById('elternportal').style.display === 'block') {
+      window.logout();
+      return false;
+    }
+  };
+
+  // Scroll reveal
+  document.querySelectorAll('.reveal').forEach(el =>
+    new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), {threshold:0.12}).observe(el)
+  );
+  document.addEventListener('keydown', e => { if(e.key==='Escape') window.closeLogin(); });
   </script>
 </body>
 </html>
