@@ -27,9 +27,9 @@
     .btn{width:100%;padding:14px;border:none;border-radius:30px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
     .btn-gold{background:var(--gold);color:var(--white);box-shadow:0 4px 16px rgba(236,161,8,0.4)}
     .btn-gold:active{transform:scale(0.97)}
+    .btn-red-sm{background:rgba(220,53,69,0.1);border:1px solid rgba(220,53,69,0.3);color:var(--red);padding:7px 12px;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap}
+    .btn-green-sm{background:rgba(40,167,69,0.1);border:1px solid rgba(40,167,69,0.3);color:var(--green);padding:7px 12px;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap}
     .btn-sm{padding:8px 16px;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;width:auto}
-    .btn-green{background:var(--green);color:white}
-    .btn-red{background:var(--red);color:white}
     .login-error{background:#fff3cd;border:1px solid #ffc107;color:#856404;border-radius:10px;padding:10px;font-size:0.87rem;margin-bottom:14px;display:none;text-align:center}
     .login-error.show{display:block}
     .topbar{background:var(--white);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(135,94,10,0.08);flex-shrink:0;min-height:62px}
@@ -89,30 +89,28 @@
     .upload-zone:hover{border-color:var(--gold);background:rgba(236,161,8,0.08)}
     .doc-item{background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;cursor:pointer;transition:background .15s}
     .doc-item:active{background:var(--cream)}
-    .doc-tag{padding:3px 8px;border-radius:8px;font-size:0.7rem;font-weight:700;margin-left:auto;flex-shrink:0}
+    .doc-tag{padding:3px 8px;border-radius:8px;font-size:0.7rem;font-weight:700;flex-shrink:0}
     .doc-tag-all{background:#d4edda;color:#155724}
     .doc-tag-kind{background:#cce5ff;color:#004085}
     .doc-delete-btn{background:rgba(220,53,69,0.08);border:1px solid rgba(220,53,69,0.25);color:var(--red);width:32px;height:32px;border-radius:50%;cursor:pointer;flex-shrink:0;font-size:0.85rem;transition:background .15s;display:flex;align-items:center;justify-content:center}
-    .doc-delete-btn:active{background:rgba(220,53,69,0.2)}
     .preview-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.95);flex-direction:column}
     .preview-modal.active{display:flex}
     .preview-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(255,255,255,0.08);flex-shrink:0}
     .preview-name-txt{color:white;font-weight:700;font-size:0.95rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:12px}
     .preview-close-btn{background:rgba(255,255,255,0.15);border:none;color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .preview-close-btn:active{background:rgba(255,255,255,0.3)}
     .preview-body{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;min-height:0}
     .preview-img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
     .preview-iframe{width:100%;height:100%;border:none;background:white;border-radius:8px}
     .modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(45,32,6,0.65);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
     .modal-overlay.active{display:flex}
-    .modal-sheet{background:white;border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;animation:slideUp .3s ease both}
+    .modal-sheet{background:white;border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;animation:slideUp .3s ease both;max-height:90vh;overflow-y:auto}
     .modal-title{font-family:'Chelsea Market',cursive;font-size:1.3rem;color:var(--brown);margin-bottom:20px;text-align:center}
     .recipient-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
     .recipient-btn{padding:16px 12px;border:2px solid rgba(236,161,8,0.25);border-radius:14px;background:var(--cream);cursor:pointer;text-align:center;font-family:'Nunito',sans-serif;font-weight:700;color:var(--brown);transition:all .2s;font-size:0.88rem}
     .recipient-btn.selected{border-color:var(--gold);background:rgba(236,161,8,0.12)}
     .recipient-icon{font-size:1.8rem;display:block;margin-bottom:6px}
     .settings-group{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px}
-    .settings-item{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(236,161,8,0.1);cursor:default}
+    .settings-item{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(236,161,8,0.1)}
     .settings-item:last-child{border-bottom:none}
     .settings-label{font-weight:700;color:var(--brown);font-size:0.95rem}
     .settings-value{font-size:0.85rem;color:#a07828}
@@ -124,20 +122,28 @@
     .pass-row{display:flex;gap:8px;align-items:center}
     .pass-input{flex:1;padding:10px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;background:var(--cream)}
     .pass-input:focus{border-color:var(--gold)}
+    .kind-mgmt-card{background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
     .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
     .cal-day-name{text-align:center;font-size:0.68rem;font-weight:800;color:var(--gold);padding:4px 0}
     .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:0.8rem;font-weight:700;color:#5a3e06}
     .cal-day.present{background:#d4edda;color:#155724}.cal-day.absent{background:#f8d7da;color:#721c24}.cal-day.today{background:var(--gold);color:white}
     .sync-badge{font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;background:#d4edda;color:#155724}
     .sync-badge.offline{background:#f8d7da;color:#721c24}
-    .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:0.88rem;font-weight:700;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:0.88rem;font-weight:700;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1}
+    .emoji-picker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .emoji-btn{width:42px;height:42px;border-radius:50%;border:2px solid transparent;background:var(--cream);font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .emoji-btn.selected{border-color:var(--gold);background:rgba(236,161,8,0.15)}
+    .color-picker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .color-dot{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .15s}
+    .color-dot.selected{border-color:var(--brown);transform:scale(1.2)}
+    .section-divider{font-weight:800;color:var(--brown);font-size:0.82rem;margin:16px 0 12px;padding:8px 0;border-top:1px solid rgba(236,161,8,0.2);letter-spacing:.5px}
+    input[type=file]{display:none}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .fade-in{animation:fadeIn .3s ease both}
     .mt-12{margin-top:12px}
-    input[type=file]{display:none}
   </style>
 </head>
 <body>
@@ -168,7 +174,7 @@
       <div class="dash-stats">
         <div class="stat-box"><div class="stat-num" id="statAnwesend">0</div><div class="stat-lbl">Anwesend</div></div>
         <div class="stat-box"><div class="stat-num" id="statSchlaeft">0</div><div class="stat-lbl">Schläft</div></div>
-        <div class="stat-box"><div class="stat-num">5</div><div class="stat-lbl">Gesamt</div></div>
+        <div class="stat-box"><div class="stat-num" id="statGesamt">0</div><div class="stat-lbl">Gesamt</div></div>
       </div>
       <div class="section-title">👶 Kinder heute</div>
       <div id="childList"></div>
@@ -236,7 +242,7 @@
       <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
         <div style="font-size:2.5rem;margin-bottom:10px">📤</div>
         <div style="font-weight:800;color:var(--brown);margin-bottom:4px">Datei hochladen</div>
-        <div style="font-size:0.82rem;color:#a07828">Tippen zum Auswählen · PDF, Bilder, Word · max. 800 KB</div>
+        <div style="font-size:0.82rem;color:#a07828">PDF, Bilder, Word · max. 800 KB</div>
       </div>
       <input type="file" id="fileInput" multiple onchange="handleFileSelect(event)"/>
       <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
@@ -244,7 +250,7 @@
         <button onclick="filterDocs('allgemein')" id="filter-allgemein" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(236,161,8,0.3);background:transparent;color:var(--brown);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">🌍 Allgemein</button>
         <button onclick="filterDocs('kind')" id="filter-kind" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(236,161,8,0.3);background:transparent;color:var(--brown);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">👶 Für Kinder</button>
       </div>
-      <div class="section-title">📁 Dokumente <span style="font-size:0.75rem;font-weight:400;color:#a07828">(Tippen zum Öffnen · 🗑️ zum Löschen)</span></div>
+      <div class="section-title">📁 Dokumente <span style="font-size:0.75rem;font-weight:400;color:#a07828">(Tippen = Öffnen · 🗑️ = Löschen)</span></div>
       <div id="docList"></div>
     </div>
     <div class="bottom-nav">
@@ -257,12 +263,15 @@
   <div id="settingsScreen" class="screen">
     <div class="topbar"><div class="topbar-title">⚙️ Einstellungen</div><div style="width:38px"></div></div>
     <div class="scroll-content">
+      <div class="section-title">👶 Kinder verwalten</div>
+      <div id="kindMgmtList"></div>
+      <button onclick="window.openAddKindModal()" style="width:100%;padding:14px;border:2px dashed rgba(236,161,8,0.4);border-radius:14px;background:rgba(236,161,8,0.04);color:var(--brown);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer;margin-bottom:24px">+ Neues Kind hinzufügen</button>
       <div class="settings-group">
         <div class="settings-item"><div><div class="settings-label">👤 Benutzerin</div><div class="settings-value">Claudia Giehl</div></div></div>
         <div class="settings-item"><div><div class="settings-label">🔥 Datenbank</div><div class="settings-value">Firebase Firestore · Live</div></div></div>
-        <div class="settings-item"><div><div class="settings-label">📱 App Version</div><div class="settings-value">2.1.0 · PWA</div></div></div>
+        <div class="settings-item"><div><div class="settings-label">📱 App Version</div><div class="settings-value">3.0.0 · PWA</div></div></div>
       </div>
-      <div class="section-title">🔐 Elternzugänge verwalten</div>
+      <div class="section-title">🔐 Elternzugänge</div>
       <div id="elternList"></div>
       <div class="settings-group" style="margin-top:18px">
         <div class="settings-item" style="cursor:pointer" onclick="if(confirm('Wirklich abmelden?'))logout()"><div class="settings-label">🚪 Abmelden</div><div class="settings-value" style="color:var(--red)">→</div></div>
@@ -286,69 +295,386 @@
 <div class="modal-overlay" id="uploadModal">
   <div class="modal-sheet">
     <div class="modal-title">📤 Dokument hochladen</div>
-    <div style="font-size:0.88rem;color:#a07828;text-align:center;margin-bottom:16px">An wen soll dieses Dokument geschickt werden?</div>
+    <div style="font-size:0.88rem;color:#a07828;text-align:center;margin-bottom:16px">An wen soll dieses Dokument?</div>
     <div class="recipient-btns">
-      <button class="recipient-btn" id="btn-allgemein" onclick="selectRecipient('allgemein')"><span class="recipient-icon">🌍</span>Allgemein<br/><span style="font-size:0.75rem;font-weight:400;opacity:0.8">Speiseplan, Infos für alle</span></button>
-      <button class="recipient-btn" id="btn-kind-select" onclick="selectRecipient('kind')"><span class="recipient-icon">👶</span>Für ein Kind<br/><span style="font-size:0.75rem;font-weight:400;opacity:0.8">Zeichnung, Bericht…</span></button>
+      <button class="recipient-btn" id="btn-allgemein" onclick="selectRecipient('allgemein')"><span class="recipient-icon">🌍</span>Allgemein<br/><span style="font-size:0.75rem;opacity:0.8">Alle Eltern</span></button>
+      <button class="recipient-btn" id="btn-kind-select" onclick="selectRecipient('kind')"><span class="recipient-icon">👶</span>Für ein Kind<br/><span style="font-size:0.75rem;opacity:0.8">Zeichnung, Bericht…</span></button>
     </div>
     <div id="kindSelect" style="display:none;margin-bottom:16px">
       <label class="form-label">WELCHES KIND?</label>
       <select id="kindSelectDropdown" class="form-input" style="margin-bottom:0"><option value="">Kind auswählen…</option></select>
     </div>
     <div style="background:var(--cream);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:0.85rem;color:var(--brown)">📎 <strong id="uploadFileName">Datei</strong></div>
-    <button class="btn btn-gold" onclick="confirmUpload()" id="confirmUploadBtn" disabled style="opacity:0.5">Hochladen & Senden ✅</button>
+    <button class="btn btn-gold" onclick="confirmUpload()" id="confirmUploadBtn" disabled style="opacity:0.5">Hochladen ✅</button>
     <button onclick="closeUploadModal()" style="margin-top:10px;width:100%;padding:12px;border:none;background:transparent;color:#a07828;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer">Abbrechen</button>
+  </div>
+</div>
+<div class="modal-overlay" id="addKindModal">
+  <div class="modal-sheet">
+    <div class="modal-title">👶 Neues Kind hinzufügen</div>
+    <div class="section-divider">📋 KIND-DATEN</div>
+    <label class="form-label">VORNAME *</label>
+    <input class="form-input" id="akVorname" type="text" placeholder="z.B. Lena" oninput="autoFillUsername()"/>
+    <label class="form-label">FAMILIENNAME *</label>
+    <input class="form-input" id="akFamilienname" type="text" placeholder="z.B. Müller" oninput="autoFillUsername()"/>
+    <label class="form-label">ALTER (JAHRE) *</label>
+    <input class="form-input" id="akAlter" type="number" min="0" max="10" placeholder="z.B. 3"/>
+    <label class="form-label">BETREUUNGSBEGINN *</label>
+    <input class="form-input" id="akBeginn" type="date"/>
+    <label class="form-label">AVATAR EMOJI</label>
+    <div class="emoji-picker">
+      <button class="emoji-btn selected" onclick="selectEmoji('🐭')">🐭</button>
+      <button class="emoji-btn" onclick="selectEmoji('🦁')">🦁</button>
+      <button class="emoji-btn" onclick="selectEmoji('🐻')">🐻</button>
+      <button class="emoji-btn" onclick="selectEmoji('🐸')">🐸</button>
+      <button class="emoji-btn" onclick="selectEmoji('🦋')">🦋</button>
+      <button class="emoji-btn" onclick="selectEmoji('🐼')">🐼</button>
+      <button class="emoji-btn" onclick="selectEmoji('🦊')">🦊</button>
+      <button class="emoji-btn" onclick="selectEmoji('🐰')">🐰</button>
+      <button class="emoji-btn" onclick="selectEmoji('🦄')">🦄</button>
+      <button class="emoji-btn" onclick="selectEmoji('🐨')">🐨</button>
+    </div>
+    <label class="form-label">AVATAR FARBE</label>
+    <div class="color-picker">
+      <div class="color-dot selected" style="background:#ffe599" onclick="selectColor('#ffe599')"></div>
+      <div class="color-dot" style="background:#d4edda" onclick="selectColor('#d4edda')"></div>
+      <div class="color-dot" style="background:#cce5ff" onclick="selectColor('#cce5ff')"></div>
+      <div class="color-dot" style="background:#f5ccff" onclick="selectColor('#f5ccff')"></div>
+      <div class="color-dot" style="background:#ffd6cc" onclick="selectColor('#ffd6cc')"></div>
+      <div class="color-dot" style="background:#d0f0c0" onclick="selectColor('#d0f0c0')"></div>
+      <div class="color-dot" style="background:#fff0b3" onclick="selectColor('#fff0b3')"></div>
+      <div class="color-dot" style="background:#ffe0b2" onclick="selectColor('#ffe0b2')"></div>
+    </div>
+    <div class="section-divider">👨‍👩‍👧 ELTERNZUGANG</div>
+    <label class="form-label">NAME DER ERZIEHUNGSBERECHTIGTEN *</label>
+    <input class="form-input" id="akElternName" type="text" placeholder="z.B. Familie Müller"/>
+    <label class="form-label">LOGIN-BENUTZERNAME *</label>
+    <input class="form-input" id="akUsername" type="text" placeholder="eltern.lena.mueller"/>
+    <label class="form-label">LOGIN-PASSWORT *</label>
+    <input class="form-input" id="akPasswort" type="text" placeholder="Sicheres Passwort vergeben…"/>
+    <label class="form-label">E-MAIL (OPTIONAL)</label>
+    <input class="form-input" id="akEmail" type="email" placeholder="eltern@email.de" style="margin-bottom:6px"/>
+    <div style="background:#fff3cd;border-radius:10px;padding:10px 14px;font-size:0.82rem;color:#856404;margin-bottom:18px">ℹ️ Nach dem Anlegen wird der Betreuungsvertrag automatisch geöffnet.</div>
+    <button class="btn btn-gold" onclick="confirmAddKind()">👶 Kind anlegen &amp; Vertrag generieren</button>
+    <button onclick="window.closeAddKindModal()" style="margin-top:10px;width:100%;padding:12px;border:none;background:transparent;color:#a07828;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer">Abbrechen</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, onSnapshot, addDoc, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest-49e4c.firebaseapp.com",projectId:"mausenest-49e4c",storageBucket:"mausenest-49e4c.firebasestorage.app",messagingSenderId:"174479569482",appId:"1:174479569482:web:f87f709c97aa030c312cb3"};
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+import { getFirestore, collection, doc, onSnapshot, addDoc, query, where, updateDoc, deleteDoc, getDocs, writeBatch, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const FC={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest-49e4c.firebaseapp.com",projectId:"mausenest-49e4c",storageBucket:"mausenest-49e4c.firebasestorage.app",messagingSenderId:"174479569482",appId:"1:174479569482:web:f87f709c97aa030c312cb3"};
+const db=getFirestore(initializeApp(FC));
 const MANAGER={user:'claudia',pass:'mausenest2025'};
 let CHILDREN={},ELTERN={},DOCS=[],currentChildId=null,currentChatId=null,chatUnsub=null,pendingFiles=null,selectedRecipient=null,selectedKind=null,docFilter='all';
-onSnapshot(collection(db,'kinder'),snap=>{snap.forEach(d=>{CHILDREN[d.id]={id:d.id,...d.data()};});updateStats();renderChildList();populateKindDropdown();},()=>{const b=document.getElementById('syncBadge');if(b){b.textContent='● Offline';b.className='sync-badge offline';}});
-onSnapshot(collection(db,'eltern'),snap=>{snap.forEach(d=>{ELTERN[d.id]={id:d.id,...d.data()};});renderElternList();});
-onSnapshot(collection(db,'dokumente'),snap=>{DOCS=[];snap.forEach(d=>DOCS.push({id:d.id,...d.data()}));DOCS.sort((a,b)=>(b.ts||0)-(a.ts||0));renderDocs();});
-function updateStats(){const vals=Object.values(CHILDREN);const anwEl=document.getElementById('statAnwesend');const schlEl=document.getElementById('statSchlaeft');if(anwEl)anwEl.textContent=vals.filter(c=>c.status==='anwesend'||c.status==='schlaeft').length;if(schlEl)schlEl.textContent=vals.filter(c=>c.status==='schlaeft').length;}
-function renderChildList(){const el=document.getElementById('childList');if(!el)return;const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));el.innerHTML=sorted.map(c=>{const badge=statusBadge(c.status);return`<div class="child-card fade-in" onclick="window.openChild('${c.id}')"><div class="child-avatar" style="background:${c.color}">${c.emoji}</div><div class="child-info"><div class="child-name">${c.name} <span style="font-size:0.8rem;color:#a07828">(${c.age}J)</span></div><div class="child-status-text">${statusText(c)}</div></div><span class="status-badge ${badge.cls}">${badge.label}</span></div>`;}).join('');}
-function statusBadge(s){if(s==='anwesend')return{cls:'badge-anwesend',label:'✅ Da'};if(s==='schlaeft')return{cls:'badge-schlaeft',label:'😴 Schläft'};if(s==='gegangen')return{cls:'badge-gegangen',label:'🏠 Gegangen'};return{cls:'badge-abwesend',label:'❌ Abwesend'};}
-function statusText(c){if(c.status==='anwesend'&&c.arrivedAt)return'Angekommen: '+c.arrivedAt;if(c.status==='schlaeft'&&c.sleepAt)return'Schläft seit: '+c.sleepAt;if(c.status==='gegangen'&&c.goneAt)return'Gegangen: '+c.goneAt;if(c.status==='abwesend')return'Heute abwesend';return'–';}
-window.openChild=function(id){currentChildId=id;const c=CHILDREN[id];document.getElementById('childScreenTitle').textContent=c.name;document.getElementById('childDetailAvatar').textContent=c.emoji;document.getElementById('childDetailAvatar').style.background=c.color;document.getElementById('childDetailName').textContent=c.name;document.getElementById('childDetailAge').textContent=c.age+' Jahre alt';document.getElementById('childNotes').value=c.notes||'';updateStatusBtns(c.status);renderTimeRows(c);renderChildCal(c);showScreen('childScreen');};
-function updateStatusBtns(status){['anwesend','schlaeft','gegangen'].forEach(s=>{const btn=document.getElementById('btn-'+s);btn.className='status-btn';if(s===status)btn.classList.add('active-'+s);});}
-function renderTimeRows(c){document.getElementById('timeRows').innerHTML=[{label:'🟢 Angekommen',val:c.arrivedAt||'–'},{label:'😴 Schlafen seit',val:c.sleepAt||'–'},{label:'🏠 Gegangen',val:c.goneAt||'–'}].map(r=>`<div class="time-row"><span class="time-label">${r.label}</span><span class="time-val">${r.val}</span></div>`).join('');}
-function renderChildCal(c){const g=document.getElementById('childCalGrid');const now=new Date();const year=now.getFullYear();const month=now.getMonth();const daysInMonth=new Date(year,month+1,0).getDate();const firstDay=new Date(year,month,1).getDay();const offset=firstDay===0?6:firstDay-1;g.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="cal-day-name">${d}</div>`).join('');for(let i=0;i<offset;i++)g.innerHTML+='<div class="cal-day"></div>';const today=now.getDate();for(let d=1;d<=daysInMonth;d++){let cls='cal-day';if(d===today)cls+=' today';else if(c.present&&c.present.includes(d))cls+=' present';else if(c.absent&&c.absent.includes(d))cls+=' absent';g.innerHTML+=`<div class="${cls}">${d}</div>`;}}
-window.setStatus=async function(status){const c=CHILDREN[currentChildId];const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');const update={status};if(status==='anwesend')update.arrivedAt=t;if(status==='schlaeft')update.sleepAt=t;if(status==='gegangen'){update.goneAt=t;const p=Array.isArray(c.present)?[...c.present]:[];const today=now.getDate();if(!p.includes(today))p.push(today);update.present=p;}await updateDoc(doc(db,'kinder',currentChildId),update);Object.assign(CHILDREN[currentChildId],update);updateStatusBtns(status);renderTimeRows(CHILDREN[currentChildId]);showToast('✅ Status gespeichert!');};
-window.saveNote=async function(){const notes=document.getElementById('childNotes').value;await updateDoc(doc(db,'kinder',currentChildId),{notes});};
-function renderMsgList(){const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));document.getElementById('msgList').innerHTML=sorted.map(c=>`<div class="msg-thread" onclick="window.openChat('${c.id}')"><div class="msg-thread-header"><div class="msg-avatar" style="background:${c.color}">${c.emoji}</div><div style="flex:1;min-width:0"><div class="msg-name">Eltern ${c.name}</div><div class="msg-preview">Chat öffnen…</div></div><div class="msg-time">heute</div></div></div>`).join('');}
-window.openChat=function(id){currentChatId=id;const c=CHILDREN[id];document.getElementById('chatTitle').textContent='Eltern '+c.name;document.getElementById('chatMessages').innerHTML='';if(chatUnsub)chatUnsub();chatUnsub=onSnapshot(query(collection(db,'nachrichten'),where('kind','==',id)),snap=>{const msgs=[];snap.forEach(d=>msgs.push(d.data()));msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));document.getElementById('chatMessages').innerHTML=msgs.map(m=>`<div class="msg-bubble ${m.dir}">${m.text}<div class="msg-meta">${m.time||''}</div></div>`).join('');const el=document.getElementById('chatMessages');el.scrollTop=el.scrollHeight;});showScreen('chatScreen');};
-window.sendMsg=async function(){const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');await addDoc(collection(db,'nachrichten'),{kind:currentChatId,from:'Claudia',text,time:t,dir:'claudia',ts:Date.now()});input.value='';};
-window.filterDocs=function(f){docFilter=f;['all','allgemein','kind'].forEach(x=>{const btn=document.getElementById('filter-'+x);if(btn){btn.style.background=x===f?'var(--gold)':'transparent';btn.style.color=x===f?'white':'var(--brown)';btn.style.borderColor=x===f?'var(--gold)':'rgba(236,161,8,0.3)';}});renderDocs();};
-function renderDocs(){const el=document.getElementById('docList');if(!el)return;let filtered=DOCS;if(docFilter==='allgemein')filtered=DOCS.filter(d=>d.recipient==='allgemein');else if(docFilter==='kind')filtered=DOCS.filter(d=>d.recipient!=='allgemein');if(!filtered.length){el.innerHTML='<div style="text-align:center;color:#a07828;padding:24px;font-size:0.9rem">Noch keine Dokumente</div>';return;}el.innerHTML=filtered.map(d=>{const tag=d.recipient==='allgemein'?'<span class="doc-tag doc-tag-all">🌍 Allgemein</span>':`<span class="doc-tag doc-tag-kind">👶 ${d.kindName||d.recipient}</span>`;const n=d.name.replace(/'/g,"\\'");return`<div class="doc-item" onclick="window.openDocPreview('${d.id}')"><div style="font-size:1.8rem">${d.type||'📄'}</div><div style="flex:1;min-width:0"><div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div><div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div></div>${tag}<button class="doc-delete-btn" onclick="event.stopPropagation();window.deleteDocItem('${d.id}','${n}')">🗑️</button></div>`;}).join('');}
-function readFileAsDataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=e=>resolve(e.target.result);reader.onerror=reject;reader.readAsDataURL(file);});}
-window.handleFileSelect=function(e){if(!e.target.files.length)return;pendingFiles=Array.from(e.target.files);document.getElementById('uploadFileName').textContent=pendingFiles.map(f=>f.name).join(', ');selectedRecipient=null;selectedKind=null;document.getElementById('btn-allgemein').classList.remove('selected');document.getElementById('btn-kind-select').classList.remove('selected');document.getElementById('kindSelect').style.display='none';document.getElementById('confirmUploadBtn').disabled=true;document.getElementById('confirmUploadBtn').style.opacity='0.5';document.getElementById('uploadModal').classList.add('active');e.target.value='';};
-window.selectRecipient=function(type){selectedRecipient=type;document.getElementById('btn-allgemein').classList.toggle('selected',type==='allgemein');document.getElementById('btn-kind-select').classList.toggle('selected',type==='kind');if(type==='kind'){document.getElementById('kindSelect').style.display='block';checkUploadReady();}else{document.getElementById('kindSelect').style.display='none';selectedKind=null;checkUploadReady();}};
-function checkUploadReady(){const ready=selectedRecipient==='allgemein'||(selectedRecipient==='kind'&&document.getElementById('kindSelectDropdown').value);document.getElementById('confirmUploadBtn').disabled=!ready;document.getElementById('confirmUploadBtn').style.opacity=ready?'1':'0.5';}
+let newKindEmoji='🐭',newKindColor='#ffe599';
+onSnapshot(collection(db,'kinder'),snap=>{
+  CHILDREN={};snap.forEach(d=>{CHILDREN[d.id]={id:d.id,...d.data()};});
+  const g=document.getElementById('statGesamt');if(g)g.textContent=Object.keys(CHILDREN).length;
+  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();
+},()=>{const b=document.getElementById('syncBadge');if(b){b.textContent='● Offline';b.className='sync-badge offline';}});
+onSnapshot(collection(db,'eltern'),snap=>{
+  ELTERN={};snap.forEach(d=>{ELTERN[d.id]={id:d.id,...d.data()};});renderElternList();
+});
+onSnapshot(collection(db,'dokumente'),snap=>{
+  DOCS=[];snap.forEach(d=>DOCS.push({id:d.id,...d.data()}));
+  DOCS.sort((a,b)=>(b.ts||0)-(a.ts||0));renderDocs();
+});
+async function checkMidnightReset(){
+  try{
+    const today=new Date();
+    const todayStr=today.toISOString().split('T')[0];
+    const sRef=doc(db,'settings','daily');
+    const snap=await getDoc(sRef);
+    const lastReset=snap.exists()?snap.data().lastReset:null;
+    if(lastReset===todayStr)return;
+    const yesterday=new Date(today);yesterday.setDate(today.getDate()-1);
+    const yDay=yesterday.getDate(),yMonth=yesterday.getMonth(),yWD=yesterday.getDay();
+    const curMonth=today.getMonth();
+    const kinderSnap=await getDocs(collection(db,'kinder'));
+    const batch=writeBatch(db);
+    kinderSnap.forEach(kd=>{
+      const data=kd.data();
+      let present=Array.isArray(data.present)?[...data.present]:[];
+      let absent=Array.isArray(data.absent)?[...data.absent]:[];
+      const upd={status:'abwesend',arrivedAt:'',sleepAt:'',goneAt:''};
+      if(lastReset){const lrd=new Date(lastReset);if(lrd.getMonth()!==curMonth){upd.present=[];upd.absent=[];absent=[];present=[];}}
+      if(yWD>=1&&yWD<=5&&yMonth===curMonth&&!present.includes(yDay)&&!absent.includes(yDay)){upd.absent=[...absent,yDay];}
+      batch.update(kd.ref,upd);
+    });
+    await batch.set(sRef,{lastReset:todayStr},{merge:true});
+    await batch.commit();
+    showToast('🌅 Neuer Tag – Status zurückgesetzt!',3000);
+  }catch(e){console.warn('Reset:',e);}
+}
+function updateStats(){
+  const v=Object.values(CHILDREN);
+  const a=document.getElementById('statAnwesend'),s=document.getElementById('statSchlaeft');
+  if(a)a.textContent=v.filter(c=>c.status==='anwesend'||c.status==='schlaeft').length;
+  if(s)s.textContent=v.filter(c=>c.status==='schlaeft').length;
+}
+function renderChildList(){
+  const el=document.getElementById('childList');if(!el)return;
+  const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(c=>{const b=statusBadge(c.status);return`<div class="child-card fade-in" onclick="window.openChild('${c.id}')"><div class="child-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div><div class="child-info"><div class="child-name">${c.name} <span style="font-size:0.8rem;color:#a07828">(${c.age||'?'}J)</span></div><div class="child-status-text">${statusText(c)}</div></div><span class="status-badge ${b.cls}">${b.label}</span></div>`;}).join('');
+}
+function statusBadge(s){
+  if(s==='anwesend')return{cls:'badge-anwesend',label:'✅ Da'};
+  if(s==='schlaeft')return{cls:'badge-schlaeft',label:'😴 Schläft'};
+  if(s==='gegangen')return{cls:'badge-gegangen',label:'🏠 Gegangen'};
+  return{cls:'badge-abwesend',label:'❌ Abwesend'};
+}
+function statusText(c){
+  if(c.status==='anwesend'&&c.arrivedAt)return'Angekommen: '+c.arrivedAt;
+  if(c.status==='schlaeft'&&c.sleepAt)return'Schläft seit: '+c.sleepAt;
+  if(c.status==='gegangen'&&c.goneAt)return'Gegangen: '+c.goneAt;
+  if(c.status==='abwesend')return'Heute abwesend';
+  return'–';
+}
+window.openChild=function(id){
+  currentChildId=id;const c=CHILDREN[id];
+  document.getElementById('childScreenTitle').textContent=c.name;
+  document.getElementById('childDetailAvatar').textContent=c.emoji||'🐭';
+  document.getElementById('childDetailAvatar').style.background=c.color||'#ffe599';
+  document.getElementById('childDetailName').textContent=c.name;
+  document.getElementById('childDetailAge').textContent=(c.age||'?')+' Jahre alt';
+  document.getElementById('childNotes').value=c.notes||'';
+  updateStatusBtns(c.status);renderTimeRows(c);renderChildCal(c);showScreen('childScreen');
+};
+function updateStatusBtns(s){['anwesend','schlaeft','gegangen'].forEach(x=>{const b=document.getElementById('btn-'+x);b.className='status-btn';if(x===s)b.classList.add('active-'+x);});}
+function renderTimeRows(c){document.getElementById('timeRows').innerHTML=[{l:'🟢 Angekommen',v:c.arrivedAt||'–'},{l:'😴 Schlafen seit',v:c.sleepAt||'–'},{l:'🏠 Gegangen',v:c.goneAt||'–'}].map(r=>`<div class="time-row"><span class="time-label">${r.l}</span><span class="time-val">${r.v}</span></div>`).join('');}
+function renderChildCal(c){
+  const g=document.getElementById('childCalGrid');
+  const now=new Date(),yr=now.getFullYear(),mo=now.getMonth();
+  const dim=new Date(yr,mo+1,0).getDate(),fd=new Date(yr,mo,1).getDay(),off=fd===0?6:fd-1;
+  g.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  for(let i=0;i<off;i++)g.innerHTML+='<div class="cal-day"></div>';
+  const td=now.getDate();
+  for(let d=1;d<=dim;d++){let cls='cal-day';if(d===td)cls+=' today';else if(c.present&&c.present.includes(d))cls+=' present';else if(c.absent&&c.absent.includes(d))cls+=' absent';g.innerHTML+=`<div class="${cls}">${d}</div>`;}
+}
+window.setStatus=async function(status){
+  const c=CHILDREN[currentChildId];const now=new Date();
+  const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  const u={status};
+  if(status==='anwesend')u.arrivedAt=t;
+  if(status==='schlaeft')u.sleepAt=t;
+  if(status==='gegangen'){u.goneAt=t;const p=Array.isArray(c.present)?[...c.present]:[];const td=now.getDate();if(!p.includes(td))p.push(td);u.present=p;}
+  await updateDoc(doc(db,'kinder',currentChildId),u);Object.assign(CHILDREN[currentChildId],u);
+  updateStatusBtns(status);renderTimeRows(CHILDREN[currentChildId]);showToast('✅ Status gespeichert!');
+};
+window.saveNote=async function(){await updateDoc(doc(db,'kinder',currentChildId),{notes:document.getElementById('childNotes').value});};
+function renderMsgList(){
+  const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById('msgList').innerHTML=sorted.map(c=>`<div class="msg-thread" onclick="window.openChat('${c.id}')"><div class="msg-thread-header"><div class="msg-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div><div style="flex:1;min-width:0"><div class="msg-name">Eltern ${c.name}</div><div class="msg-preview">Chat öffnen…</div></div><div class="msg-time">heute</div></div></div>`).join('');
+}
+window.openChat=function(id){
+  currentChatId=id;const c=CHILDREN[id];
+  document.getElementById('chatTitle').textContent='Eltern '+c.name;
+  document.getElementById('chatMessages').innerHTML='';
+  if(chatUnsub)chatUnsub();
+  chatUnsub=onSnapshot(query(collection(db,'nachrichten'),where('kind','==',id)),snap=>{
+    const msgs=[];snap.forEach(d=>msgs.push(d.data()));msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
+    document.getElementById('chatMessages').innerHTML=msgs.map(m=>`<div class="msg-bubble ${m.dir}">${m.text}<div class="msg-meta">${m.time||''}</div></div>`).join('');
+    const el=document.getElementById('chatMessages');el.scrollTop=el.scrollHeight;
+  });showScreen('chatScreen');
+};
+window.sendMsg=async function(){
+  const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;
+  const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  await addDoc(collection(db,'nachrichten'),{kind:currentChatId,from:'Claudia',text,time:t,dir:'claudia',ts:Date.now()});input.value='';
+};
+window.filterDocs=function(f){
+  docFilter=f;['all','allgemein','kind'].forEach(x=>{const b=document.getElementById('filter-'+x);if(b){b.style.background=x===f?'var(--gold)':'transparent';b.style.color=x===f?'white':'var(--brown)';b.style.borderColor=x===f?'var(--gold)':'rgba(236,161,8,0.3)';}});renderDocs();
+};
+function renderDocs(){
+  const el=document.getElementById('docList');if(!el)return;
+  let fd=DOCS;if(docFilter==='allgemein')fd=DOCS.filter(d=>d.recipient==='allgemein');else if(docFilter==='kind')fd=DOCS.filter(d=>d.recipient!=='allgemein');
+  if(!fd.length){el.innerHTML='<div style="text-align:center;color:#a07828;padding:24px;font-size:0.9rem">Noch keine Dokumente</div>';return;}
+  el.innerHTML=fd.map(d=>{
+    const tag=d.recipient==='allgemein'?'<span class="doc-tag doc-tag-all">🌍 Allgemein</span>':`<span class="doc-tag doc-tag-kind">👶 ${d.kindName||d.recipient}</span>`;
+    const n=d.name.replace(/'/g,"\\'");
+    return`<div class="doc-item" onclick="window.openDocPreview('${d.id}')"><div style="font-size:1.8rem">${d.type||'📄'}</div><div style="flex:1;min-width:0"><div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div><div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div></div>${tag}<button class="doc-delete-btn" onclick="event.stopPropagation();window.deleteDocItem('${d.id}','${n}')">🗑️</button></div>`;
+  }).join('');
+}
+function readFileAsDataUrl(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});}
+window.handleFileSelect=function(e){
+  if(!e.target.files.length)return;pendingFiles=Array.from(e.target.files);
+  document.getElementById('uploadFileName').textContent=pendingFiles.map(f=>f.name).join(', ');
+  selectedRecipient=null;selectedKind=null;
+  document.getElementById('btn-allgemein').classList.remove('selected');document.getElementById('btn-kind-select').classList.remove('selected');
+  document.getElementById('kindSelect').style.display='none';
+  document.getElementById('confirmUploadBtn').disabled=true;document.getElementById('confirmUploadBtn').style.opacity='0.5';
+  document.getElementById('uploadModal').classList.add('active');e.target.value='';
+};
+window.selectRecipient=function(type){
+  selectedRecipient=type;
+  document.getElementById('btn-allgemein').classList.toggle('selected',type==='allgemein');
+  document.getElementById('btn-kind-select').classList.toggle('selected',type==='kind');
+  if(type==='kind'){document.getElementById('kindSelect').style.display='block';}else{document.getElementById('kindSelect').style.display='none';selectedKind=null;}
+  checkUploadReady();
+};
+function checkUploadReady(){const r=selectedRecipient==='allgemein'||(selectedRecipient==='kind'&&document.getElementById('kindSelectDropdown').value);document.getElementById('confirmUploadBtn').disabled=!r;document.getElementById('confirmUploadBtn').style.opacity=r?'1':'0.5';}
 document.addEventListener('change',e=>{if(e.target.id==='kindSelectDropdown'){selectedKind=e.target.value;checkUploadReady();}});
-window.confirmUpload=async function(){if(!pendingFiles)return;const recipient=selectedRecipient==='allgemein'?'allgemein':(selectedKind||'allgemein');const kindName=selectedRecipient==='kind'&&CHILDREN[selectedKind]?CHILDREN[selectedKind].name:null;const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();let uploaded=0;for(const f of pendingFiles){if(f.size>800*1024){showToast('⚠️ '+f.name+' zu groß (max 800 KB)');continue;}const type=f.type.includes('pdf')?'📋':f.type.includes('image')?'🖼️':f.type.includes('word')?'📝':'📄';const dataUrl=await readFileAsDataUrl(f);await addDoc(collection(db,'dokumente'),{name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,ts:Date.now(),dataUrl});uploaded++;}closeUploadModal();showTab('docs');if(uploaded>0)showToast(`✅ ${uploaded} Datei(en) hochgeladen!`);pendingFiles=null;};
+window.confirmUpload=async function(){
+  if(!pendingFiles)return;
+  const recipient=selectedRecipient==='allgemein'?'allgemein':(selectedKind||'allgemein');
+  const kindName=selectedRecipient==='kind'&&CHILDREN[selectedKind]?CHILDREN[selectedKind].name:null;
+  const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
+  let uploaded=0;
+  for(const f of pendingFiles){
+    if(f.size>800*1024){showToast('⚠️ '+f.name+' zu groß (max 800 KB)');continue;}
+    const type=f.type.includes('pdf')?'📋':f.type.includes('image')?'🖼️':f.type.includes('word')?'📝':'📄';
+    const dataUrl=await readFileAsDataUrl(f);
+    await addDoc(collection(db,'dokumente'),{name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,ts:Date.now(),dataUrl});
+    uploaded++;
+  }
+  closeUploadModal();showTab('docs');if(uploaded>0)showToast(`✅ ${uploaded} Datei(en) hochgeladen!`);pendingFiles=null;
+};
 window.closeUploadModal=function(){document.getElementById('uploadModal').classList.remove('active');};
-window.openDocPreview=function(id){const d=DOCS.find(x=>x.id===id);if(!d)return;document.getElementById('previewDocName').textContent=d.name;const body=document.getElementById('previewBody');if(!d.dataUrl){body.innerHTML=`<div style="color:white;text-align:center;padding:32px"><div style="font-size:4rem;margin-bottom:16px">${d.type||'📄'}</div><div style="font-weight:700;font-size:1.1rem;margin-bottom:8px">${d.name}</div><div style="opacity:.65;font-size:0.88rem">Keine Vorschau verfügbar</div></div>`;}else if(d.dataUrl.startsWith('data:image/')){body.innerHTML=`<img class="preview-img" src="${d.dataUrl}" alt="${d.name}"/>`;}else if(d.dataUrl.startsWith('data:application/pdf')){body.innerHTML=`<iframe class="preview-iframe" src="${d.dataUrl}"></iframe>`;}else{const n=d.name.replace(/"/g,'&quot;');body.innerHTML=`<div style="color:white;text-align:center;padding:32px"><div style="font-size:4rem;margin-bottom:16px">${d.type||'📄'}</div><div style="font-weight:700;font-size:1.1rem;margin-bottom:20px">${d.name}</div><a href="${d.dataUrl}" download="${n}" style="background:var(--gold);color:white;padding:14px 32px;border-radius:24px;text-decoration:none;font-weight:700;font-size:1rem">⬇️ Herunterladen</a></div>`;}document.getElementById('previewModal').classList.add('active');};
+window.openDocPreview=function(id){
+  const d=DOCS.find(x=>x.id===id);if(!d)return;
+  document.getElementById('previewDocName').textContent=d.name;
+  const body=document.getElementById('previewBody');
+  if(!d.dataUrl){body.innerHTML=`<div style="color:white;text-align:center;padding:32px"><div style="font-size:4rem;margin-bottom:16px">${d.type||'📄'}</div><div style="font-weight:700;font-size:1.1rem">${d.name}</div><div style="opacity:.65;font-size:0.88rem;margin-top:8px">Keine Vorschau</div></div>`;}
+  else if(d.dataUrl.startsWith('data:image/')){body.innerHTML=`<img class="preview-img" src="${d.dataUrl}" alt="${d.name}"/>`;}
+  else if(d.dataUrl.startsWith('data:application/pdf')){body.innerHTML=`<iframe class="preview-iframe" src="${d.dataUrl}"></iframe>`;}
+  else{const n=d.name.replace(/"/g,'&quot;');body.innerHTML=`<div style="color:white;text-align:center;padding:32px"><div style="font-size:4rem;margin-bottom:16px">${d.type||'📄'}</div><div style="font-weight:700;font-size:1.1rem;margin-bottom:20px">${d.name}</div><a href="${d.dataUrl}" download="${n}" style="background:var(--gold);color:white;padding:14px 32px;border-radius:24px;text-decoration:none;font-weight:700">⬇️ Herunterladen</a></div>`;}
+  document.getElementById('previewModal').classList.add('active');
+};
 window.closeDocPreview=function(){document.getElementById('previewModal').classList.remove('active');document.getElementById('previewBody').innerHTML='';};
-window.deleteDocItem=async function(id,name){if(!confirm(`"${name}" wirklich löschen?\n\nDas Dokument wird auch beim Elternportal entfernt.`))return;await deleteDoc(doc(db,'dokumente',id));showToast('🗑️ Dokument gelöscht!');};
-function renderElternList(){const el=document.getElementById('elternList');if(!el)return;const sorted=Object.values(ELTERN).sort((a,b)=>a.name.localeCompare(b.name));if(!sorted.length){el.innerHTML='<div style="color:#a07828;font-size:0.9rem;text-align:center;padding:16px">Lade…</div>';return;}el.innerHTML=sorted.map(e=>{const c=CHILDREN[e.kind];return`<div class="eltern-card"><div class="eltern-card-header"><div class="eltern-avatar">${c?c.emoji:'👤'}</div><div><div class="eltern-name">${e.name}</div><div class="eltern-kind">Kind: ${c?c.name:e.kind} · ${e.email||''}</div></div></div><div class="pass-row"><input class="pass-input" id="pass-${e.id}" type="text" value="${e.pass}" placeholder="Neues Passwort…"/><button class="btn-sm btn-gold" onclick="window.savePass('${e.id}')">💾 Speichern</button></div></div>`;}).join('');}
-window.savePass=async function(id){const newPass=document.getElementById('pass-'+id).value.trim();if(!newPass||newPass.length<4){showToast('❌ Mindestens 4 Zeichen!');return;}await updateDoc(doc(db,'eltern',id),{pass:newPass});showToast('✅ Passwort gespeichert!');};
-function populateKindDropdown(){const sel=document.getElementById('kindSelectDropdown');if(!sel)return;const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));sel.innerHTML='<option value="">Kind auswählen…</option>'+sorted.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');}
-window.showTab=function(tab){const map={dash:'dashScreen',msgs:'msgsScreen',docs:'docsScreen',settings:'settingsScreen'};showScreen(map[tab]||'dashScreen');if(tab==='msgs')renderMsgList();};
+window.deleteDocItem=async function(id,name){
+  if(!confirm(`"${name}" wirklich löschen?`))return;
+  await deleteDoc(doc(db,'dokumente',id));showToast('🗑️ Dokument gelöscht!');
+};
+function renderKindMgmtList(){
+  const el=document.getElementById('kindMgmtList');if(!el)return;
+  const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!sorted.length){el.innerHTML='<div style="color:#a07828;font-size:0.9rem;text-align:center;padding:16px;background:white;border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow)">Noch keine Kinder eingetragen</div>';return;}
+  el.innerHTML=sorted.map(c=>`<div class="kind-mgmt-card"><div style="width:44px;height:44px;border-radius:50%;background:${c.color||'#ffe599'};display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">${c.emoji||'🐭'}</div><div style="flex:1;min-width:0"><div style="font-weight:800;color:var(--brown);font-size:0.95rem">${c.name}</div><div style="font-size:0.75rem;color:#a07828;margin-top:2px">${c.age||'?'} J. · ${statusBadge(c.status).label}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn-green-sm" onclick="window.printContract('${c.id}')">📄 Vertrag</button><button class="btn-red-sm" onclick="window.removeKind('${c.id}','${c.name.replace(/'/g,"\\'")}')">🗑️</button></div></div>`).join('');
+}
+window.removeKind=async function(id,name){
+  if(!confirm(`"${name}" wirklich entfernen?\n\nKind und Elternzugang werden gelöscht.`))return;
+  const batch=writeBatch(db);
+  const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
+  elternSnap.forEach(d=>batch.delete(d.ref));
+  batch.delete(doc(db,'kinder',id));
+  await batch.commit();
+  showToast(`🗑️ ${name} entfernt.`);
+};
+window.openAddKindModal=function(){
+  ['akVorname','akFamilienname','akAlter','akBeginn','akElternName','akUsername','akPasswort','akEmail'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  newKindEmoji='🐭';newKindColor='#ffe599';
+  document.querySelectorAll('.emoji-btn').forEach((b,i)=>b.classList.toggle('selected',i===0));
+  document.querySelectorAll('.color-dot').forEach((b,i)=>b.classList.toggle('selected',i===0));
+  document.getElementById('addKindModal').classList.add('active');
+};
+window.closeAddKindModal=function(){document.getElementById('addKindModal').classList.remove('active');};
+window.selectEmoji=function(emoji){newKindEmoji=emoji;document.querySelectorAll('.emoji-btn').forEach(b=>b.classList.toggle('selected',b.textContent.trim()===emoji));};
+window.selectColor=function(color){newKindColor=color;document.querySelectorAll('.color-dot').forEach(b=>b.classList.toggle('selected',b.style.background===color||b.style.background===hexToRgb(color)));};
+function hexToRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgb(${r}, ${g}, ${b})`;}
+window.autoFillUsername=function(){
+  const v=document.getElementById('akVorname').value.trim().toLowerCase().replace(/\s+/g,'').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/[^a-z0-9]/g,'');
+  const f=document.getElementById('akFamilienname').value.trim().toLowerCase().replace(/\s+/g,'').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/[^a-z0-9]/g,'');
+  if(v||f)document.getElementById('akUsername').value='eltern.'+(v||'')+(f?'.'+f:'');
+};
+window.confirmAddKind=async function(){
+  const vorname=document.getElementById('akVorname').value.trim();
+  const familienname=document.getElementById('akFamilienname').value.trim();
+  const alter=parseInt(document.getElementById('akAlter').value)||0;
+  const beginn=document.getElementById('akBeginn').value;
+  const elternName=document.getElementById('akElternName').value.trim();
+  const username=document.getElementById('akUsername').value.trim().toLowerCase();
+  const passwort=document.getElementById('akPasswort').value.trim();
+  const email=document.getElementById('akEmail').value.trim();
+  if(!vorname||!familienname||!alter||!beginn||!elternName||!username||!passwort){showToast('⚠️ Bitte alle Pflichtfelder ausfüllen!');return;}
+  if(passwort.length<4){showToast('⚠️ Passwort mind. 4 Zeichen!');return;}
+  const fullName=vorname+' '+familienname;
+  try{
+    const kindRef=await addDoc(collection(db,'kinder'),{name:fullName,vorname,familienname,age:alter,emoji:newKindEmoji,color:newKindColor,status:'abwesend',arrivedAt:'',sleepAt:'',goneAt:'',present:[],absent:[],notes:'',betreuungsBeginn:beginn,ts:Date.now()});
+    await setDoc(doc(db,'eltern',username),{name:elternName,email,pass:passwort,kind:kindRef.id,kindName:fullName,ts:Date.now()});
+    window.closeAddKindModal();
+    showToast(`✅ ${fullName} wurde hinzugefügt!`);
+    setTimeout(()=>openContractWindow({vorname,familienname,alter,beginn,emoji:newKindEmoji},{name:elternName,email,username}),800);
+  }catch(e){console.error(e);showToast('❌ Fehler: '+e.message);}
+};
+window.printContract=function(kindId){
+  const c=CHILDREN[kindId];if(!c)return;
+  const eu=Object.keys(ELTERN).find(k=>ELTERN[k].kind===kindId)||'';
+  const ed=ELTERN[eu]||{};
+  openContractWindow({vorname:c.vorname||c.name.split(' ')[0],familienname:c.familienname||c.name.split(' ').slice(1).join(' '),alter:c.age,beginn:c.betreuungsBeginn||'',emoji:c.emoji||'🐭'},{name:ed.name||'',email:ed.email||'',username:eu});
+};
+function openContractWindow(kind,eltern){
+  const w=window.open('','_blank','width=900,height=1200');
+  if(!w){showToast('⚠️ Popup blockiert – bitte erlauben');return;}
+  const today=new Date();
+  const dateStr=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
+  const bf=kind.beginn?kind.beginn.split('-').reverse().join('.'):'____________';
+  w.document.write(makeContractHTML(kind,eltern,dateStr,bf));
+  w.document.close();
+  setTimeout(()=>{try{w.focus();w.print();}catch(e){}},700);
+}
+function makeContractHTML(k,e,today,beginn){return`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"/><title>Betreuungsvertrag</title><style>*{box-sizing:border-box}body{font-family:'Times New Roman',serif;font-size:11pt;line-height:1.65;color:#000;margin:0;padding:28px 36px}h1{font-size:17pt;text-align:center;margin-bottom:4px}h2{font-size:12pt;text-align:center;color:#555;margin-bottom:6px;font-weight:normal}.sub{text-align:center;font-size:10pt;color:#777;border-bottom:2px solid #ECA108;padding-bottom:14px;margin-bottom:20px}.parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0;border:1px solid #ccc;padding:16px;border-radius:6px}.pl{font-size:9pt;text-transform:uppercase;letter-spacing:1px;color:#875E0A;font-weight:bold;margin-bottom:8px}h3{font-size:10.5pt;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:3px}p{margin:5px 0 8px}.ib{background:#FFF9EC;border-left:4px solid #ECA108;padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0;font-size:10pt}.sg{margin-top:48px}.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:24px}.sl{border-top:1px solid #000;padding-top:6px;font-size:9.5pt;color:#555}.sn{font-weight:bold;margin-top:10px;font-size:10pt}.ft{margin-top:32px;font-size:8.5pt;color:#888;border-top:1px solid #ddd;padding-top:10px;text-align:center}@media print{body{padding:16px 24px}button{display:none!important}}</style></head><body>
+<div style="text-align:center;margin-bottom:4px;font-size:10pt;color:#875E0A">🐭 CLAUDIAS MÄUSENEST</div>
+<h1>BETREUUNGSVERTRAG</h1><h2>Kindertagespflege nach § 22 ff. SGB VIII</h2>
+<div class="sub">Dieser Vertrag regelt die Betreuung sowie die Nutzung der digitalen Betreuungs-App</div>
+<div class="parties"><div><div class="pl">Kindertagespflegeperson</div><strong>Claudia Giehl</strong><br/>Claudias Mäusenest<br/>E-Mail: claudia@mausenest.de</div><div><div class="pl">Erziehungsberechtigte/r</div><strong>${e.name||'________________________'}</strong><br/>${e.email?'E-Mail: '+e.email+'<br/>':''}Login: <strong>${e.username||'________________________'}</strong></div></div>
+<div class="ib"><strong>Kind:</strong> ${k.emoji||'🐭'} ${k.vorname} ${k.familienname}, ${k.alter||'__'} J. &nbsp;|&nbsp; <strong>Betreuungsbeginn:</strong> ${beginn}</div>
+<h3>§ 1 Vertragsgegenstand</h3><p>Die Kindertagespflegeperson übernimmt die Betreuung, Bildung, Erziehung und Versorgung des Kindes nach § 22 ff. SGB VIII.</p>
+<h3>§ 2 Betreuungsbeginn und -umfang</h3><p>Betreuungsbeginn: <strong>${beginn}</strong> · Zeiten: Mo–Fr _______ bis _______ Uhr</p>
+<h3>§ 3 Betreuungsentgelt</h3><p>Monatliches Entgelt: <strong>________________ €</strong>, fällig am 1. des Monats.</p>
+<h3>§ 4 Entgelt bei Abwesenheit</h3><p>Das Entgelt ist grundsätzlich unabhängig von der Inanspruchnahme zu entrichten. Ab dem 4. Fehltag in Folge (bei Erkrankung) 50 % Reduktion, max. 4 Wochen/Jahr.</p>
+<h3>§ 5 Urlaub und Schließzeiten</h3><p>Bis zu 5 Wochen Urlaub/Jahr (mind. 4 Wochen Voranmeldung). Gesetzliche Feiertage BW gelten als Schließzeiten.</p>
+<h3>§ 6 Kündigung</h3><p>Kündigung mit 4 Wochen Frist zum Monatsende, schriftlich. Fristlose Kündigung bei wichtigem Grund vorbehalten.</p>
+<h3>§ 7 Erkrankung des Kindes</h3><p>Erkrankte Kinder können nicht betreut werden. Info bis 7:30 Uhr. Medikamente nur mit schriftlicher Einverständniserklärung.</p>
+<h3>§ 8 Erkrankung der Tagespflegeperson</h3><p>Information so früh wie möglich. Entgelt entfällt ab dem 4. Ausfalltag.</p>
+<h3>§ 9 Eingewöhnung</h3><p>Nach dem Berliner Eingewöhnungsmodell (ca. 2–4 Wochen). Begleitperson täglich anwesend und erreichbar.</p>
+<h3>§ 10 Verpflegung</h3><p>Altersgerechte Mahlzeiten werden gestellt. Allergien schriftlich mitteilen.</p>
+<h3>§ 11 Datenschutz (DSGVO)</h3><p>Verarbeitung gemäß Art. 6 Abs. 1 lit. b DSGVO. Keine Weitergabe an Dritte. Löschung nach gesetzlicher Aufbewahrungsfrist.</p>
+<h3>§ 12 Nutzung der App „Claudias Mäusenest"</h3>
+<div class="ib"><strong>Login:</strong> ${e.username||'________________________'} &nbsp;|&nbsp; Passwort wird separat übergeben</div>
+<p>Datenspeicherung via Google Firebase (EU-Standardvertragsklauseln). Fotos nur privat. Einverständnis zur App-Nutzung mit Unterschrift bestätigen.</p>
+<h3>§ 13 Haftung und Unfallversicherung</h3><p>Gesetzliche Unfallversicherung für Betreuungszeit. Private Haftpflicht empfohlen.</p>
+<h3>§ 14 Schlussbestimmungen</h3><p>Änderungen bedürfen der Schriftform. Es gilt deutsches Recht.</p>
+<div class="sg"><p>Ort, Datum: _________________________, den <strong>${today}</strong></p>
+<div class="sgrid"><div><div style="height:70px"></div><div class="sl"><div class="sn">Claudia Giehl</div>Kindertagespflegeperson</div></div><div><div style="height:70px"></div><div class="sl"><div class="sn">${e.name||'________________________'}</div>Erziehungsberechtigte/r für ${k.vorname} ${k.familienname}</div></div></div>
+<div style="margin-top:32px;padding:14px;border:1px dashed #ccc;border-radius:6px;font-size:9.5pt"><strong>Einverständnis App-Nutzung (§ 12):</strong><br/>Ich erkläre mein Einverständnis mit der Nutzung der App und der Datenspeicherung via Firebase.<br/><br/><div class="sgrid"><div><div style="height:50px"></div><div class="sl">Datum, Unterschrift Eltern</div></div><div><div style="height:50px"></div><div class="sl">Datum, Unterschrift Claudia Giehl</div></div></div></div></div>
+<div class="ft">Claudias Mäusenest · mausenest.netlify.app · Erstellt am ${today}</div>
+<div style="text-align:center;margin-top:20px"><button onclick="window.print()" style="background:#ECA108;color:white;border:none;padding:12px 32px;border-radius:24px;font-size:1rem;font-weight:bold;cursor:pointer">🖨️ Drucken / Als PDF speichern</button></div>
+</body></html>`;}
+function renderElternList(){
+  const el=document.getElementById('elternList');if(!el)return;
+  const sorted=Object.values(ELTERN).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!sorted.length){el.innerHTML='<div style="color:#a07828;font-size:0.9rem;text-align:center;padding:16px">Lade…</div>';return;}
+  el.innerHTML=sorted.map(e=>{const c=CHILDREN[e.kind];return`<div class="eltern-card"><div class="eltern-card-header"><div class="eltern-avatar" style="background:${c?c.color:'var(--cream)'}">${c?c.emoji:'👤'}</div><div><div class="eltern-name">${e.name}</div><div class="eltern-kind">Kind: ${c?c.name:e.kindName||e.kind} · Login: ${e.id}</div></div></div><div class="pass-row"><input class="pass-input" id="pass-${e.id}" type="text" value="${e.pass||''}" placeholder="Neues Passwort…"/><button class="btn-sm btn-gold" onclick="window.savePass('${e.id}')">💾</button></div></div>`;}).join('');
+}
+window.savePass=async function(id){const v=document.getElementById('pass-'+id).value.trim();if(!v||v.length<4){showToast('❌ Mind. 4 Zeichen!');return;}await updateDoc(doc(db,'eltern',id),{pass:v});showToast('✅ Passwort gespeichert!');};
+function populateKindDropdown(){
+  const sel=document.getElementById('kindSelectDropdown');if(!sel)return;
+  const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));
+  sel.innerHTML='<option value="">Kind auswählen…</option>'+sorted.map(c=>`<option value="${c.id}">${c.emoji||'🐭'} ${c.name}</option>`).join('');
+}
+window.showTab=function(tab){
+  const m={dash:'dashScreen',msgs:'msgsScreen',docs:'docsScreen',settings:'settingsScreen'};
+  showScreen(m[tab]||'dashScreen');if(tab==='msgs')renderMsgList();
+};
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-function showToast(msg,dur=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
-window.doLogin=function(){const u=document.getElementById('loginUser').value.trim();const p=document.getElementById('loginPass').value;if(u===MANAGER.user&&p===MANAGER.pass){showScreen('dashScreen');const now=new Date();const days=['So','Mo','Di','Mi','Do','Fr','Sa'];const months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];document.getElementById('dashDate').textContent=days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()]+' '+now.getFullYear();}else{document.getElementById('loginErr').classList.add('show');document.getElementById('loginPass').value='';}};
+function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+window.doLogin=async function(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(u===MANAGER.user&&p===MANAGER.pass){
+    showScreen('dashScreen');
+    const now=new Date();
+    const days=['So','Mo','Di','Mi','Do','Fr','Sa'],months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    document.getElementById('dashDate').textContent=days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()]+' '+now.getFullYear();
+    await checkMidnightReset();
+  }else{document.getElementById('loginErr').classList.add('show');document.getElementById('loginPass').value='';}
+};
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
 window.logout=function(){if(chatUnsub)chatUnsub();showScreen('loginScreen');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';};
 window.goBack=function(){window.showTab('dash');};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeDocPreview();});
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
