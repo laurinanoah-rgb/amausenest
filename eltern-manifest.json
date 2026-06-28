@@ -1,0 +1,28 @@
+{
+  "name": "Claudias Mäusenest – Eltern-App",
+  "short_name": "Mäusenest",
+  "description": "Eltern-Portal für Claudias Kindertagespflege – Anwesenheit, Nachrichten, Dokumente",
+  "start_url": "./eltern-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF9EC",
+  "theme_color": "#ECA108",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "kids"],
+  "gcm_sender_id": "174479569482"
+}

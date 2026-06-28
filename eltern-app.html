@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <meta name="theme-color" content="#ECA108"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Mäusenest"/>
+  <title>🐭 Mäusenest Eltern-App</title>
+  <link rel="manifest" href="./eltern-manifest.json"/>
+  <link rel="apple-touch-icon" href="./icon-192.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    :root{--gold:#ECA108;--brown:#875E0A;--cream:#FFF9EC;--white:#fff;--gray:#f5f5f5;--text:#2d2006;--radius:16px;--shadow:0 4px 20px rgba(135,94,10,0.12);--green:#28a745;--red:#dc3545;--blue:#007bff}
+    html,body{height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text)}
+    #app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+    .screen{display:none;flex-direction:column;flex:1;overflow:hidden}
+    .screen.active{display:flex}
+    /* LOGIN */
+    #loginScreen{background:linear-gradient(160deg,#fff9e0,var(--cream));align-items:center;justify-content:center;padding:32px 24px}
+    .login-logo{font-size:5.5rem;margin-bottom:8px;animation:bounce 2.5s ease-in-out infinite}
+    .login-title{font-family:'Chelsea Market',cursive;font-size:2.1rem;color:var(--brown);text-align:center;margin-bottom:4px}
+    .login-sub{color:#a07828;font-size:0.9rem;text-align:center;margin-bottom:32px}
+    .login-box{background:var(--white);border-radius:24px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 12px 48px rgba(135,94,10,0.18)}
+    .form-label{font-weight:700;font-size:0.8rem;color:var(--brown);display:block;margin-bottom:6px;letter-spacing:.4px}
+    .form-input{width:100%;padding:13px 16px;border:2px solid rgba(236,161,8,0.25);border-radius:12px;font-size:0.97rem;font-family:'Nunito',sans-serif;outline:none;background:var(--cream);color:var(--text);transition:border-color .2s;margin-bottom:16px}
+    .form-input:focus{border-color:var(--gold)}
+    .btn{width:100%;padding:14px;border:none;border-radius:30px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-gold{background:var(--gold);color:white;box-shadow:0 4px 16px rgba(236,161,8,0.4)}
+    .btn-gold:active{transform:scale(0.97)}
+    .login-error{background:#fff3cd;border:1px solid #ffc107;color:#856404;border-radius:10px;padding:10px;font-size:0.87rem;margin-bottom:14px;display:none;text-align:center}
+    .login-error.show{display:block}
+    /* TOPBAR */
+    .topbar{background:var(--white);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(135,94,10,0.08);flex-shrink:0;min-height:62px}
+    .topbar-title{font-family:'Chelsea Market',cursive;font-size:1.2rem;color:var(--brown);display:flex;align-items:center;gap:8px}
+    .topbar-back{background:var(--cream);border:none;width:38px;height:38px;border-radius:50%;cursor:pointer;color:var(--brown);font-size:1.1rem;display:flex;align-items:center;justify-content:center}
+    .topbar-action{background:var(--gold);border:none;padding:8px 16px;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;color:white;cursor:pointer}
+    .scroll-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
+    /* BOTTOM NAV */
+    .bottom-nav{background:var(--white);display:flex;border-top:1px solid rgba(236,161,8,0.2);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;cursor:pointer;color:#a07828;transition:color .2s;border:none;background:none;font-family:'Nunito',sans-serif}
+    .nav-item.active{color:var(--gold)}
+    .nav-icon{font-size:1.4rem;margin-bottom:2px}
+    .nav-label{font-size:0.68rem;font-weight:700}
+    /* HOME */
+    .home-hero{background:linear-gradient(135deg,var(--gold),#f5b800);padding:24px 18px 20px;margin:-16px -16px 16px;color:white}
+    .home-date{font-size:0.82rem;opacity:.85;margin-bottom:2px}
+    .home-greeting{font-family:'Chelsea Market',cursive;font-size:1.6rem}
+    .home-child{font-size:0.9rem;opacity:.9;margin-top:4px}
+    .status-card{background:var(--white);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px}
+    .status-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0}
+    .status-name{font-family:'Chelsea Market',cursive;font-size:1.4rem;color:var(--brown)}
+    .status-text{font-size:0.88rem;color:#a07828;margin-top:2px}
+    .status-badge-lg{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:0.82rem;font-weight:800;margin-top:8px}
+    .badge-anwesend{background:#d4edda;color:#155724}
+    .badge-schlaeft{background:#cce5ff;color:#004085}
+    .badge-gegangen{background:#f5f5f5;color:#555}
+    .badge-abwesend{background:#f8d7da;color:#721c24}
+    .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+    .quick-card{background:var(--white);border-radius:var(--radius);padding:20px 16px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:transform .15s;border:none;width:100%;font-family:'Nunito',sans-serif}
+    .quick-card:active{transform:scale(0.96)}
+    .quick-icon{font-size:2.2rem;margin-bottom:8px}
+    .quick-label{font-weight:800;color:var(--brown);font-size:0.88rem}
+    .quick-sub{font-size:0.72rem;color:#a07828;margin-top:2px}
+    /* NACHRICHTEN */
+    .chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+    .msg-bubble{max-width:80%;padding:11px 15px;border-radius:18px;font-size:0.93rem;line-height:1.55}
+    .msg-bubble.claudia{background:var(--gold);color:white;border-bottom-left-radius:4px;align-self:flex-start}
+    .msg-bubble.parent{background:var(--white);color:var(--text);border-bottom-right-radius:4px;align-self:flex-end;box-shadow:var(--shadow)}
+    .msg-meta{font-size:0.7rem;opacity:.65;margin-top:4px}
+    .chat-input-area{background:var(--white);padding:12px 14px;display:flex;gap:10px;align-items:center;border-top:1px solid rgba(236,161,8,0.15);flex-shrink:0}
+    .chat-input{flex:1;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:24px;font-family:'Nunito',sans-serif;font-size:0.93rem;outline:none;background:var(--cream)}
+    .chat-input:focus{border-color:var(--gold)}
+    .send-btn{width:42px;height:42px;border-radius:50%;background:var(--gold);border:none;color:white;cursor:pointer;font-size:1.1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    /* KALENDER */
+    .section-title{font-family:'Chelsea Market',cursive;font-size:1.1rem;color:var(--brown);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .cal-month{font-family:'Chelsea Market',cursive;font-size:1.2rem;color:var(--brown)}
+    .cal-nav{background:var(--cream);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;color:var(--brown);display:flex;align-items:center;justify-content:center}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+    .cal-day-name{text-align:center;font-size:0.7rem;font-weight:800;color:var(--gold);padding:4px 0}
+    .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:0.82rem;font-weight:700;color:#5a3e06}
+    .cal-day.present{background:#d4edda;color:#155724}
+    .cal-day.absent{background:#f8d7da;color:#721c24}
+    .cal-day.today{background:var(--gold);color:white}
+    .cal-day.weekend{color:#ccc}
+    .cal-legend{display:flex;gap:14px;margin-top:12px;font-size:0.78rem;color:#a07828}
+    .cal-stat{background:var(--white);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-around;box-shadow:var(--shadow);margin-top:14px}
+    .cs-item{text-align:center}
+    .cs-num{font-family:'Chelsea Market',cursive;font-size:1.8rem;color:var(--gold)}
+    .cs-lbl{font-size:0.72rem;color:#a07828;font-weight:700}
+    /* DOKUMENTE */
+    .doc-item{background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s}
+    .doc-item:active{background:var(--cream)}
+    /* PREVIEW */
+    .preview-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.95);flex-direction:column}
+    .preview-modal.active{display:flex}
+    .preview-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(255,255,255,0.08);flex-shrink:0}
+    .preview-name-txt{color:white;font-weight:700;font-size:0.95rem;flex:1;margin-right:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .preview-close-btn{background:rgba(255,255,255,0.15);border:none;color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .preview-body{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;min-height:0}
+    .preview-img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
+    .preview-iframe{width:100%;height:100%;border:none;background:white;border-radius:8px}
+    /* PUSH BANNER */
+    .push-banner{background:linear-gradient(135deg,#ECA108,#f5b800);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;cursor:pointer}
+    .push-banner-text{flex:1}
+    .push-banner-title{font-weight:800;color:white;font-size:0.92rem}
+    .push-banner-sub{font-size:0.78rem;color:rgba(255,255,255,0.85);margin-top:2px}
+    /* INSTALL BANNER */
+    .install-banner{background:var(--white);border:2px solid rgba(236,161,8,0.3);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+    /* TOAST */
+    .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:0.88rem;font-weight:700;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast.show{opacity:1}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .3s ease both}
+    .mt-12{margin-top:12px}
+    .empty-state{text-align:center;color:#a07828;padding:40px 24px;font-size:0.92rem}
+    .empty-state-icon{font-size:3rem;margin-bottom:12px}
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- LOGIN -->
+  <div id="loginScreen" class="screen active">
+    <div class="login-logo">🐭</div>
+    <div class="login-title">Eltern-App</div>
+    <div class="login-sub">Claudias Mäusenest · Ihr persönlicher Bereich</div>
+    <div class="login-box">
+      <div class="login-error" id="loginErr">❌ Benutzername oder Passwort falsch.</div>
+      <label class="form-label">BENUTZERNAME</label>
+      <input class="form-input" id="loginUser" type="text" placeholder="z.B. eltern.lena.mueller" autocomplete="username" autocapitalize="none"/>
+      <label class="form-label">PASSWORT</label>
+      <input class="form-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+      <button class="btn btn-gold" onclick="doLogin()">🔑 Einloggen</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="homeScreen" class="screen">
+    <div class="topbar">
+      <div class="topbar-title">🐭 Mäusenest</div>
+      <button class="topbar-action" onclick="logout()">Abmelden</button>
+    </div>
+    <div class="scroll-content">
+      <div class="home-hero">
+        <div class="home-date" id="homeDate"></div>
+        <div class="home-greeting" id="homeGreeting">Willkommen!</div>
+        <div class="home-child" id="homeChildName"></div>
+      </div>
+      <!-- Push-Benachrichtigungen -->
+      <div id="pushBanner" class="push-banner" onclick="requestPush()" style="display:none">
+        <div style="font-size:2rem">🔔</div>
+        <div class="push-banner-text">
+          <div class="push-banner-title">Push-Benachrichtigungen aktivieren</div>
+          <div class="push-banner-sub">Bleiben Sie immer informiert über Ihr Kind</div>
+        </div>
+        <div style="color:white;font-size:1.2rem">→</div>
+      </div>
+      <!-- Install Banner (PWA) -->
+      <div id="installBanner" class="install-banner" style="display:none">
+        <div style="font-size:2rem">📱</div>
+        <div style="flex:1">
+          <div style="font-weight:800;color:var(--brown);font-size:0.92rem">Als App installieren</div>
+          <div style="font-size:0.78rem;color:#a07828;margin-top:2px">Schneller Zugriff direkt vom Homescreen</div>
+        </div>
+        <button onclick="installPWA()" style="background:var(--gold);border:none;padding:8px 16px;border-radius:20px;color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">Installieren</button>
+      </div>
+      <!-- Status-Karte -->
+      <div id="childStatusCard">
+        <div class="empty-state"><div class="empty-state-icon">🐭</div>Lade…</div>
+      </div>
+      <!-- Schnellzugriff -->
+      <div class="section-title mt-12">⚡ Schnellzugriff</div>
+      <div class="quick-grid">
+        <button class="quick-card" onclick="showTab('cal')"><div class="quick-icon">📅</div><div class="quick-label">Kalender</div><div class="quick-sub">Anwesenheit</div></button>
+        <button class="quick-card" onclick="showTab('chat')"><div class="quick-icon">💬</div><div class="quick-label">Nachrichten</div><div class="quick-sub">Mit Claudia</div></button>
+        <button class="quick-card" onclick="showTab('docs')"><div class="quick-icon">📄</div><div class="quick-label">Dokumente</div><div class="quick-sub">Fotos &amp; PDFs</div></button>
+        <button class="quick-card" onclick="showInfo()"><div class="quick-icon">ℹ️</div><div class="quick-label">Info</div><div class="quick-sub">Kontakt &amp; Zeiten</div></button>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+      <button class="nav-item" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
+      <button class="nav-item" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+    </div>
+  </div>
+
+  <!-- KALENDER -->
+  <div id="calScreen" class="screen">
+    <div class="topbar"><div class="topbar-title">📅 Anwesenheit</div><div style="width:38px"></div></div>
+    <div class="scroll-content">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="changeMonth(-1)">◀</button>
+        <div class="cal-month" id="calMonthLabel"></div>
+        <button class="cal-nav" onclick="changeMonth(1)">▶</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-legend">
+        <span>🟢 Anwesend</span>
+        <span>🔴 Gefehlt</span>
+        <span>🟡 Heute</span>
+      </div>
+      <div class="cal-stat" id="calStat">
+        <div class="cs-item"><div class="cs-num" id="csPresent">0</div><div class="cs-lbl">Anwesend</div></div>
+        <div class="cs-item"><div class="cs-num" id="csAbsent">0</div><div class="cs-lbl">Gefehlt</div></div>
+        <div class="cs-item"><div class="cs-num" id="csWorkdays">0</div><div class="cs-lbl">Werktage</div></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+      <button class="nav-item active" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
+      <button class="nav-item" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chatScreen" class="screen">
+    <div class="topbar"><div class="topbar-title">💬 Claudia</div><div style="width:38px"></div></div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-state"><div class="empty-state-icon">💬</div>Noch keine Nachrichten</div>
+    </div>
+    <div class="chat-input-area">
+      <input class="chat-input" id="chatInput" type="text" placeholder="Nachricht an Claudia…" onkeydown="if(event.key==='Enter')sendMsg()"/>
+      <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+      <button class="nav-item" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
+      <button class="nav-item active" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+    </div>
+  </div>
+
+  <!-- DOKUMENTE -->
+  <div id="docsScreen" class="screen">
+    <div class="topbar"><div class="topbar-title">📄 Dokumente</div><div style="width:38px"></div></div>
+    <div class="scroll-content" id="docsContent">
+      <div class="empty-state"><div class="empty-state-icon">📄</div>Lade…</div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+      <button class="nav-item" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
+      <button class="nav-item" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
+      <button class="nav-item active" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+    </div>
+  </div>
+
+  <!-- PREVIEW MODAL -->
+  <div class="preview-modal" id="previewModal">
+    <div class="preview-topbar">
+      <div class="preview-name-txt" id="previewDocName">Dokument</div>
+      <button class="preview-close-btn" onclick="closePreview()">✕</button>
+    </div>
+    <div class="preview-body" id="previewBody"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// Für Push-Nachrichten (optional – benötigt VAPID Key in eltern-manifest.json und firebase-messaging-sw.js):
+// import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+
+const FC={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest-49e4c.firebaseapp.com",projectId:"mausenest-49e4c",storageBucket:"mausenest-49e4c.firebasestorage.app",messagingSenderId:"174479569482",appId:"1:174479569482:web:f87f709c97aa030c312cb3"};
+const app=initializeApp(FC);
+const db=getFirestore(app);
+
+let SESSION=null; // {username, kindId, kindName, elternName}
+let KIND_DATA=null;
+let calViewYear=new Date().getFullYear();
+let calViewMonth=new Date().getMonth();
+let chatUnsub=null,kindUnsub=null,docsUnsub=null;
+let deferredInstallPrompt=null;
+let allDocs=[];
+
+// PWA Install
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;document.getElementById('installBanner').style.display='flex';});
+window.addEventListener('appinstalled',()=>{document.getElementById('installBanner').style.display='none';showToast('✅ App installiert!');});
+
+window.installPWA=function(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.then(()=>{deferredInstallPrompt=null;document.getElementById('installBanner').style.display='none';});}};
+
+// Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./firebase-messaging-sw.js',{scope:'./'})
+    .then(reg=>console.log('SW registered',reg))
+    .catch(e=>console.warn('SW error',e));
+}
+
+// ── Login ──────────────────────────────────────────────────
+window.doLogin=async function(){
+  const username=document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  if(!username||!pass){showToast('⚠️ Bitte alles ausfüllen');return;}
+  try{
+    const snap=await getDoc(doc(db,'eltern',username));
+    if(!snap.exists()||snap.data().pass!==pass){
+      document.getElementById('loginErr').classList.add('show');return;
+    }
+    const d=snap.data();
+    SESSION={username,kindId:d.kind,kindName:d.kindName,elternName:d.name};
+    document.getElementById('loginErr').classList.remove('show');
+    startSession();
+  }catch(e){console.error(e);showToast('❌ Verbindungsfehler');}
+};
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
+
+function startSession(){
+  // Datum & Begrüßung
+  const now=new Date();
+  const days=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  const months=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  document.getElementById('homeDate').textContent=days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()];
+  const h=now.getHours();const gr=h<12?'Guten Morgen':h<17?'Guten Tag':'Guten Abend';
+  document.getElementById('homeGreeting').textContent=gr+', '+SESSION.elternName+'! 👋';
+  document.getElementById('homeChildName').textContent='Kind: '+SESSION.kindName;
+  // Listeners
+  startKindListener();startChatListener();startDocsListener();
+  showScreen('homeScreen');
+  // Push-Banner (sofern noch nicht erlaubt)
+  if('Notification' in window&&Notification.permission==='default'){
+    document.getElementById('pushBanner').style.display='flex';
+  }
+  // Kalender initial
+  calViewYear=now.getFullYear();calViewMonth=now.getMonth();renderCal();
+}
+
+// ── Kind Listener ──────────────────────────────────────────
+function startKindListener(){
+  if(kindUnsub)kindUnsub();
+  kindUnsub=onSnapshot(doc(db,'kinder',SESSION.kindId),snap=>{
+    if(!snap.exists())return;
+    KIND_DATA={id:snap.id,...snap.data()};
+    renderStatusCard();renderCal();
+  });
+}
+
+function renderStatusCard(){
+  const c=KIND_DATA;
+  const b=statusBadge(c.status);
+  const txt=statusTimeText(c);
+  document.getElementById('childStatusCard').innerHTML=`
+    <div class="status-card fade-in">
+      <div class="status-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div>
+      <div>
+        <div class="status-name">${c.name||SESSION.kindName}</div>
+        <div class="status-text">${txt}</div>
+        <span class="status-badge-lg ${b.cls}">${b.label}</span>
+      </div>
+    </div>`;
+}
+function statusBadge(s){
+  if(s==='anwesend')return{cls:'badge-anwesend',label:'✅ Angekommen'};
+  if(s==='schlaeft')return{cls:'badge-schlaeft',label:'😴 Schläft gerade'};
+  if(s==='gegangen')return{cls:'badge-gegangen',label:'🏠 Gegangen'};
+  return{cls:'badge-abwesend',label:'❌ Heute nicht da'};
+}
+function statusTimeText(c){
+  if(c.status==='anwesend'&&c.arrivedAt)return'Angekommen um '+c.arrivedAt+' Uhr';
+  if(c.status==='schlaeft'&&c.sleepAt)return'Schläft seit '+c.sleepAt+' Uhr';
+  if(c.status==='gegangen'&&c.goneAt)return'Gegangen um '+c.goneAt+' Uhr';
+  if(c.status==='abwesend')return'Heute zu Hause';
+  return'–';
+}
+
+// ── Kalender ───────────────────────────────────────────────
+window.changeMonth=function(dir){
+  calViewMonth+=dir;
+  if(calViewMonth>11){calViewMonth=0;calViewYear++;}
+  if(calViewMonth<0){calViewMonth=11;calViewYear--;}
+  renderCal();
+};
+function renderCal(){
+  const months=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  document.getElementById('calMonthLabel').textContent=months[calViewMonth]+' '+calViewYear;
+  const now=new Date(),curY=now.getFullYear(),curM=now.getMonth(),curD=now.getDate();
+  const dim=new Date(calViewYear,calViewMonth+1,0).getDate();
+  const fd=new Date(calViewYear,calViewMonth,1).getDay();
+  const off=fd===0?6:fd-1;
+  const g=document.getElementById('calGrid');
+  g.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  for(let i=0;i<off;i++)g.innerHTML+='<div class="cal-day"></div>';
+  const isCurrentMonth=(calViewYear===curY&&calViewMonth===curM);
+  const present=KIND_DATA?.present||[];
+  const absent=KIND_DATA?.absent||[];
+  let pCount=0,aCount=0,wdCount=0;
+  for(let d=1;d<=dim;d++){
+    const wd=new Date(calViewYear,calViewMonth,d).getDay();
+    const isWd=wd>=1&&wd<=5;if(isWd&&d<=curD)wdCount++;
+    let cls='cal-day';
+    const isToday=isCurrentMonth&&d===curD;
+    if(isToday)cls+=' today';
+    else if(present.includes(d)){cls+=' present';pCount++;}
+    else if(absent.includes(d)){cls+=' absent';aCount++;}
+    else if(wd===0||wd===6)cls+=' weekend';
+    g.innerHTML+=`<div class="${cls}">${d}</div>`;
+  }
+  document.getElementById('csPresent').textContent=pCount;
+  document.getElementById('csAbsent').textContent=aCount;
+  document.getElementById('csWorkdays').textContent=wdCount;
+}
+
+// ── Chat ───────────────────────────────────────────────────
+function startChatListener(){
+  if(chatUnsub)chatUnsub();
+  chatUnsub=onSnapshot(query(collection(db,'nachrichten'),where('kind','==',SESSION.kindId)),snap=>{
+    const msgs=[];snap.forEach(d=>msgs.push(d.data()));msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
+    const el=document.getElementById('chatMessages');
+    if(!msgs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">💬</div>Noch keine Nachrichten</div>';return;}
+    el.innerHTML=msgs.map(m=>`<div class="msg-bubble ${m.dir||'parent'}">${escHtml(m.text)}<div class="msg-meta">${m.from||''} · ${m.time||''}</div></div>`).join('');
+    el.scrollTop=el.scrollHeight;
+  });
+}
+window.sendMsg=async function(){
+  const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;
+  const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  await addDoc(collection(db,'nachrichten'),{kind:SESSION.kindId,from:SESSION.elternName,text,time:t,dir:'parent',ts:Date.now()});
+  input.value='';
+};
+
+// ── Dokumente ──────────────────────────────────────────────
+function startDocsListener(){
+  if(docsUnsub)docsUnsub();
+  docsUnsub=onSnapshot(collection(db,'dokumente'),snap=>{
+    allDocs=[];snap.forEach(d=>allDocs.push({id:d.id,...d.data()}));
+    allDocs.sort((a,b)=>(b.ts||0)-(a.ts||0));renderDocs();
+  });
+}
+function renderDocs(){
+  const myDocs=allDocs.filter(d=>d.recipient==='allgemein'||d.recipient===SESSION.kindId);
+  const el=document.getElementById('docsContent');
+  if(!myDocs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📄</div>Noch keine Dokumente</div>';return;}
+  const tagAll=`<span style="background:#d4edda;color:#155724;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">🌍 Allgemein</span>`;
+  const tagKind=`<span style="background:#cce5ff;color:#004085;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">👶 Für Sie</span>`;
+  el.innerHTML=myDocs.map(d=>`
+    <div class="doc-item fade-in" onclick="openPreview('${d.id}')">
+      <div style="font-size:2rem">${d.type||'📄'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(d.name)}</div>
+        <div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div>
+      </div>
+      ${d.recipient==='allgemein'?tagAll:tagKind}
+    </div>`).join('');
+}
+window.openPreview=function(id){
+  const d=allDocs.find(x=>x.id===id);if(!d)return;
+  document.getElementById('previewDocName').textContent=d.name;
+  const body=document.getElementById('previewBody');
+  if(!d.dataUrl){body.innerHTML=`<div style="color:white;text-align:center;padding:32px"><div style="font-size:4rem;margin-bottom:12px">${d.type||'📄'}</div><div style="font-weight:700">${escHtml(d.name)}</div></div>`;}
+  else if(d.dataUrl.startsWith('data:image/')){body.innerHTML=`<img class="preview-img" src="${d.dataUrl}" alt="${escHtml(d.name)}"/>`;}
+  else if(d.dataUrl.startsWith('data:application/pdf')){body.innerHTML=`<iframe class="preview-iframe" src="${d.dataUrl}"></iframe>`;}
+  else{const nm=d.name.replace(/"/g,'&quot;');body.innerHTML=`<div style="color:white;text-align:center;padding:32px"><div style="font-size:4rem;margin-bottom:12px">${d.type||'📄'}</div><div style="font-weight:700;margin-bottom:20px">${escHtml(d.name)}</div><a href="${d.dataUrl}" download="${nm}" style="background:var(--gold);color:white;padding:14px 32px;border-radius:24px;text-decoration:none;font-weight:700">⬇️ Herunterladen</a></div>`;}
+  document.getElementById('previewModal').classList.add('active');
+};
+window.closePreview=function(){document.getElementById('previewModal').classList.remove('active');document.getElementById('previewBody').innerHTML='';};
+
+// ── Push-Benachrichtigungen ────────────────────────────────
+window.requestPush=async function(){
+  if(!('Notification' in window)){showToast('❌ Push nicht unterstützt');return;}
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    document.getElementById('pushBanner').style.display='none';
+    showToast('🔔 Push-Benachrichtigungen aktiviert!');
+    // Hier FCM Token holen wenn VAPID Key konfiguriert:
+    // const messaging=getMessaging(app);
+    // const token=await getToken(messaging,{vapidKey:'DEIN_VAPID_KEY',serviceWorkerRegistration:swReg});
+    // Token kann in Firestore gespeichert werden für gezielte Notifications
+  }else{showToast('❌ Benachrichtigungen abgelehnt');}
+};
+
+// ── Info ───────────────────────────────────────────────────
+window.showInfo=function(){alert('📞 Claudias Mäusenest\n\nBei Fragen oder Notfällen:\nclaudia@mausenest.de\n\nBetreuungszeiten:\nMontag – Freitag\n7:00 – 16:00 Uhr');}
+
+// ── Navigation ─────────────────────────────────────────────
+window.showTab=function(tab){
+  const map={home:'homeScreen',cal:'calScreen',chat:'chatScreen',docs:'docsScreen'};
+  showScreen(map[tab]||'homeScreen');
+  if(tab==='cal')renderCal();
+};
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+window.logout=function(){if(chatUnsub)chatUnsub();if(kindUnsub)kindUnsub();if(docsUnsub)docsUnsub();SESSION=null;KIND_DATA=null;showScreen('loginScreen');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';document.getElementById('pushBanner').style.display='none';};
+
+function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePreview();});
+</script>
+</body>
+</html>
