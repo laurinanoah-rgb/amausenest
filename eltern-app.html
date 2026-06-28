@@ -39,6 +39,11 @@
     .topbar-back{background:var(--cream);border:none;width:38px;height:38px;border-radius:50%;cursor:pointer;color:var(--brown);font-size:1.1rem;display:flex;align-items:center;justify-content:center}
     .topbar-action{background:var(--gold);border:none;padding:8px 16px;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;color:white;cursor:pointer}
     .scroll-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
+    /* UNFALL */
+    .unfall-card{background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(220,53,69,0.08);border-left:4px solid var(--red)}
+    .unfall-card-date{font-weight:800;font-size:0.88rem;color:var(--red);margin-bottom:4px}
+    .unfall-card-body{font-size:0.85rem;color:var(--text);line-height:1.5;margin-bottom:6px}
+    .unfall-tag{display:inline-block;background:#fff3cd;padding:2px 8px;border-radius:8px;font-size:0.75rem;margin:2px 4px 2px 0}
     /* BOTTOM NAV */
     .bottom-nav{background:var(--white);display:flex;border-top:1px solid rgba(236,161,8,0.2);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
     .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;cursor:pointer;color:#a07828;transition:color .2s;border:none;background:none;font-family:'Nunito',sans-serif}
@@ -182,6 +187,11 @@
         <button class="quick-card" onclick="showTab('docs')"><div class="quick-icon">📄</div><div class="quick-label">Dokumente</div><div class="quick-sub">Fotos &amp; PDFs</div></button>
         <button class="quick-card" onclick="showInfo()"><div class="quick-icon">ℹ️</div><div class="quick-label">Info</div><div class="quick-sub">Kontakt &amp; Zeiten</div></button>
       </div>
+      <!-- Unfallberichte -->
+      <div id="unfallSection" style="display:none">
+        <div class="section-title mt-12">🚨 Unfallberichte</div>
+        <div id="elternUnfallList"></div>
+      </div>
     </div>
     <div class="bottom-nav">
       <button class="nav-item active" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
@@ -267,7 +277,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 // Für Push-Nachrichten (optional – benötigt VAPID Key in eltern-manifest.json und firebase-messaging-sw.js):
 // import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
@@ -324,7 +334,7 @@ function startSession(){
   document.getElementById('homeGreeting').textContent=gr+', '+SESSION.elternName+'! 👋';
   document.getElementById('homeChildName').textContent='Kind: '+SESSION.kindName;
   // Listeners
-  startKindListener();startChatListener();startDocsListener();
+  startKindListener();startChatListener();startDocsListener();loadElternUnfallberichte();
   showScreen('homeScreen');
   // Push-Banner (sofern noch nicht erlaubt)
   if('Notification' in window&&Notification.permission==='default'){
@@ -476,6 +486,34 @@ window.requestPush=async function(){
     // Token kann in Firestore gespeichert werden für gezielte Notifications
   }else{showToast('❌ Benachrichtigungen abgelehnt');}
 };
+
+// ── Unfallberichte für Eltern ──────────────────────────────
+async function loadElternUnfallberichte(){
+  if(!SESSION.kindId)return;
+  const el=document.getElementById('elternUnfallList');
+  const sec=document.getElementById('unfallSection');
+  if(!el||!sec)return;
+  try{
+    const snap=await getDocs(collection(db,'unfallberichte'));
+    const berichte=[];
+    snap.forEach(d=>{const data=d.data();if(data.kindId===SESSION.kindId)berichte.push({id:d.id,...data});});
+    berichte.sort((a,b)=>b.erstelltAm.localeCompare(a.erstelltAm));
+    if(!berichte.length){sec.style.display='none';return;}
+    sec.style.display='block';
+    el.innerHTML=berichte.map(b=>`
+      <div class="unfall-card">
+        <div class="unfall-card-date">🚨 ${b.datum} um ${b.uhrzeit} Uhr · ${b.ort}</div>
+        <div class="unfall-card-body">${b.hergang}</div>
+        <div>
+          ${b.koerperteil?`<span class="unfall-tag">📍 ${b.koerperteil}</span>`:''}
+          ${b.verletzungsart?`<span class="unfall-tag">🩹 ${b.verletzungsart}</span>`:''}
+          ${b.arztEmpfohlen?`<span class="unfall-tag">🏥 Arzt: ${b.arztEmpfohlen}</span>`:''}
+          ${b.ersteHilfe?`<span class="unfall-tag">💊 ${b.ersteHilfe}</span>`:''}
+        </div>
+        <div style="margin-top:6px;font-size:0.72rem;color:#bbb">Dokumentiert von ${b.erstelltVon}</div>
+      </div>`).join('');
+  }catch(e){sec.style.display='none';}
+}
 
 // ── Info ───────────────────────────────────────────────────
 window.showInfo=function(){alert('📞 Claudias Mäusenest\n\nBei Fragen oder Notfällen:\nclaudia@mausenest.de\n\nBetreuungszeiten:\nMontag – Freitag\n7:00 – 16:00 Uhr');}

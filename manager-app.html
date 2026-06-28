@@ -139,6 +139,21 @@
     .color-dot{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .15s}
     .color-dot.selected{border-color:var(--brown);transform:scale(1.2)}
     .section-divider{font-weight:800;color:var(--brown);font-size:0.82rem;margin:16px 0 12px;padding:8px 0;border-top:1px solid rgba(236,161,8,0.2);letter-spacing:.5px}
+    .unfall-card{background:var(--white);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(220,53,69,0.08);border-left:4px solid var(--red)}
+    .unfall-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+    .unfall-card-date{font-weight:800;font-size:0.88rem;color:var(--red)}
+    .unfall-card-loc{font-size:0.78rem;color:#a07828;background:rgba(236,161,8,0.1);padding:3px 8px;border-radius:10px}
+    .unfall-card-body{font-size:0.85rem;color:var(--text);line-height:1.5}
+    .unfall-card-footer{margin-top:8px;font-size:0.75rem;color:#a07828;display:flex;gap:10px;flex-wrap:wrap}
+    .unfall-tag{background:#fff3cd;padding:2px 8px;border-radius:8px}
+    .btn-unfall{width:100%;padding:13px;border:2px solid var(--red);border-radius:30px;background:rgba(220,53,69,0.07);color:var(--red);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.97rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:4px}
+    .btn-unfall:active{background:rgba(220,53,69,0.15)}
+    .select-field{width:100%;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:12px;font-size:0.95rem;font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);outline:none;margin-bottom:14px}
+    .select-field:focus{border-color:var(--gold)}
+    .radio-group{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .radio-opt{flex:1;min-width:80px;padding:10px;border:2px solid rgba(236,161,8,0.2);border-radius:12px;text-align:center;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;color:var(--brown);transition:all .2s;background:var(--white)}
+    .radio-opt.sel{background:var(--gold);color:white;border-color:var(--gold)}
+    .radio-opt-red.sel{background:var(--red);color:white;border-color:var(--red)}
     input[type=file]{display:none}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -219,6 +234,84 @@
       <div style="display:flex;gap:10px;margin-top:10px;font-size:0.75rem;flex-wrap:wrap"><span>🟢 Anwesend</span><span>🔴 Gefehlt</span><span>🟡 Heute</span></div>
       <div class="section-title mt-12">📝 Notizen</div>
       <textarea class="notes-area" id="childNotes" rows="4" placeholder="Notizen…" oninput="saveNote()"></textarea>
+      <div class="section-title mt-12">🚨 Unfallberichte</div>
+      <div id="unfallList"><div style="color:#a07828;font-size:0.85rem;text-align:center;padding:10px">Keine Berichte</div></div>
+      <button class="btn-unfall" onclick="window.openUnfallModal()">🚨 Unfall melden</button>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+
+  <!-- UNFALL MODAL -->
+  <div id="unfallModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch">
+    <div style="background:var(--white);border-radius:24px 24px 0 0;margin-top:40px;padding:24px 20px 40px;min-height:calc(100dvh - 40px)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div style="font-family:'Chelsea Market',cursive;font-size:1.3rem;color:var(--red)">🚨 Unfallbericht</div>
+        <button onclick="window.closeUnfallModal()" style="background:var(--cream);border:none;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer">✕</button>
+      </div>
+      <div style="background:#fff3cd;border-radius:12px;padding:10px 14px;font-size:0.82rem;color:#856404;margin-bottom:18px">
+        ℹ️ Der Bericht wird für die Eltern des Kindes und für dich sichtbar gespeichert.
+      </div>
+
+      <!-- Datum & Uhrzeit -->
+      <label class="form-label">DATUM & UHRZEIT DES UNFALLS *</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <input class="form-input" id="uDatum" type="date" style="margin-bottom:0"/>
+        <input class="form-input" id="uUhrzeit" type="time" style="margin-bottom:0"/>
+      </div>
+
+      <!-- Ort -->
+      <label class="form-label">ORT DES UNFALLS *</label>
+      <select class="select-field" id="uOrt">
+        <option value="">– bitte wählen –</option>
+        <option>Im Haus / Spielzimmer</option>
+        <option>Im Garten</option>
+        <option>Auf dem Spielplatz</option>
+        <option>Unterwegs / Spaziergang</option>
+        <option>Badezimmer</option>
+        <option>Sonstiges</option>
+      </select>
+
+      <!-- Hergang -->
+      <label class="form-label">WAS IST PASSIERT? (Hergang) *</label>
+      <textarea class="form-input" id="uHergang" rows="3" placeholder="Beschreibe was passiert ist…" style="resize:none;margin-bottom:14px"></textarea>
+
+      <!-- Körperstelle -->
+      <label class="form-label">VERLETZTE KÖRPERSTELLE</label>
+      <input class="form-input" id="uKoerper" type="text" placeholder="z. B. linkes Knie, Stirn…"/>
+
+      <!-- Verletzungsart -->
+      <label class="form-label">ART DER VERLETZUNG</label>
+      <div class="radio-group" id="uVerletzungGroup">
+        <div class="radio-opt" onclick="selectRadio('uVerletzungGroup',this,'radio-opt')">Schürfwunde</div>
+        <div class="radio-opt" onclick="selectRadio('uVerletzungGroup',this,'radio-opt')">Prellung</div>
+        <div class="radio-opt" onclick="selectRadio('uVerletzungGroup',this,'radio-opt')">Schnitt</div>
+        <div class="radio-opt" onclick="selectRadio('uVerletzungGroup',this,'radio-opt')">Beule</div>
+        <div class="radio-opt" onclick="selectRadio('uVerletzungGroup',this,'radio-opt')">Verbrennung</div>
+        <div class="radio-opt" onclick="selectRadio('uVerletzungGroup',this,'radio-opt')">Sonstiges</div>
+      </div>
+
+      <!-- Erste Hilfe -->
+      <label class="form-label">ERSTE HILFE GELEISTET</label>
+      <textarea class="form-input" id="uErsteHilfe" rows="2" placeholder="z. B. Wunde gereinigt, Pflaster, Kühlung…" style="resize:none;margin-bottom:14px"></textarea>
+
+      <!-- Arzt -->
+      <label class="form-label">ARZT AUFGESUCHT / EMPFOHLEN?</label>
+      <div class="radio-group" id="uArztGroup">
+        <div class="radio-opt radio-opt-red" onclick="selectRadio('uArztGroup',this,'radio-opt radio-opt-red')">Ja</div>
+        <div class="radio-opt radio-opt-red" onclick="selectRadio('uArztGroup',this,'radio-opt radio-opt-red')">Nein</div>
+        <div class="radio-opt radio-opt-red" onclick="selectRadio('uArztGroup',this,'radio-opt radio-opt-red')">Empfohlen</div>
+      </div>
+
+      <!-- Eltern benachrichtigt -->
+      <label class="form-label">ELTERN BENACHRICHTIGT UM</label>
+      <input class="form-input" id="uElternBenachrichtigt" type="time" placeholder="Uhrzeit…"/>
+
+      <!-- Zeugen -->
+      <label class="form-label">ANWESENDE ZEUGEN</label>
+      <input class="form-input" id="uZeugen" type="text" placeholder="z. B. Max M. (anderes Kind), kein Zeuge…"/>
+
+      <button class="btn btn-gold" onclick="window.submitUnfall()" style="margin-top:8px">💾 Bericht speichern</button>
+      <button onclick="window.closeUnfallModal()" style="margin-top:10px;width:100%;padding:12px;border:none;background:transparent;color:#a07828;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer">Abbrechen</button>
     </div>
   </div>
 
@@ -488,7 +581,7 @@ window.openChild=function(id){
   document.getElementById('childDetailName').textContent=c.name;
   document.getElementById('childDetailAge').textContent=(c.age||'?')+' Jahre alt';
   document.getElementById('childNotes').value=c.notes||'';
-  updateStatusBtns(c.status);renderTimeRows(c);renderChildCal(c);showScreen('childScreen');
+  updateStatusBtns(c.status);renderTimeRows(c);renderChildCal(c);showScreen('childScreen');loadUnfallberichte(id);
 };
 function updateStatusBtns(s){['anwesend','schlaeft','gegangen'].forEach(x=>{const b=document.getElementById('btn-'+x);b.className='status-btn';if(x===s)b.classList.add('active-'+x);});}
 function renderTimeRows(c){document.getElementById('timeRows').innerHTML=[{l:'🟢 Angekommen',v:c.arrivedAt||'–'},{l:'😴 Schlafen seit',v:c.sleepAt||'–'},{l:'🏠 Gegangen',v:c.goneAt||'–'}].map(r=>`<div class="time-row"><span class="time-label">${r.l}</span><span class="time-val">${r.v}</span></div>`).join('');}
@@ -675,6 +768,86 @@ window.confirmAddKind=async function(){
     setTimeout(()=>generateContractPDF({vorname,familienname,alter,beginn,emoji:newKindEmoji},{name:elternName,email,username}),800);
   }catch(e){console.error(e);showToast('❌ Fehler: '+e.message);}
 };
+
+// ── Unfallberichte ─────────────────────────────────────────
+function selectRadio(groupId,el,cls){
+  document.querySelectorAll('#'+groupId+' .radio-opt').forEach(d=>{d.className=cls;});
+  el.className=cls+' sel';
+}
+
+window.openUnfallModal=function(){
+  const modal=document.getElementById('unfallModal');
+  // Datum/Zeit vorausfüllen
+  const now=new Date();
+  document.getElementById('uDatum').value=now.toISOString().split('T')[0];
+  document.getElementById('uUhrzeit').value=now.toTimeString().slice(0,5);
+  document.getElementById('uOrt').value='';
+  document.getElementById('uHergang').value='';
+  document.getElementById('uKoerper').value='';
+  document.getElementById('uErsteHilfe').value='';
+  document.getElementById('uElternBenachrichtigt').value='';
+  document.getElementById('uZeugen').value='';
+  document.querySelectorAll('#uVerletzungGroup .radio-opt').forEach(d=>{d.className='radio-opt';});
+  document.querySelectorAll('#uArztGroup .radio-opt').forEach(d=>{d.className='radio-opt radio-opt-red';});
+  modal.style.display='block';
+};
+window.closeUnfallModal=function(){document.getElementById('unfallModal').style.display='none';};
+
+window.submitUnfall=async function(){
+  const datum=document.getElementById('uDatum').value;
+  const uhrzeit=document.getElementById('uUhrzeit').value;
+  const ort=document.getElementById('uOrt').value;
+  const hergang=document.getElementById('uHergang').value.trim();
+  if(!datum||!uhrzeit||!ort||!hergang){showToast('⚠️ Bitte Datum, Uhrzeit, Ort und Hergang ausfüllen.');return;}
+  const verletzung=document.querySelector('#uVerletzungGroup .sel')?.textContent||'';
+  const arzt=document.querySelector('#uArztGroup .sel')?.textContent||'';
+  const data={
+    kindId:currentChildId,
+    kindName:CHILDREN[currentChildId]?.name||'',
+    datum,uhrzeit,ort,hergang,
+    koerperteil:document.getElementById('uKoerper').value.trim(),
+    verletzungsart:verletzung,
+    ersteHilfe:document.getElementById('uErsteHilfe').value.trim(),
+    arztEmpfohlen:arzt,
+    elternBenachrichtigt:document.getElementById('uElternBenachrichtigt').value,
+    zeugen:document.getElementById('uZeugen').value.trim(),
+    erstelltVon:'Claudia Giehl',
+    erstelltAm:new Date().toISOString()
+  };
+  try{
+    await addDoc(collection(db,'unfallberichte'),data);
+    window.closeUnfallModal();
+    showToast('✅ Unfallbericht gespeichert!');
+    loadUnfallberichte(currentChildId);
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
+
+async function loadUnfallberichte(kindId){
+  const el=document.getElementById('unfallList');if(!el)return;
+  try{
+    const snap=await getDocs(collection(db,'unfallberichte'));
+    const berichte=[];
+    snap.forEach(d=>{const data=d.data();if(data.kindId===kindId)berichte.push({id:d.id,...data});});
+    berichte.sort((a,b)=>b.erstelltAm.localeCompare(a.erstelltAm));
+    if(!berichte.length){el.innerHTML='<div style="color:#a07828;font-size:0.85rem;text-align:center;padding:10px">Keine Berichte vorhanden</div>';return;}
+    el.innerHTML=berichte.map(b=>`
+      <div class="unfall-card">
+        <div class="unfall-card-header">
+          <span class="unfall-card-date">🚨 ${b.datum} um ${b.uhrzeit} Uhr</span>
+          <span class="unfall-card-loc">${b.ort}</span>
+        </div>
+        <div class="unfall-card-body">${b.hergang}</div>
+        <div class="unfall-card-footer">
+          ${b.koerperteil?`<span class="unfall-tag">📍 ${b.koerperteil}</span>`:''}
+          ${b.verletzungsart?`<span class="unfall-tag">🩹 ${b.verletzungsart}</span>`:''}
+          ${b.arztEmpfohlen?`<span class="unfall-tag">🏥 Arzt: ${b.arztEmpfohlen}</span>`:''}
+          ${b.ersteHilfe?`<span class="unfall-tag">💊 ${b.ersteHilfe}</span>`:''}
+          ${b.elternBenachrichtigt?`<span class="unfall-tag">📞 Eltern: ${b.elternBenachrichtigt} Uhr</span>`:''}
+        </div>
+        <div style="margin-top:6px;font-size:0.72rem;color:#bbb">Erstellt von ${b.erstelltVon} · ${new Date(b.erstelltAm).toLocaleString('de-DE')}</div>
+      </div>`).join('');
+  }catch(e){el.innerHTML='<div style="color:#a07828;font-size:0.85rem">Fehler beim Laden</div>';}
+}
 
 // ── Vertrag als PDF herunterladen ──────────────────────────
 window.printContract=function(kindId){
