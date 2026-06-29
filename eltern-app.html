@@ -12,6 +12,7 @@
   <link rel="manifest" href="./eltern-manifest.json"/>
   <link rel="apple-touch-icon" href="./icon-192.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--gold:#ECA108;--brown:#875E0A;--cream:#FFF9EC;--white:#fff;--gray:#f5f5f5;--text:#2d2006;--radius:16px;--shadow:0 4px 20px rgba(135,94,10,0.12);--green:#28a745;--red:#dc3545;--blue:#007bff}
@@ -195,6 +196,16 @@
         <div class="home-child" id="homeChildName"></div>
       </div>
 
+      <!-- Push-Benachrichtigungen – ganz oben -->
+      <div id="pushBanner" class="push-banner" onclick="requestPush()" style="display:none;margin-bottom:14px">
+        <div style="font-size:1.6rem">🔔</div>
+        <div class="push-banner-text">
+          <div class="push-banner-title">Push-Benachrichtigungen aktivieren</div>
+          <div class="push-banner-sub">Bleiben Sie immer informiert über Ihr Kind</div>
+        </div>
+        <div style="color:white;font-size:1.2rem">→</div>
+      </div>
+
       <!-- Status-Karte Kind -->
       <div id="childStatusCard">
         <div class="empty-state"><div class="empty-state-icon">🐭</div>Lade…</div>
@@ -253,16 +264,8 @@
         </div>
       </div>
 
-      <!-- Push & Install (untergeordnet) -->
-      <div id="pushBanner" class="push-banner" onclick="requestPush()" style="display:none;margin-top:6px">
-        <div style="font-size:1.6rem">🔔</div>
-        <div class="push-banner-text">
-          <div class="push-banner-title">Push-Benachrichtigungen aktivieren</div>
-          <div class="push-banner-sub">Bleiben Sie immer informiert über Ihr Kind</div>
-        </div>
-        <div style="color:white;font-size:1.2rem">→</div>
-      </div>
-      <div id="installBanner" class="install-banner" style="display:none">
+      <!-- Install Banner -->
+      <div id="installBanner" class="install-banner" style="display:none;margin-top:6px">
         <div style="font-size:2rem">📱</div>
         <div style="flex:1">
           <div style="font-weight:800;color:var(--brown);font-size:0.92rem">Als App installieren</div>
@@ -596,12 +599,15 @@ async function loadElternUnfallberichte(){
       <div class="unfall-alert-item">
         <div class="unfall-alert-date">${b.datum?b.datum.split('-').reverse().join('.'):'?'} um ${b.uhrzeit||'?'} Uhr · ${b.ort||''}</div>
         <div style="margin-bottom:6px">${b.hergang}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px">
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
           ${b.koerperteil?`<span style="background:rgba(255,255,255,0.2);border-radius:8px;padding:2px 8px;font-size:0.75rem">📍 ${b.koerperteil}</span>`:''}
           ${b.verletzungsart?`<span style="background:rgba(255,255,255,0.2);border-radius:8px;padding:2px 8px;font-size:0.75rem">🩹 ${b.verletzungsart}</span>`:''}
           ${b.arztEmpfohlen?`<span style="background:rgba(255,255,255,0.2);border-radius:8px;padding:2px 8px;font-size:0.75rem">🏥 Arzt: ${b.arztEmpfohlen}</span>`:''}
         </div>
-        <div style="margin-top:6px;font-size:0.72rem;opacity:.75">Dokumentiert von ${b.erstelltVon||'Claudia'}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.72rem;opacity:.75">Dokumentiert von ${b.erstelltVon||'Claudia'}</span>
+          <button onclick="window.elternDownloadUnfallPDF(${JSON.stringify(b).replace(/"/g,'&quot;')})" style="background:rgba(255,255,255,0.9);border:none;border-radius:20px;color:#c0392b;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.75rem;padding:4px 12px;cursor:pointer">📄 PDF</button>
+        </div>
       </div>`).join('');
   }catch(e){sec.style.display='none';}
 }
@@ -692,6 +698,97 @@ function startSchlisstageListener(){
 
 // ── Info ───────────────────────────────────────────────────
 window.showInfo=function(){alert('📞 Claudias Mäusenest\n\nBei Fragen oder Notfällen:\nclaudia@mausenest.de\n\nBetreuungszeiten:\nMontag – Freitag\n7:00 – 16:00 Uhr');}
+
+// ── Unfallbericht PDF (Eltern-Ansicht) ──────────────────────
+window.elternDownloadUnfallPDF=function(b){
+  if(!window.jspdf){showToast('⚠️ PDF-Library nicht geladen');return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const PW=210,PH=297,ML=20,MR=20,MT=18,TW=PW-ML-MR;
+  let y=MT;
+
+  function checkPage(need=10){if(y+need>PH-18){doc.addPage();y=MT;}}
+  function hline(yy){doc.setDrawColor('#ECA108');doc.setLineWidth(0.5);doc.line(ML,yy,PW-MR,yy);}
+
+  // Kopf
+  doc.setFillColor('#c0392b');doc.rect(0,0,PW,14,'F');
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
+  doc.text('🚨  UNFALLBERICHT  –  CLAUDIAS MÄUSENEST',ML,9.5);
+  doc.text('Kindertagespflege',PW-MR,9.5,{align:'right'});
+  y=22;
+
+  doc.setFontSize(15);doc.setFont('helvetica','bold');doc.setTextColor('#c0392b');
+  doc.text('UNFALLBERICHT',PW/2,y,{align:'center'});y+=5;
+  doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor('#555555');
+  doc.text('Dokumentiert von Claudias Mäusenest – Kindertagespflege',PW/2,y,{align:'center'});y+=6;
+  hline(y);y+=7;
+
+  // Stammdaten Box
+  const df=d=>{if(!d)return'—';const[yr,mo,t]=d.split('-');return`${t}.${mo}.${yr}`;};
+  doc.setFillColor('#FFF0EE');doc.roundedRect(ML,y,TW,20,2,2,'F');
+  doc.setDrawColor('#c0392b');doc.setLineWidth(0.4);doc.roundedRect(ML,y,TW,20,2,2,'S');
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor('#c0392b');
+  doc.text('KIND',ML+4,y+5);
+  doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor('#000');
+  doc.text(b.kindName||'—',ML+4,y+11);
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor('#c0392b');
+  doc.text('DATUM & ORT',PW/2+2,y+5);
+  doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor('#000');
+  doc.text(`${df(b.datum)} · ${b.uhrzeit||'—'} Uhr · ${b.ort||'—'}`,PW/2+2,y+11);
+  y+=26;
+
+  function block(label,text,fillCol='#FFF9EC',bordCol='#ECA108'){
+    checkPage(22);
+    const lines=doc.splitTextToSize(text||'—',TW-8);
+    const h=10+lines.length*4.8;
+    doc.setFillColor(fillCol);doc.roundedRect(ML,y,TW,h,2,2,'F');
+    doc.setDrawColor(bordCol);doc.setLineWidth(0.4);doc.roundedRect(ML,y,TW,h,2,2,'S');
+    doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+    doc.text(label,ML+4,y+5);
+    doc.setFont('helvetica','normal');doc.setTextColor('#000');doc.setFontSize(9.5);
+    lines.forEach(l=>{doc.text(l,ML+4,y+10);y+=4.8;});
+    y+=13;
+  }
+
+  block('UNFALLHERGANG',b.hergang,'#FFF0EE','#c0392b');
+
+  // Verletzung + Körperteil nebeneinander
+  checkPage(20);
+  [[`KÖRPERTEIL`,b.koerperteil||'—',ML],[`VERLETZUNGSART`,b.verletzungsart||'—',ML+TW/2+2]].forEach(([lbl,val,x])=>{
+    doc.setFillColor('#ffffff');doc.roundedRect(x,y,TW/2-2,16,2,2,'F');
+    doc.setDrawColor('#ECA108');doc.setLineWidth(0.4);doc.roundedRect(x,y,TW/2-2,16,2,2,'S');
+    doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');doc.text(lbl,x+4,y+5);
+    doc.setFont('helvetica','normal');doc.setTextColor('#000');doc.setFontSize(9.5);doc.text(val,x+4,y+11);
+  });
+  y+=22;
+
+  block('ERSTE-HILFE-MAßNAHMEN',b.ersteHilfe);
+
+  checkPage(20);
+  [[`ARZTBESUCH`,b.arztEmpfohlen||'—',ML],[`ELTERN BENACHRICHTIGT`,b.elternBenachrichtigt?(b.elternBenachrichtigt+' Uhr'):'—',ML+TW/2+2]].forEach(([lbl,val,x])=>{
+    doc.setFillColor('#ffffff');doc.roundedRect(x,y,TW/2-2,16,2,2,'F');
+    doc.setDrawColor('#ECA108');doc.setLineWidth(0.4);doc.roundedRect(x,y,TW/2-2,16,2,2,'S');
+    doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');doc.text(lbl,x+4,y+5);
+    doc.setFont('helvetica','normal');doc.setTextColor('#000');doc.setFontSize(9.5);doc.text(val,x+4,y+11);
+  });
+  y+=22;
+
+  if(b.zeugen)block('ZEUGEN',b.zeugen);
+
+  checkPage(18);y+=4;
+  hline(y);y+=7;
+  doc.setFontSize(8.5);doc.setFont('helvetica','italic');doc.setTextColor('#555');
+  doc.text('Dieses Dokument wurde automatisch aus der Claudias Mäusenest App erstellt.',ML,y);y+=5;
+  doc.text('Bei Fragen wenden Sie sich direkt an Claudia: claudia@mausenest.de',ML,y);
+
+  // Footer
+  doc.setFillColor('#c0392b');doc.rect(0,PH-10,PW,10,'F');
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor('#ffffff');
+  doc.text('Claudias Mäusenest – Kindertagespflege | Unfallbericht',PW/2,PH-4,{align:'center'});
+
+  const fname='Unfallbericht_'+((b.kindName||'Kind').replace(/ /g,'_'))+'_'+((b.datum||'').replace(/-/g,''))+'.pdf';
+  doc.save(fname);
+};
 
 // ── Navigation ─────────────────────────────────────────────
 window.showTab=function(tab){
