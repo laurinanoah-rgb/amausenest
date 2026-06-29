@@ -1307,12 +1307,21 @@ function renderSteuerRechner(){
   const el=document.getElementById('steuerKinderList');if(!el)return;
   const active=Object.values(CHILDREN).filter(c=>!c.archiviert).sort((a,b)=>a.name.localeCompare(b.name));
   if(!active.length){el.innerHTML='<div style="color:#a07828;font-size:0.85rem;text-align:center;padding:8px">Keine aktiven Kinder</div>';calcSteuer();return;}
-  el.innerHTML=active.map(c=>`
-    <div class="steuer-row">
+  el.innerHTML=active.map(c=>{
+    // Gespeicherten Wert aus localStorage laden, Fallback auf c.pflegegeld
+    const saved=localStorage.getItem('mausenest_pflegegeld_'+c.id);
+    const val=saved!==null?saved:(c.pflegegeld||'');
+    return`<div class="steuer-row">
       <span class="steuer-row-label">${c.emoji||'🐭'} ${c.name}</span>
       <input class="steuer-pflegegeld" id="sg-${c.id}" type="number" min="0" step="0.01"
-        value="${c.pflegegeld||''}" placeholder="0" oninput="calcSteuer()"/>
-    </div>`).join('');
+        value="${val}" placeholder="0" oninput="calcSteuer()"/>
+    </div>`;
+  }).join('');
+  // Ausgaben-Felder aus localStorage wiederherstellen
+  const skpEl=document.getElementById('steuerSKP');
+  const sonstEl=document.getElementById('steuerSonstige');
+  if(skpEl&&!skpEl.value){const v=localStorage.getItem('mausenest_skp');if(v)skpEl.value=v;}
+  if(sonstEl&&!sonstEl.value){const v=localStorage.getItem('mausenest_sonstige');if(v)sonstEl.value=v;}
   calcSteuer();
 }
 
@@ -1321,10 +1330,18 @@ function calcSteuer(){
   let monthlyGross=0;
   active.forEach(c=>{
     const inp=document.getElementById('sg-'+c.id);
-    monthlyGross+=parseFloat(inp?.value||c.pflegegeld||0);
+    const val=parseFloat(inp?.value||c.pflegegeld||0);
+    monthlyGross+=val;
+    // In localStorage speichern
+    if(inp&&inp.value!=='')localStorage.setItem('mausenest_pflegegeld_'+c.id,inp.value);
   });
-  const skp=parseFloat(document.getElementById('steuerSKP')?.value||0);
-  const sonstige=parseFloat(document.getElementById('steuerSonstige')?.value||0);
+  const skpEl=document.getElementById('steuerSKP');
+  const sonstEl=document.getElementById('steuerSonstige');
+  const skp=parseFloat(skpEl?.value||0);
+  const sonstige=parseFloat(sonstEl?.value||0);
+  // Ausgaben persistieren
+  if(skpEl&&skpEl.value!=='')localStorage.setItem('mausenest_skp',skpEl.value);
+  if(sonstEl&&sonstEl.value!=='')localStorage.setItem('mausenest_sonstige',sonstEl.value);
   const monthlyAusgaben=skp+sonstige;
   const jahresGross=monthlyGross*12;
   const jahresAusgaben=monthlyAusgaben*12;
@@ -1443,15 +1460,7 @@ function renderAktenMainView(){
     h+='</div>';
   }
 
-  // Allgemeine Dokumente
-  h+=`<div class="ak-section-lbl" style="margin-top:6px">ALLGEMEIN & PRIVAT</div>
-  <div class="ak-allgemein-box">`;
-  if(allgemeinDocs.length){
-    allgemeinDocs.forEach(d=>{h+=docRow(d,false);});
-  }else{
-    h+='<div class="ak-empty">Noch keine allgemeinen Dokumente</div>';
-  }
-  h+='</div>';
+  // Allgemein & Privat ausgeblendet (nur in Kind-Ordnern sichtbar)
 
   // Archiv
   h+=`<button class="ak-archiv-toggle" onclick="window.toggleAktenArchiv()">
