@@ -243,6 +243,46 @@
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .fade-in{animation:fadeIn .3s ease both}
     .mt-12{margin-top:12px}
+    /* ── NEUES AKTEN-SYSTEM ─── */
+    .ak-section-lbl{font-size:0.7rem;font-weight:800;color:#a07828;letter-spacing:.5px;text-transform:uppercase;margin:0 0 10px}
+    .ak-child-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+    .ak-child-card{background:var(--white);border-radius:var(--radius);padding:16px 12px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:transform .15s;border:none;width:100%;font-family:'Nunito',sans-serif;position:relative;display:block}
+    .ak-child-card:active{transform:scale(0.96)}
+    .ak-child-avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 10px}
+    .ak-child-name{font-weight:800;color:var(--brown);font-size:0.9rem;margin-bottom:2px}
+    .ak-child-count{font-size:0.72rem;color:#a07828}
+    .ak-child-badge{position:absolute;top:8px;right:8px;background:#dc3545;color:white;border-radius:10px;font-size:0.62rem;font-weight:800;padding:2px 6px}
+    .ak-ordner-card{background:var(--white);border-radius:14px;margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden}
+    .ak-ordner-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
+    .ak-ordner-icon{font-size:1.5rem;flex-shrink:0;width:36px;text-align:center}
+    .ak-ordner-label{font-weight:800;color:var(--brown);font-size:0.92rem}
+    .ak-ordner-count{font-size:0.74rem;color:#a07828;margin-top:1px}
+    .ak-ordner-arrow{color:#a07828;font-size:0.9rem;transition:transform .2s;flex-shrink:0;margin-left:auto}
+    .ak-ordner-arrow.open{transform:rotate(180deg)}
+    .ak-ordner-body{border-top:1px solid rgba(236,161,8,0.12);padding:12px 14px 14px;animation:fadeIn .18s ease}
+    .ak-doc-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(236,161,8,0.08)}
+    .ak-doc-row:last-child{border-bottom:none}
+    .ak-doc-icon{font-size:1.3rem;flex-shrink:0}
+    .ak-doc-info{flex:1;min-width:0}
+    .ak-doc-name{font-size:0.83rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ak-doc-date{font-size:0.7rem;color:#a07828;margin-top:1px}
+    .ak-doc-btns{display:flex;gap:4px;flex-shrink:0}
+    .ak-doc-btn{padding:4px 9px;border-radius:8px;border:1px solid rgba(236,161,8,0.3);background:var(--cream);color:var(--brown);font-size:0.72rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap}
+    .ak-doc-btn.red{border-color:rgba(220,53,69,0.25);color:#dc3545;background:#fff5f5}
+    .ak-upload-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border:2px dashed rgba(236,161,8,0.4);border-radius:10px;background:rgba(236,161,8,0.03);cursor:pointer;margin-top:8px;color:var(--brown);font-weight:700;font-size:0.83rem;font-family:'Nunito',sans-serif;width:100%;border-left:none;border-right:none;border-top:none;border-bottom:none;border:2px dashed rgba(236,161,8,0.4)}
+    .ak-kind-hdr{display:flex;align-items:center;gap:12px;background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+    .ak-kind-avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
+    .ak-kind-name{font-family:'Chelsea Market',cursive;font-size:1.1rem;color:var(--brown)}
+    .ak-kind-sub{font-size:0.74rem;color:#a07828;margin-top:2px}
+    .ak-archiv-toggle{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--white);border-radius:14px;box-shadow:var(--shadow);cursor:pointer;margin-bottom:10px;border:none;width:100%;font-family:'Nunito',sans-serif;text-align:left}
+    .ak-archiv-count{background:rgba(108,117,125,0.1);color:#6c757d;font-size:0.7rem;font-weight:800;border-radius:10px;padding:2px 8px;margin-left:4px}
+    .ak-archiv-body{background:var(--white);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px}
+    .ak-archiv-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(236,161,8,0.1);cursor:pointer}
+    .ak-archiv-item:last-child{border-bottom:none;padding-bottom:0}
+    .ak-search{width:100%;padding:10px 16px;border:2px solid rgba(236,161,8,0.25);border-radius:24px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;background:var(--white);color:var(--text);margin-bottom:14px;box-sizing:border-box}
+    .ak-allgemein-box{background:var(--white);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:18px}
+    .ak-empty{text-align:center;color:#a07828;font-size:0.83rem;padding:14px 0}
+    .ak-zip-btn{width:100%;padding:11px;margin-top:10px;border:none;border-radius:12px;background:var(--gold);color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.88rem;cursor:pointer}
   </style>
 </head>
 <body>
@@ -321,9 +361,8 @@
     <div class="bottom-nav">
       <button class="nav-item active" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -443,9 +482,8 @@
     <div class="bottom-nav">
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item active" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -464,34 +502,8 @@
     </div>
   </div>
 
-  <!-- DOKUMENTE -->
-  <div id="docsScreen" class="screen">
-    <div class="topbar"><div class="topbar-title">📄 Dokumente</div><div style="width:38px"></div></div>
-    <div class="scroll-content">
-      <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-        <div style="font-size:2.5rem;margin-bottom:10px">📤</div>
-        <div style="font-weight:800;color:var(--brown);margin-bottom:4px">Datei hochladen</div>
-        <div style="font-size:0.82rem;color:#a07828">PDF, Bilder, Word · max. 800 KB</div>
-      </div>
-      <input type="file" id="fileInput" multiple onchange="handleFileSelect(event)"/>
-      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-        <button onclick="filterDocs('all')" id="filter-all" style="padding:7px 16px;border-radius:20px;border:2px solid var(--gold);background:var(--gold);color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">Alle</button>
-        <button onclick="filterDocs('allgemein')" id="filter-allgemein" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(236,161,8,0.3);background:transparent;color:var(--brown);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">🌍 Allgemein</button>
-        <button onclick="filterDocs('kind')" id="filter-kind" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(236,161,8,0.3);background:transparent;color:var(--brown);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">👶 Für Kinder</button>
-        <button onclick="filterDocs('privat')" id="filter-privat" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(108,117,125,0.3);background:transparent;color:#495057;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">🔒 Privat</button>
-      </div>
-      <div class="section-title">📁 Dokumente <span style="font-size:0.75rem;font-weight:400;color:#a07828">(Tippen = Öffnen · 🗑️ = Löschen)</span></div>
-      <div id="docList"></div>
-    </div>
-    <div class="bottom-nav">
-      <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
-      <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
-      <button class="nav-item active" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
-      <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
-      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
-    </div>
-  </div>
+  <!-- Versteckter File-Input für Upload -->
+  <input type="file" id="fileInput" multiple onchange="handleFileSelect(event)" style="display:none"/>
 
   <!-- EINSTELLUNGEN -->
   <div id="settingsScreen" class="screen">
@@ -545,9 +557,8 @@
     <div class="bottom-nav">
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item active" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -606,7 +617,6 @@
     <div class="bottom-nav">
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
       <button class="nav-item active" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
@@ -615,16 +625,22 @@
 
   <!-- AKTEN SCREEN -->
   <div id="aktenScreen" class="screen">
-    <div class="topbar"><div class="topbar-title">📁 Akten – Archivierte Kinder</div><div style="width:38px"></div></div>
-    <div class="scroll-content">
-      <div id="aktenScreenList"><div style="color:#a07828;font-size:0.88rem;text-align:center;padding:24px;background:var(--white);border-radius:14px;box-shadow:var(--shadow)">Keine archivierten Kinder vorhanden.</div></div>
+    <div class="topbar" id="aktenTopbar">
+      <div id="aktenTopbarLeft" style="width:38px"></div>
+      <div class="topbar-title" id="aktenTopbarTitle">📁 Akten</div>
+      <div id="aktenTopbarRight" style="min-width:38px"></div>
+    </div>
+    <div class="scroll-content" id="aktenContent">
+      <div class="empty-state" style="padding:48px 24px">
+        <div style="font-size:3rem;margin-bottom:12px">📁</div>
+        <div>Lade…</div>
+      </div>
     </div>
     <div class="bottom-nav">
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item active" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -731,15 +747,27 @@ const FC={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest
 const db=getFirestore(initializeApp(FC));
 const MANAGER={user:'claudia',pass:'mausenest2025'};
 
-let CHILDREN={},ELTERN={},DOCS=[],currentChildId=null,currentChatId=null,chatUnsub=null,pendingFiles=null,selectedRecipient=null,selectedKind=null,docFilter='all';
+let CHILDREN={},ELTERN={},DOCS=[],currentChildId=null,currentChatId=null,chatUnsub=null,pendingFiles=null,selectedRecipient=null,selectedKind=null;
 let newKindEmoji='🐭',newKindColor='#ffe599';
+// ── Akten State ────────────────────────────────────────────
+let AKTEN_VIEW='main',AKTEN_KIND_ID=null,AKTEN_OPEN_ORDNER=null,AKTEN_ARCHIV_OPEN=false;
+let pendingUploadKindId=null,pendingUploadKategorie=null;
+const ORDNER_DEFS=[
+  {id:'vertrag',       icon:'📋', label:'Verträge',          color:'#875E0A'},
+  {id:'login',         icon:'🔑', label:'Login-Dokumente',   color:'#0056b3'},
+  {id:'unfallbericht', icon:'🚨', label:'Unfallberichte',    color:'#c0392b'},
+  {id:'krankmeldung',  icon:'🤒', label:'Krankmeldungen',    color:'#e67e22'},
+  {id:'anwesenheit',   icon:'📅', label:'Anwesenheit',       color:'#27ae60'},
+  {id:'sonstiges',     icon:'📁', label:'Sonstiges',         color:'#6c757d'},
+];
 
 // ── Real-time listeners ────────────────────────────────────
 onSnapshot(collection(db,'kinder'),snap=>{
   CHILDREN={};snap.forEach(d=>{CHILDREN[d.id]={id:d.id,...d.data()};});
   const aktive=Object.values(CHILDREN).filter(c=>!c.archiviert);
   const g=document.getElementById('statGesamt');if(g)g.textContent=aktive.length;
-  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();renderAktenList();renderSteuerRechner();renderAktenScreen();
+  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();renderSteuerRechner();
+  if(document.getElementById('aktenScreen')?.classList.contains('active'))renderAkten();
 },()=>{const b=document.getElementById('syncBadge');if(b){b.textContent='● Offline';b.className='sync-badge offline';}});
 
 onSnapshot(collection(db,'eltern'),snap=>{
@@ -748,7 +776,8 @@ onSnapshot(collection(db,'eltern'),snap=>{
 
 onSnapshot(collection(db,'dokumente'),snap=>{
   DOCS=[];snap.forEach(d=>DOCS.push({id:d.id,...d.data()}));
-  DOCS.sort((a,b)=>(b.ts||0)-(a.ts||0));renderDocs();
+  DOCS.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  if(document.getElementById('aktenScreen')?.classList.contains('active'))renderAkten();
 });
 
 // ── Ankündigungen ──────────────────────────────────────────
@@ -1080,31 +1109,42 @@ window.filterDocs=function(f){
   renderDocs();
 };
 function renderDocs(){
-  const el=document.getElementById('docList');if(!el)return;
-  let fd=DOCS;
-  if(docFilter==='allgemein')fd=DOCS.filter(d=>d.recipient==='allgemein');
-  else if(docFilter==='kind')fd=DOCS.filter(d=>d.recipient!=='allgemein'&&d.recipient!=='privat');
-  else if(docFilter==='privat')fd=DOCS.filter(d=>d.recipient==='privat');
-  else fd=DOCS; // 'all' — show everything incl. privat
-  if(!fd.length){el.innerHTML='<div style="text-align:center;color:#a07828;padding:24px;font-size:0.9rem">Noch keine Dokumente</div>';return;}
-  el.innerHTML=fd.map(d=>{
-    let tag;
-    if(d.recipient==='allgemein')tag='<span class="doc-tag doc-tag-all">🌍 Allgemein</span>';
-    else if(d.recipient==='privat')tag='<span class="doc-tag doc-tag-privat">🔒 Privat</span>';
-    else tag=`<span class="doc-tag doc-tag-kind">👶 ${d.kindName||d.recipient}</span>`;
-    const n=d.name.replace(/'/g,"\\'");
-    return`<div class="doc-item" onclick="window.openDocPreview('${d.id}')"><div style="font-size:1.8rem">${d.type||'📄'}</div><div style="flex:1;min-width:0"><div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div><div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div></div>${tag}<button class="doc-delete-btn" onclick="event.stopPropagation();window.deleteDocItem('${d.id}','${n}')">🗑️</button></div>`;
-  }).join('');
+  // Akten-Bildschirm aktualisieren wenn aktiv
+  if(document.getElementById('aktenScreen')?.classList.contains('active'))renderAkten();
 }
 function readFileAsDataUrl(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});}
 window.handleFileSelect=function(e){
   if(!e.target.files.length)return;pendingFiles=Array.from(e.target.files);
+  // If called from Akten folder upload, skip modal
+  if(pendingUploadKindId!==null||pendingUploadKategorie!==null){
+    window._confirmAktenUpload();e.target.value='';return;
+  }
   document.getElementById('uploadFileName').textContent=pendingFiles.map(f=>f.name).join(', ');
   selectedRecipient=null;selectedKind=null;
   document.getElementById('btn-allgemein').classList.remove('selected');document.getElementById('btn-kind-select').classList.remove('selected');
   document.getElementById('kindSelect').style.display='none';
   document.getElementById('confirmUploadBtn').disabled=true;document.getElementById('confirmUploadBtn').style.opacity='0.5';
   document.getElementById('uploadModal').classList.add('active');e.target.value='';
+};
+window._confirmAktenUpload=async function(){
+  if(!pendingFiles)return;
+  const kindId=pendingUploadKindId;const kat=pendingUploadKategorie;
+  pendingUploadKindId=null;pendingUploadKategorie=null;
+  const recipient=kindId||'allgemein';
+  const kindName=kindId&&CHILDREN[kindId]?CHILDREN[kindId].name:null;
+  const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
+  let uploaded=0;
+  for(const f of pendingFiles){
+    if(f.size>800*1024){showToast('⚠️ '+f.name+' zu groß (max 800 KB)');continue;}
+    const type=f.type.includes('pdf')?'📋':f.type.includes('image')?'🖼️':f.type.includes('word')?'📝':'📄';
+    const dataUrl=await readFileAsDataUrl(f);
+    const docData={name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,elternSichtbar:true,ts:Date.now(),dataUrl};
+    if(kat)docData.kategorie=kat;
+    await addDoc(collection(db,'dokumente'),docData);uploaded++;
+  }
+  pendingFiles=null;
+  if(uploaded>0)showToast(`✅ ${uploaded} Datei(en) hochgeladen!`);
+  renderAkten();
 };
 window.selectRecipient=function(type){
   selectedRecipient=type;
@@ -1127,10 +1167,10 @@ window.confirmUpload=async function(){
     if(f.size>800*1024){showToast('⚠️ '+f.name+' zu groß (max 800 KB)');continue;}
     const type=f.type.includes('pdf')?'📋':f.type.includes('image')?'🖼️':f.type.includes('word')?'📝':'📄';
     const dataUrl=await readFileAsDataUrl(f);
-    await addDoc(collection(db,'dokumente'),{name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,elternSichtbar,ts:Date.now(),dataUrl});
+    await addDoc(collection(db,'dokumente'),{name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,elternSichtbar,kategorie:'sonstiges',ts:Date.now(),dataUrl});
     uploaded++;
   }
-  closeUploadModal();showTab('docs');if(uploaded>0)showToast(`✅ ${uploaded} Datei(en) hochgeladen!`);pendingFiles=null;
+  closeUploadModal();showTab('akten');if(uploaded>0)showToast(`✅ ${uploaded} Datei(en) hochgeladen!`);pendingFiles=null;
 };
 window.closeUploadModal=function(){document.getElementById('uploadModal').classList.remove('active');};
 window.openDocPreview=function(id){
@@ -1323,74 +1363,217 @@ window.restoreKind=async function(id,name){
   }catch(e){showToast('❌ Fehler: '+e.message);}
 };
 
-function renderAktenList(){
-  const el=document.getElementById('aktenList');if(!el)return;
-  const archiviert=Object.values(CHILDREN).filter(c=>c.archiviert===true);
-  if(!archiviert.length){el.innerHTML='<div style="color:#a07828;font-size:0.85rem;text-align:center;padding:12px">Keine archivierten Kinder</div>';return;}
-  el.innerHTML=archiviert.map(c=>`
-    <div class="archiv-card">
-      <div class="archiv-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div>
-      <div class="archiv-info">
-        <div class="archiv-name">${c.name}</div>
-        <div class="archiv-sub">${c.age||'?'} J. · Archiviert ${c.archiviertAm?new Date(c.archiviertAm).toLocaleDateString('de-DE'):''}</div>
-      </div>
-      <button class="btn-restore" onclick="window.restoreKind('${c.id}','${c.name.replace(/'/g,"\\'")}')">↩️ Wiederherstellen</button>
-    </div>`).join('');
+// ── NEUES AKTEN-SYSTEM ─────────────────────────────────────
+function renderAkten(){
+  if(AKTEN_VIEW==='kind'&&AKTEN_KIND_ID)renderAktenKindView();
+  else renderAktenMainView();
 }
 
-async function renderAktenScreen(){
-  const el=document.getElementById('aktenScreenList');if(!el)return;
-  const archiviert=Object.values(CHILDREN).filter(c=>c.archiviert===true).sort((a,b)=>a.name.localeCompare(b.name));
-  if(!archiviert.length){
-    el.innerHTML='<div style="color:#a07828;font-size:0.88rem;text-align:center;padding:32px;background:var(--white);border-radius:14px;box-shadow:var(--shadow)">📁 Noch keine archivierten Kinder.</div>';
-    return;
+function getKindDocs(kindId,ordnerId){
+  const all=DOCS.filter(d=>(d.recipient===kindId||d.archiviertKindId===kindId));
+  if(ordnerId==='sonstiges'){
+    const known=ORDNER_DEFS.map(o=>o.id).filter(x=>x!=='sonstiges');
+    return all.filter(d=>!d.kategorie||!known.includes(d.kategorie));
   }
-  // Load archived docs for all archived children
-  const allArchivedDocs=DOCS.filter(d=>d.archiviert===true||Object.values(CHILDREN).filter(c=>c.archiviert).some(c=>c.id===d.recipient));
-  el.innerHTML=archiviert.map(c=>{
-    const kindDocs=DOCS.filter(d=>d.recipient===c.id||d.archiviertKindId===c.id);
-    const nm=c.name.replace(/'/g,"\\'");
-    const archiviertAm=c.archiviertAm?new Date(c.archiviertAm).toLocaleDateString('de-DE'):'–';
-    const docRows=kindDocs.length?kindDocs.map(d=>`
-      <div class="steuer-row" style="padding:8px 0;align-items:center">
-        <div style="flex:1;min-width:0">
-          ${d.kategorie==='unfallbericht'?'<span style="font-size:0.7rem;font-weight:800;background:#fff0ee;color:#c0392b;border-radius:6px;padding:1px 6px;margin-right:6px">🚨 UNFALL</span>':''}
-          <span style="font-size:0.85rem;color:var(--text)">${d.name}</span>
-          ${!d.elternSichtbar?'<span style="font-size:0.7rem;color:#aaa;margin-left:6px">🔒</span>':''}
-        </div>
-        <button class="btn-green-sm" onclick="window.openDocPreview('${d.id}')">👁️</button>
-      </div>`).join(''):'<div style="color:#a07828;font-size:0.82rem;padding:8px 0">Keine Dokumente archiviert.</div>';
-    return`
-    <div class="kind-accordion" id="akc-${c.id}">
-      <div class="kind-acc-header" onclick="window.toggleAktenAcc('${c.id}')">
-        <div style="width:46px;height:46px;border-radius:50%;background:${c.color||'#ffe599'};display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;opacity:.85">${c.emoji||'🐭'}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:800;color:var(--brown)">${c.name}</div>
-          <div style="font-size:0.75rem;color:#a07828">Archiviert: ${archiviertAm} · ${kindDocs.length} Dok.</div>
-        </div>
-        <div class="kind-acc-arrow" id="akcarrow-${c.id}">▾</div>
-      </div>
-      <div class="kind-acc-body" id="akcbody-${c.id}" style="display:none">
-        <div class="kind-acc-section">📋 Stammdaten</div>
-        <div style="font-size:0.85rem;color:var(--text);display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
-          <div><span style="color:#a07828">Alter:</span> ${c.age||'–'} J.</div>
-          <div><span style="color:#a07828">Beginn:</span> ${c.betreuungsBeginn?c.betreuungsBeginn.split('-').reverse().join('.'):'–'}</div>
-        </div>
-        <div class="kind-acc-section">📄 Archivierte Dokumente</div>
-        ${docRows}
-        ${kindDocs.length?`<button class="btn-sm btn-gold" style="width:100%;padding:11px;margin-top:12px" onclick="window.downloadKindZip('${c.id}','${nm}')">⬇️ Alle als ZIP herunterladen</button>`:''}
-        <button class="btn-restore" style="margin-top:10px;width:100%;text-align:center" onclick="window.restoreKind('${c.id}','${nm}')">↩️ Kind wiederherstellen</button>
-      </div>
-    </div>`;
-  }).join('');
+  return all.filter(d=>d.kategorie===ordnerId);
 }
 
-window.toggleAktenAcc=function(id){
-  const body=document.getElementById('akcbody-'+id);
-  const arrow=document.getElementById('akcarrow-'+id);
-  const open=body.style.display==='block';
-  body.style.display=open?'none':'block';
-  arrow.classList.toggle('open',!open);
+function docRow(d,isArchived){
+  const nm=d.name.replace(/'/g,"\\'");
+  return`<div class="ak-doc-row">
+    <div class="ak-doc-icon">${d.type||'📄'}</div>
+    <div class="ak-doc-info">
+      <div class="ak-doc-name">${d.name}${!d.elternSichtbar?' 🔒':''}</div>
+      <div class="ak-doc-date">${d.date||''}</div>
+    </div>
+    <div class="ak-doc-btns">
+      <button class="ak-doc-btn" onclick="window.openDocPreview('${d.id}')">👁️</button>
+      <button class="ak-doc-btn" onclick="window.downloadDoc('${d.id}')">⬇️</button>
+      ${!isArchived?`<button class="ak-doc-btn red" onclick="window.deleteDocItem('${d.id}','${nm}')">🗑️</button>`:''}
+    </div>
+  </div>`;
+}
+
+function renderAktenMainView(){
+  const el=document.getElementById('aktenContent');if(!el)return;
+  document.getElementById('aktenTopbarTitle').textContent='📁 Akten';
+  document.getElementById('aktenTopbarLeft').innerHTML='';
+  document.getElementById('aktenTopbarRight').innerHTML='';
+
+  const searchEl=document.getElementById('ak-main-search');
+  const searchVal=searchEl?searchEl.value:'';
+  const archivSearchEl=document.getElementById('ak-archiv-search');
+  const archivSearch=archivSearchEl?archivSearchEl.value:'';
+
+  const active=Object.values(CHILDREN).filter(c=>!c.archiviert)
+    .filter(c=>!searchVal||c.name.toLowerCase().includes(searchVal.toLowerCase()))
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  const archived=Object.values(CHILDREN).filter(c=>c.archiviert===true)
+    .filter(c=>!AKTEN_ARCHIV_OPEN||!archivSearch||c.name.toLowerCase().includes(archivSearch.toLowerCase()))
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  const archivedTotal=Object.values(CHILDREN).filter(c=>c.archiviert===true).length;
+  const allgemeinDocs=DOCS.filter(d=>d.recipient==='allgemein'||d.recipient==='privat');
+
+  let h='';
+
+  // Suche
+  h+=`<input class="ak-search" id="ak-main-search" placeholder="🔍 Kind suchen…" oninput="renderAktenMainView()" value="${searchVal}">`;
+
+  // Aktive Kinder
+  h+=`<div class="ak-section-lbl">AKTIVE KINDER (${Object.values(CHILDREN).filter(c=>!c.archiviert).length})</div>`;
+  if(!active.length){
+    h+='<div class="ak-empty" style="background:var(--white);border-radius:14px;padding:24px;box-shadow:var(--shadow);margin-bottom:16px">Keine aktiven Kinder</div>';
+  }else{
+    h+='<div class="ak-child-grid">';
+    active.forEach(c=>{
+      const count=DOCS.filter(d=>d.recipient===c.id).length;
+      const unfallCount=DOCS.filter(d=>d.recipient===c.id&&d.kategorie==='unfallbericht').length;
+      const nm=c.name.replace(/'/g,"\\'");
+      h+=`<button class="ak-child-card" onclick="window.openKindAkten('${c.id}')">
+        ${unfallCount?`<div class="ak-child-badge">🚨 ${unfallCount}</div>`:''}
+        <div class="ak-child-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div>
+        <div class="ak-child-name">${c.name}</div>
+        <div class="ak-child-count">${count} Dok.</div>
+      </button>`;
+    });
+    h+='</div>';
+  }
+
+  // Allgemeine Dokumente
+  h+=`<div class="ak-section-lbl" style="margin-top:6px">ALLGEMEIN & PRIVAT</div>
+  <div class="ak-allgemein-box">
+    <button class="ak-upload-btn" onclick="window.aktenUpload(null,'allgemein')">📤 <span>Datei hochladen</span></button>`;
+  if(allgemeinDocs.length){
+    allgemeinDocs.forEach(d=>{h+=docRow(d,false);});
+  }else{
+    h+='<div class="ak-empty">Noch keine allgemeinen Dokumente</div>';
+  }
+  h+='</div>';
+
+  // Archiv
+  h+=`<button class="ak-archiv-toggle" onclick="window.toggleAktenArchiv()">
+    <span style="font-size:1.3rem">🗂️</span>
+    <span style="font-weight:800;color:var(--brown);font-size:0.92rem;flex:1">Archivierte Kinder</span>
+    <span class="ak-archiv-count">${archivedTotal}</span>
+    <span style="color:#a07828;font-size:0.9rem;transition:transform .2s${AKTEN_ARCHIV_OPEN?';display:inline-block;transform:rotate(180deg)':''}"}>▾</span>
+  </button>`;
+
+  if(AKTEN_ARCHIV_OPEN){
+    h+=`<div class="ak-archiv-body">
+      <input class="ak-search" id="ak-archiv-search" placeholder="🔍 Archiv durchsuchen…" oninput="renderAktenMainView()" value="${archivSearch}">`;
+    if(!archived.length){
+      h+='<div class="ak-empty">Keine Treffer</div>';
+    }else{
+      archived.forEach(c=>{
+        const count=DOCS.filter(d=>d.recipient===c.id||d.archiviertKindId===c.id).length;
+        const am=c.archiviertAm?new Date(c.archiviertAm).toLocaleDateString('de-DE'):'–';
+        h+=`<div class="ak-archiv-item" onclick="window.openKindAkten('${c.id}')">
+          <div class="ak-child-avatar" style="background:${c.color||'#ffe599'};width:42px;height:42px;font-size:1.3rem;filter:grayscale(40%)">${c.emoji||'🐭'}</div>
+          <div style="flex:1">
+            <div style="font-weight:800;color:var(--brown)">${c.name}</div>
+            <div style="font-size:0.73rem;color:#a07828">Archiviert: ${am} · ${count} Dok.</div>
+          </div>
+          <span style="color:#a07828">→</span>
+        </div>`;
+      });
+    }
+    h+='</div>';
+  }
+
+  el.innerHTML=h;
+}
+
+function renderAktenKindView(){
+  const el=document.getElementById('aktenContent');if(!el)return;
+  const c=CHILDREN[AKTEN_KIND_ID];
+  if(!c){AKTEN_VIEW='main';renderAktenMainView();return;}
+  const isArchived=c.archiviert===true;
+  const nm=c.name.replace(/'/g,"\\'");
+
+  // Topbar
+  document.getElementById('aktenTopbarTitle').textContent=c.name;
+  document.getElementById('aktenTopbarLeft').innerHTML=`<button class="topbar-back" onclick="window.aktenBack()">←</button>`;
+  document.getElementById('aktenTopbarRight').innerHTML=`<button onclick="window.downloadKindZip('${c.id}','${nm}')" style="background:var(--cream);border:none;padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">⬇️ ZIP</button>`;
+
+  let h=`<div class="ak-kind-hdr">
+    <div class="ak-kind-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div>
+    <div>
+      <div class="ak-kind-name">${c.name}</div>
+      <div class="ak-kind-sub">${c.age||'?'} J. · Seit ${c.betreuungsBeginn?c.betreuungsBeginn.split('-').reverse().join('.'):'–'}${isArchived?' · <span style="color:#dc3545;font-weight:800">ARCHIVIERT</span>':''}</div>
+    </div>
+  </div>`;
+
+  ORDNER_DEFS.forEach(ord=>{
+    const isOpen=AKTEN_OPEN_ORDNER===ord.id;
+    let count=0,bodyHtml='';
+
+    if(ord.id==='krankmeldung'){
+      const kms=KRANKMELDUNGEN.filter(k=>k.typ==='kind'&&k.kindId===AKTEN_KIND_ID).sort((a,b)=>(b.datum||'').localeCompare(a.datum||''));
+      count=kms.length;
+      if(isOpen){
+        bodyHtml=`<div class="ak-ordner-body">`;
+        if(!kms.length){bodyHtml+='<div class="ak-empty">Keine Krankmeldungen</div>';}
+        else kms.forEach(k=>{
+          bodyHtml+=`<div class="ak-doc-row">
+            <div class="ak-doc-icon">🤒</div>
+            <div class="ak-doc-info">
+              <div class="ak-doc-name">${k.datum?k.datum.split('-').reverse().join('.'):'?'} – ${k.kindName||''}</div>
+              <div class="ak-doc-date">${k.notiz||'Keine Notiz'} · ${k.erstelltVon||''}</div>
+            </div>
+          </div>`;
+        });
+        bodyHtml+='</div>';
+      }
+    }else{
+      const docs=getKindDocs(AKTEN_KIND_ID,ord.id);
+      count=docs.length;
+      if(isOpen){
+        bodyHtml=`<div class="ak-ordner-body">`;
+        if(!isArchived){bodyHtml+=`<button class="ak-upload-btn" onclick="window.aktenUpload('${AKTEN_KIND_ID}','${ord.id}')">📤 <span>Datei hochladen</span></button>`;}
+        if(!docs.length){bodyHtml+='<div class="ak-empty">Noch leer</div>';}
+        else docs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=docRow(d,isArchived);});
+        if(isArchived&&docs.length){bodyHtml+=`<button class="ak-zip-btn" onclick="window.downloadKindZip('${c.id}','${nm}')">⬇️ Alle als ZIP herunterladen</button>`;}
+        bodyHtml+='</div>';
+      }
+    }
+
+    h+=`<div class="ak-ordner-card">
+      <div class="ak-ordner-header" onclick="window.toggleAktenOrdner('${ord.id}')">
+        <div class="ak-ordner-icon">${ord.icon}</div>
+        <div style="flex:1">
+          <div class="ak-ordner-label">${ord.label}</div>
+          <div class="ak-ordner-count">${count} ${count===1?'Dokument':'Dokumente'}</div>
+        </div>
+        <div class="ak-ordner-arrow${isOpen?' open':''}">▾</div>
+      </div>
+      ${bodyHtml}
+    </div>`;
+  });
+
+  if(isArchived){
+    h+=`<button class="btn-restore" style="width:100%;padding:12px;text-align:center;margin-top:4px" onclick="window.restoreKind('${c.id}','${nm}')">↩️ Kind wiederherstellen</button>`;
+  }
+
+  el.innerHTML=h;
+}
+
+window.openKindAkten=function(kindId){
+  AKTEN_VIEW='kind';AKTEN_KIND_ID=kindId;AKTEN_OPEN_ORDNER=null;
+  renderAktenKindView();
+};
+window.aktenBack=function(){AKTEN_VIEW='main';AKTEN_OPEN_ORDNER=null;renderAktenMainView();};
+window.toggleAktenArchiv=function(){AKTEN_ARCHIV_OPEN=!AKTEN_ARCHIV_OPEN;renderAktenMainView();};
+window.toggleAktenOrdner=function(id){
+  AKTEN_OPEN_ORDNER=AKTEN_OPEN_ORDNER===id?null:id;
+  renderAktenKindView();
+};
+window.aktenUpload=function(kindId,kategorie){
+  pendingUploadKindId=kindId;pendingUploadKategorie=kategorie;
+  document.getElementById('fileInput').click();
+};
+window.downloadDoc=function(id){
+  const d=DOCS.find(x=>x.id===id);if(!d||!d.dataUrl){showToast('⚠️ Keine Datei verfügbar');return;}
+  const a=document.createElement('a');a.href=d.dataUrl;a.download=d.name||'Dokument';a.click();
 };
 
 window.downloadKindZip=async function(id,name){
@@ -2077,11 +2260,11 @@ function populateKindDropdown(){
 
 // ── Navigation & Utils ─────────────────────────────────────
 window.showTab=function(tab){
-  const m={dash:'dashScreen',msgs:'msgsScreen',docs:'docsScreen',settings:'settingsScreen',finanzen:'finanzScreen',akten:'aktenScreen'};
+  const m={dash:'dashScreen',msgs:'msgsScreen',docs:'aktenScreen',settings:'settingsScreen',finanzen:'finanzScreen',akten:'aktenScreen'};
   showScreen(m[tab]||'dashScreen');
   if(tab==='msgs')renderMsgList();
   if(tab==='finanzen')renderSteuerRechner();
-  if(tab==='akten')renderAktenScreen();
+  if(tab==='akten'||tab==='docs'){AKTEN_VIEW='main';renderAkten();}
 };
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
