@@ -1,8 +1,10 @@
 // Mäusenest Manager – Service Worker
-const CACHE_NAME = 'mausenest-v2';
+const CACHE_NAME = 'mausenest-v3';
 const ASSETS = [
 './manager-app.html',
+'./eltern-app.html',
 './manifest.json',
+'./logo.png',
 'https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap'
 ];
 
