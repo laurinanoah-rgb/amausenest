@@ -795,7 +795,8 @@
     Update verfügbar!
     <span>Neue Version bereit – bitte einmal neu laden.</span>
   </div>
-  <button class="update-reload-btn" onclick="window.location.reload()">Neu laden ↺</button>
+  <button class="update-reload-btn" onclick="window.applyUpdate()">Neu laden ↺</button>
+  <button onclick="document.getElementById('updateBanner').classList.remove('show')" style="background:rgba(255,255,255,0.2);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-left:4px">✕</button>
 </div>
 
 <script type="module">
@@ -2689,9 +2690,15 @@ window.logout=function(){if(chatUnsub)chatUnsub();showScreen('loginScreen');docu
 window.goBack=function(){window.showTab('dash');};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeDocPreview();});
 // ── Service Worker + Update-Banner ────────────────────────
+let swReg=null;
+window.applyUpdate=function(){
+  if(swReg&&swReg.waiting){swReg.waiting.postMessage({type:'SKIP_WAITING'});}
+  else{window.location.reload();}
+};
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('./sw.js').then(reg=>{
+      swReg=reg;
       // Auf neuen SW warten
       reg.addEventListener('updatefound',()=>{
         const nw=reg.installing;

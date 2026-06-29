@@ -26,6 +26,11 @@ Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
 self.clients.claim();
 });
 
+// Message: allow page to trigger skipWaiting
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
 // Fetch: network first, then cache
 self.addEventListener('fetch', event => {
 event.respondWith(

@@ -211,7 +211,7 @@
   <!-- HOME -->
   <div id="homeScreen" class="screen">
     <div class="topbar">
-      <div class="topbar-title">🐭 Mäusenest</div>
+      <div class="topbar-title"><img src="./logo.png" alt="" style="height:32px;width:32px;object-fit:contain;border-radius:50%;flex-shrink:0"> Mäusenest</div>
       <button class="topbar-action" onclick="logout()">Abmelden</button>
     </div>
     <div class="scroll-content">
@@ -392,7 +392,8 @@
     Update verfügbar!
     <span style="display:block;font-size:0.75rem;font-weight:400;opacity:.85;margin-top:2px">Neue Version bereit – bitte einmal neu laden.</span>
   </div>
-  <button class="update-reload-btn" onclick="window.location.reload()">Neu laden ↺</button>
+  <button class="update-reload-btn" onclick="window.applyUpdate()">Neu laden ↺</button>
+  <button onclick="document.getElementById('updateBanner').classList.remove('show')" style="background:rgba(255,255,255,0.2);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-left:4px">✕</button>
 </div>
 
 <!-- KRANK MODAL -->
@@ -453,21 +454,26 @@ window.addEventListener('appinstalled',()=>{document.getElementById('installBann
 window.installPWA=function(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.then(()=>{deferredInstallPrompt=null;document.getElementById('installBanner').style.display='none';});}};
 
 // ── Service Worker + Update-Banner ────────────────────────
+let swReg=null;
+window.applyUpdate=function(){
+  if(swReg&&swReg.waiting){swReg.waiting.postMessage({type:'SKIP_WAITING'});}
+  else{window.location.reload();}
+};
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./firebase-messaging-sw.js',{scope:'./'})
-    .then(reg=>{
-      reg.addEventListener('updatefound',()=>{
-        const nw=reg.installing;
-        nw.addEventListener('statechange',()=>{
-          if(nw.state==='installed'&&navigator.serviceWorker.controller){
-            document.getElementById('updateBanner').classList.add('show');
-          }
-        });
+  navigator.serviceWorker.register('./sw.js').then(reg=>{
+    swReg=reg;
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;
+      nw.addEventListener('statechange',()=>{
+        if(nw.state==='installed'&&navigator.serviceWorker.controller){
+          document.getElementById('updateBanner').classList.add('show');
+        }
       });
-      if(reg.waiting&&navigator.serviceWorker.controller){
-        document.getElementById('updateBanner').classList.add('show');
-      }
-    }).catch(e=>console.warn('SW error',e));
+    });
+    if(reg.waiting&&navigator.serviceWorker.controller){
+      document.getElementById('updateBanner').classList.add('show');
+    }
+  }).catch(e=>console.warn('SW error',e));
   let refreshing=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
     if(!refreshing){refreshing=true;window.location.reload();}
