@@ -614,6 +614,34 @@
         </div>
         <div class="steuer-hint">⚠️ Grobe Schätzung – kein Ersatz für Steuerberatung. SV-Beiträge nicht enthalten.</div>
       </div>
+
+      <!-- Rechnungsgenerator -->
+      <div class="steuer-card">
+        <div class="steuer-title">🧾 Rechnungsgenerator</div>
+        <div class="steuer-row">
+          <span class="steuer-row-label">Kind</span>
+          <select id="rgKind" style="border:2px solid rgba(236,161,8,0.3);border-radius:10px;padding:6px 10px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;color:var(--brown);background:var(--white);outline:none" onchange="window.rgUpdateBetrag()">
+            <option value="">– Kind wählen –</option>
+          </select>
+        </div>
+        <div class="steuer-row">
+          <span class="steuer-row-label">Monat / Jahr</span>
+          <input id="rgMonat" type="month" style="border:2px solid rgba(236,161,8,0.3);border-radius:10px;padding:6px 10px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;color:var(--brown);background:var(--white);outline:none"/>
+        </div>
+        <div class="steuer-row">
+          <span class="steuer-row-label">Betrag (€)</span>
+          <input id="rgBetrag" type="number" min="0" step="0.01" placeholder="0,00" class="steuer-pflegegeld"/>
+        </div>
+        <div class="steuer-row">
+          <span class="steuer-row-label">Zusatzkosten (€)</span>
+          <input id="rgZusatz" type="number" min="0" step="0.01" placeholder="0,00" class="steuer-pflegegeld"/>
+        </div>
+        <div class="steuer-row" id="rgZusatzLblRow" style="display:none">
+          <span class="steuer-row-label" style="font-size:0.78rem">Bezeichnung Zusatz</span>
+          <input id="rgZusatzLbl" type="text" placeholder="z.B. Ausflug" style="border:2px solid rgba(236,161,8,0.3);border-radius:10px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:0.82rem;width:130px;outline:none"/>
+        </div>
+        <button class="btn btn-gold" style="margin-top:14px" onclick="window.genRechnung()">🧾 Rechnung erstellen & speichern</button>
+      </div>
     </div>
     <div class="bottom-nav">
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
@@ -759,6 +787,7 @@ let pendingUploadKindId=null,pendingUploadKategorie=null;
 const ORDNER_DEFS=[
   {id:'vertrag',       icon:'📋', label:'Verträge',          color:'#875E0A'},
   {id:'login',         icon:'🔑', label:'Login-Dokumente',   color:'#0056b3'},
+  {id:'rechnung',      icon:'🧾', label:'Rechnungen',        color:'#1a7a4a'},
   {id:'unfallbericht', icon:'🚨', label:'Unfallberichte',    color:'#c0392b'},
   {id:'krankmeldung',  icon:'🤒', label:'Krankmeldungen',    color:'#e67e22'},
   {id:'anwesenheit',   icon:'📅', label:'Anwesenheit',       color:'#27ae60'},
@@ -1322,6 +1351,16 @@ function renderSteuerRechner(){
   const sonstEl=document.getElementById('steuerSonstige');
   if(skpEl&&!skpEl.value){const v=localStorage.getItem('mausenest_skp');if(v)skpEl.value=v;}
   if(sonstEl&&!sonstEl.value){const v=localStorage.getItem('mausenest_sonstige');if(v)sonstEl.value=v;}
+  // Rechnungs-Dropdown befüllen
+  const rgKind=document.getElementById('rgKind');
+  if(rgKind){
+    const prev=rgKind.value;
+    rgKind.innerHTML='<option value="">– Kind wählen –</option>'+active.map(c=>`<option value="${c.id}">${c.emoji||'🐭'} ${c.name}</option>`).join('');
+    if(prev)rgKind.value=prev;
+  }
+  // Aktuellen Monat vorbelegen
+  const rgMonat=document.getElementById('rgMonat');
+  if(rgMonat&&!rgMonat.value){const n=new Date();rgMonat.value=n.getFullYear()+'-'+(String(n.getMonth()+1).padStart(2,'0'));}
   calcSteuer();
 }
 
@@ -1357,6 +1396,159 @@ function calcSteuer(){
   set('res-zve',zvE);
   set('res-est',est);
   set('res-netto',monatsNetto);
+}
+
+// ── Rechnungsgenerator ────────────────────────────────────
+window.rgUpdateBetrag=function(){
+  const kindId=document.getElementById('rgKind')?.value;
+  if(kindId&&CHILDREN[kindId]){
+    const pf=CHILDREN[kindId].pflegegeld||localStorage.getItem('mausenest_pflegegeld_'+kindId)||'';
+    const el=document.getElementById('rgBetrag');if(el&&!el.value&&pf)el.value=pf;
+  }
+};
+
+document.addEventListener('input',e=>{
+  if(e.target.id==='rgZusatz'){
+    const row=document.getElementById('rgZusatzLblRow');
+    if(row)row.style.display=parseFloat(e.target.value)>0?'flex':'none';
+  }
+});
+
+window.genRechnung=async function(){
+  const kindId=document.getElementById('rgKind')?.value;
+  const monat=document.getElementById('rgMonat')?.value;
+  const betrag=parseFloat(document.getElementById('rgBetrag')?.value||0);
+  const zusatz=parseFloat(document.getElementById('rgZusatz')?.value||0);
+  const zusatzLbl=document.getElementById('rgZusatzLbl')?.value.trim()||'Zusatzkosten';
+  if(!kindId){showToast('⚠️ Bitte ein Kind wählen');return;}
+  if(!monat){showToast('⚠️ Bitte Monat wählen');return;}
+  if(!betrag){showToast('⚠️ Betrag eingeben');return;}
+  const c=CHILDREN[kindId];if(!c){return;}
+  const eu=Object.keys(ELTERN).find(k=>ELTERN[k].kind===kindId)||'';
+  const ed=ELTERN[eu]||{};
+  const [year,mon]=monat.split('-');
+  const monatNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const monatStr=monatNames[parseInt(mon)-1]+' '+year;
+  const {dataUrl,fname}=generateRechnungPDF({kind:c,eltern:ed,monat:monatStr,betrag,zusatz,zusatzLbl,year,mon});
+  // In Akten speichern
+  const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
+  await addDoc(collection(db,'dokumente'),{
+    name:fname,type:'🧾',size:'PDF',date,dataUrl,
+    recipient:kindId,kindName:c.name,elternSichtbar:true,archiviert:false,
+    kategorie:'rechnung',ts:Date.now()
+  });
+  showToast('✅ Rechnung erstellt & in Akten gespeichert!');
+  // Felder zurücksetzen
+  document.getElementById('rgBetrag').value='';
+  document.getElementById('rgZusatz').value='';
+  document.getElementById('rgZusatzLbl').value='';
+};
+
+function generateRechnungPDF({kind,eltern,monat,betrag,zusatz,zusatzLbl,year,mon}){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const PW=210,PH=297,ML=20,MR=20,TW=PW-ML-MR;
+  const today=new Date();
+  const dateStr=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
+  const rgnr='RG-'+year+mon+'-'+(kind.name||'').replace(/\s/g,'').substring(0,6).toUpperCase();
+  const gesamt=betrag+(zusatz||0);
+  const faellig=new Date(today.getTime()+14*86400000);
+  const faelligStr=faellig.getDate()+'.'+(faellig.getMonth()+1)+'.'+faellig.getFullYear();
+  let y=0;
+
+  // ── Kopfbalken ──
+  doc.setFillColor('#ECA108');doc.rect(0,0,PW,22,'F');
+  doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
+  doc.text('🐭  CLAUDIAS MÄUSENEST',ML,10);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');
+  doc.text('Kindertagespflege',ML,15);
+  doc.text('claudia26.giehl@googlemail.com',PW-MR,10,{align:'right'});
+  doc.text('claudia@mausenest.de',PW-MR,15,{align:'right'});
+  y=32;
+
+  // ── Titel ──
+  doc.setFontSize(22);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('RECHNUNG',ML,y);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor('#555');
+  doc.text('Rechnungsnr.: '+rgnr,PW-MR,y-6,{align:'right'});
+  doc.text('Datum: '+dateStr,PW-MR,y,{align:'right'});
+  y+=10;
+
+  // ── Trennlinie ──
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.5);doc.line(ML,y,PW-MR,y);y+=8;
+
+  // ── Empfänger & Absender ──
+  doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('RECHNUNGSEMPFÄNGER',ML,y);
+  doc.text('ABSENDER',PW/2+5,y);
+  y+=5;
+  doc.setFont('helvetica','normal');doc.setTextColor('#000');
+  doc.setFontSize(9.5);
+  const empfLines=[eltern.name||'Erziehungsberechtigte/r','Elternteil von: '+kind.name];
+  const absLines=['Claudia Giehl','Tagespflegeperson','claudia26.giehl@googlemail.com'];
+  const maxLines=Math.max(empfLines.length,absLines.length);
+  for(let i=0;i<maxLines;i++){
+    if(empfLines[i])doc.text(empfLines[i],ML,y);
+    if(absLines[i])doc.text(absLines[i],PW/2+5,y);
+    y+=5.5;
+  }
+  y+=6;
+
+  // ── Leistungsübersicht ──
+  doc.setFillColor('#FFF9EC');doc.rect(ML,y,TW,8,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor('#875E0A');
+  doc.text('LEISTUNG',ML+3,y+5.5);
+  doc.text('BETRAG',PW-MR-3,y+5.5,{align:'right'});
+  y+=10;
+
+  // Hauptposition
+  doc.setFont('helvetica','normal');doc.setTextColor('#000');doc.setFontSize(10);
+  const pos1=`Tagespflege ${kind.name} – ${monat}`;
+  doc.text(pos1,ML+3,y+1);
+  doc.text(betrag.toFixed(2).replace('.',',')+' €',PW-MR-3,y+1,{align:'right'});
+  y+=8;
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.3);doc.line(ML,y,PW-MR,y);y+=1;
+
+  // Zusatzkosten
+  if(zusatz>0){
+    doc.text(zusatzLbl,ML+3,y+5);
+    doc.text(zusatz.toFixed(2).replace('.',',')+' €',PW-MR-3,y+5,{align:'right'});
+    y+=10;
+    doc.line(ML,y,PW-MR,y);y+=1;
+  }
+
+  // Gesamt
+  y+=5;
+  doc.setFillColor('#875E0A');doc.rect(ML,y,TW,10,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor('#fff');
+  doc.text('GESAMTBETRAG',ML+3,y+7);
+  doc.text(gesamt.toFixed(2).replace('.',',')+' €',PW-MR-3,y+7,{align:'right'});
+  y+=18;
+
+  // ── Zahlungsinfos ──
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor('#555');
+  doc.text('Zahlungsziel: '+faelligStr+' (14 Tage nach Rechnungsdatum)',ML,y);y+=6;
+  doc.text('Verwendungszweck: '+rgnr+' / '+kind.name,ML,y);y+=10;
+  doc.setFillColor('#FFF9EC');doc.rect(ML,y,TW,20,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor('#875E0A');
+  doc.text('BANKVERBINDUNG',ML+3,y+5);
+  doc.setFont('helvetica','normal');doc.setTextColor('#555');
+  doc.text('Kontoinhaber: Claudia Giehl',ML+3,y+11);
+  doc.text('IBAN: DE__ ____ ____ ____ ____ __  ·  BIC: ____________',ML+3,y+17);
+  y+=26;
+
+  // ── Hinweis ──
+  doc.setFontSize(7.5);doc.setTextColor('#888');
+  doc.text('Gemäß § 4 Nr. 25 UStG ist diese Leistung von der Umsatzsteuer befreit (anerkannte Einrichtung zur Betreuung von Kindern).',ML,y,{maxWidth:TW});
+
+  // ── Footer ──
+  doc.setFillColor('#ECA108');doc.rect(0,PH-10,PW,10,'F');
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor('#fff');
+  doc.text('Claudias Mäusenest – Kindertagespflege  |  '+rgnr,PW/2,PH-4,{align:'center'});
+
+  const fname='Rechnung_'+kind.name.replace(/ /g,'_')+'_'+year+mon+'.pdf';
+  doc.save(fname);
+  return{dataUrl:doc.output('datauristring'),fname};
 }
 
 window.removeKind=async function(id,name){
