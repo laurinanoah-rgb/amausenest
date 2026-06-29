@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="Mäusenest"/>
   <title>🐭 Mäusenest Eltern-App</title>
   <link rel="manifest" href="./eltern-manifest.json"/>
-  <link rel="apple-touch-icon" href="./icon-192.png"/>
+  <link rel="apple-touch-icon" href="./logo.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -23,7 +23,8 @@
     .screen.active{display:flex}
     /* LOGIN */
     #loginScreen{background:linear-gradient(160deg,#fff9e0,var(--cream));align-items:center;justify-content:center;padding:32px 24px}
-    .login-logo{font-size:5.5rem;margin-bottom:8px;animation:bounce 2.5s ease-in-out infinite}
+    .login-logo{margin-bottom:8px;animation:bounce 2.5s ease-in-out infinite}
+    .login-logo img{width:140px;height:140px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(135,94,10,0.25))}
     .login-title{font-family:'Chelsea Market',cursive;font-size:2.1rem;color:var(--brown);text-align:center;margin-bottom:4px}
     .login-sub{color:#a07828;font-size:0.9rem;text-align:center;margin-bottom:32px}
     .login-box{background:var(--white);border-radius:24px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 12px 48px rgba(135,94,10,0.18)}
@@ -171,7 +172,7 @@
 
   <!-- LOGIN -->
   <div id="loginScreen" class="screen active">
-    <div class="login-logo">🐭</div>
+    <div class="login-logo"><img src="./logo.png" alt="Claudias Mäusenest"/></div>
     <div class="login-title">Eltern-App</div>
     <div class="login-sub">Claudias Mäusenest · Ihr persönlicher Bereich</div>
     <div class="login-box">
@@ -387,6 +388,8 @@ const db=getFirestore(app);
 
 let SESSION=null; // {username, kindId, kindName, elternName}
 let KIND_DATA=null;
+let LOGO_B64=null;
+(function loadLogo(){fetch('./logo.png').then(r=>r.blob()).then(b=>{const fr=new FileReader();fr.onload=e=>{LOGO_B64=e.target.result;};fr.readAsDataURL(b);}).catch(()=>{});})();
 let calViewYear=new Date().getFullYear();
 let calViewMonth=new Date().getMonth();
 let chatUnsub=null,kindUnsub=null,docsUnsub=null;
@@ -779,11 +782,14 @@ window.elternDownloadUnfallPDF=function(b){
   function hline(yy){doc.setDrawColor('#ECA108');doc.setLineWidth(0.5);doc.line(ML,yy,PW-MR,yy);}
 
   // Kopf
-  doc.setFillColor('#c0392b');doc.rect(0,0,PW,14,'F');
+  doc.setFillColor('#c0392b');doc.rect(0,0,PW,20,'F');
+  if(LOGO_B64)doc.addImage(LOGO_B64,'PNG',ML,1,16,16);
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
-  doc.text('🚨  UNFALLBERICHT  –  CLAUDIAS MÄUSENEST',ML,9.5);
-  doc.text('Kindertagespflege',PW-MR,9.5,{align:'right'});
-  y=22;
+  doc.text('UNFALLBERICHT  –  CLAUDIAS MÄUSENEST',ML+(LOGO_B64?19:0),8);
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+  doc.text('Kindertagespflege',ML+(LOGO_B64?19:0),14);
+  doc.text('claudia26.giehl@googlemail.com',PW-MR,14,{align:'right'});
+  y=26;
 
   doc.setFontSize(15);doc.setFont('helvetica','bold');doc.setTextColor('#c0392b');
   doc.text('UNFALLBERICHT',PW/2,y,{align:'center'});y+=5;

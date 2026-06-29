@@ -8,6 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <title>🐭 Mäusenest Manager</title>
   <link rel="manifest" href="./manifest.json"/>
+  <link rel="apple-touch-icon" href="./logo.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -19,7 +20,8 @@
     .screen{display:none;flex-direction:column;flex:1;overflow:hidden}
     .screen.active{display:flex}
     #loginScreen{background:linear-gradient(160deg,#fff9e0,var(--cream));align-items:center;justify-content:center;padding:32px 24px}
-    .login-logo{font-size:5rem;margin-bottom:8px;animation:bounce 2.5s ease-in-out infinite}
+    .login-logo{margin-bottom:8px;animation:bounce 2.5s ease-in-out infinite}
+    .login-logo img{width:150px;height:150px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(135,94,10,0.3))}
     .login-title{font-family:'Chelsea Market',cursive;font-size:2rem;color:var(--brown);text-align:center;margin-bottom:6px}
     .login-sub{color:#a07828;font-size:0.92rem;text-align:center;margin-bottom:36px}
     .login-box{background:var(--white);border-radius:24px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 12px 48px rgba(135,94,10,0.18)}
@@ -290,7 +292,7 @@
 
   <!-- LOGIN -->
   <div id="loginScreen" class="screen active">
-    <div class="login-logo">🐭</div>
+    <div class="login-logo"><img src="./logo.png" alt="Claudias Mäusenest"/></div>
     <div class="login-title">Mäusenest Manager</div>
     <div class="login-sub">Claudias Kindertagespflege · Live mit Firebase 🔥</div>
     <div class="login-box">
@@ -793,6 +795,9 @@ const auth=getAuth(app);
 const MANAGER={user:'claudia',pass:'mausenest2025',email:'claudia26.giehl@googlemail.com'};
 
 let CHILDREN={},ELTERN={},DOCS=[],currentChildId=null,currentChatId=null,chatUnsub=null,pendingFiles=null,selectedRecipient=null,selectedKind=null;
+// ── Logo für PDFs ──────────────────────────────────────────
+let LOGO_B64=null;
+(function loadLogo(){fetch('./logo.png').then(r=>r.blob()).then(b=>{const fr=new FileReader();fr.onload=e=>{LOGO_B64=e.target.result;};fr.readAsDataURL(b);}).catch(()=>{});})();
 let newKindEmoji='🐭',newKindColor='#ffe599';
 // ── Akten State ────────────────────────────────────────────
 let AKTEN_VIEW='main',AKTEN_KIND_ID=null,AKTEN_OPEN_ORDNER=null,AKTEN_ARCHIV_OPEN=false;
@@ -1478,14 +1483,15 @@ function generateRechnungPDF({kind,eltern,monat,betrag,zusatz,zusatzLbl,year,mon
   let y=0;
 
   // ── Kopfbalken ──
-  doc.setFillColor('#ECA108');doc.rect(0,0,PW,22,'F');
+  doc.setFillColor('#ECA108');doc.rect(0,0,PW,28,'F');
+  if(LOGO_B64)doc.addImage(LOGO_B64,'PNG',ML,1,24,24);
   doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
-  doc.text('🐭  CLAUDIAS MÄUSENEST',ML,10);
+  doc.text('CLAUDIAS MÄUSENEST',ML+(LOGO_B64?27:0),10);
   doc.setFontSize(8);doc.setFont('helvetica','normal');
-  doc.text('Kindertagespflege',ML,15);
+  doc.text('Kindertagespflege',ML+(LOGO_B64?27:0),16);
   doc.text('claudia26.giehl@googlemail.com',PW-MR,10,{align:'right'});
-  doc.text('claudia@mausenest.de',PW-MR,15,{align:'right'});
-  y=32;
+  doc.text('claudia@mausenest.de',PW-MR,16,{align:'right'});
+  y=38;
 
   // ── Titel ──
   doc.setFontSize(22);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
@@ -2113,11 +2119,14 @@ function generateUnfallPDF(b,returnBase64=false){
   }
 
   // ── Kopf ──
-  doc.setFillColor('#c0392b');doc.rect(0,0,PW,14,'F');
+  doc.setFillColor('#c0392b');doc.rect(0,0,PW,20,'F');
+  if(LOGO_B64)doc.addImage(LOGO_B64,'PNG',ML,1,16,16);
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
-  doc.text('🚨  UNFALLBERICHT  –  CLAUDIAS MÄUSENEST',ML,9.5);
-  doc.text('Kindertagespflege',PW-MR,9.5,{align:'right'});
-  y=22;
+  doc.text('UNFALLBERICHT  –  CLAUDIAS MÄUSENEST',ML+(LOGO_B64?19:0),8);
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+  doc.text('Kindertagespflege',ML+(LOGO_B64?19:0),14);
+  doc.text('claudia26.giehl@googlemail.com',PW-MR,14,{align:'right'});
+  y=26;
 
   // ── Titel ──
   doc.setFontSize(15);doc.setFont('helvetica','bold');doc.setTextColor('#c0392b');
@@ -2242,12 +2251,14 @@ function generateLoginPDF(kindName,elternName,username,passwort,kindId){
   let y=0;
 
   // ── Goldener Kopfbalken ──
-  doc.setFillColor('#ECA108');doc.rect(0,0,PW,18,'F');
+  doc.setFillColor('#ECA108');doc.rect(0,0,PW,26,'F');
+  if(LOGO_B64)doc.addImage(LOGO_B64,'PNG',ML,1,22,22);
   doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
-  doc.text('🐭  CLAUDIAS MÄUSENEST  –  Kindertagespflege',ML,11);
+  doc.text('CLAUDIAS MÄUSENEST  –  Kindertagespflege',ML+(LOGO_B64?26:0),11);
   doc.setFontSize(8);doc.setFont('helvetica','normal');
   doc.text('claudia@mausenest.de',PW-MR,11,{align:'right'});
-  y=30;
+  doc.text('claudia26.giehl@googlemail.com',PW-MR,17,{align:'right'});
+  y=36;
 
   // ── Titel ──
   doc.setFontSize(20);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
@@ -2402,11 +2413,14 @@ function generateContractPDF(k,e,kindId){
   }
 
   // ── Kopf ──
-  doc.setFillColor('#ECA108');doc.rect(0,0,PW,14,'F');
+  doc.setFillColor('#ECA108');doc.rect(0,0,PW,22,'F');
+  if(LOGO_B64)doc.addImage(LOGO_B64,'PNG',ML,1,18,18);
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
-  doc.text('🐭  CLAUDIAS MÄUSENEST  –  Kindertagespflege',ML,9.5);
-  doc.text('claudia@mausenest.de',PW-MR,9.5,{align:'right'});
-  y=22;
+  doc.text('CLAUDIAS MÄUSENEST  –  Kindertagespflege',ML+(LOGO_B64?21:0),9);
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+  doc.text('claudia26.giehl@googlemail.com',PW-MR,9,{align:'right'});
+  doc.text('claudia@mausenest.de',PW-MR,15,{align:'right'});
+  y=30;
 
   doc.setFontSize(16);doc.setFont('helvetica','bold');black();
   doc.text('BETREUUNGSVERTRAG',PW/2,y,{align:'center'});y+=6;
