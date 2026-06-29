@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="./logo.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1h0.1/jszip.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--gold:#ECA108;--brown:#875E0A;--cream:#FFF9EC;--white:#fff;--gray:#f5f5f5;--text:#2d2006;--radius:16px;--shadow:0 4px 20px rgba(135,94,10,0.12);--green:#28a745;--red:#dc3545;--blue:#007bff}
@@ -402,7 +402,7 @@ import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/fir
 // Für Push-Nachrichten (optional – benötigt VAPID Key in eltern-manifest.json und firebase-messaging-sw.js):
 // import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
-const FC={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest-49e4c.firebaseapp.com",projectId:"mausenest-49e4c",storageBucket:"mausenest-49e4c.firebasestorage.app",messagingSenderId:"174479569482",appId:"1:174479569482:web:f87f709c97aa030c312cb3"};
+const FC={apiKey:"AIzaSyADjr99IlfFBPO5lvP5x7RjLpzUzaSXLQA",authDomain:"mausenest-49e4c.firebaseapp.com",projectId:"mausenest-49e4c",storageBucket:"mausenest-49e4c.firebasestorage.app",messagingSenderId:"174479569482",appId:"1:174479569482:web:f87f709c97aa030c312cb3"};
 const app=initializeApp(FC);
 const db=getFirestore(app);
 const auth=getAuth(app);
