@@ -1441,8 +1441,7 @@ function renderAktenMainView(){
 
   // Allgemeine Dokumente
   h+=`<div class="ak-section-lbl" style="margin-top:6px">ALLGEMEIN & PRIVAT</div>
-  <div class="ak-allgemein-box">
-    <button class="ak-upload-btn" onclick="window.aktenUpload(null,'allgemein')">📤 <span>Datei hochladen</span></button>`;
+  <div class="ak-allgemein-box">`;
   if(allgemeinDocs.length){
     allgemeinDocs.forEach(d=>{h+=docRow(d,false);});
   }else{
