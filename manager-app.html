@@ -154,6 +154,14 @@
     .radio-opt{flex:1;min-width:80px;padding:10px;border:2px solid rgba(236,161,8,0.2);border-radius:12px;text-align:center;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;color:var(--brown);transition:all .2s;background:var(--white)}
     .radio-opt.sel{background:var(--gold);color:white;border-color:var(--gold)}
     .radio-opt-red.sel{background:var(--red);color:white;border-color:var(--red)}
+    .archiv-card{background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;gap:12px;opacity:0.82}
+    .archiv-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;filter:grayscale(40%)}
+    .archiv-info{flex:1;min-width:0}
+    .archiv-name{font-weight:800;font-size:0.95rem;color:var(--brown)}
+    .archiv-sub{font-size:0.75rem;color:#a07828;margin-top:1px}
+    .doc-tag-privat{background:rgba(108,117,125,0.12);color:#495057;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700}
+    .privat-recipient-btn{grid-column:1/-1}
+    .btn-restore{background:rgba(40,167,69,0.1);border:1px solid rgba(40,167,69,0.3);color:var(--green);padding:6px 12px;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.75rem;cursor:pointer;white-space:nowrap}
     input[type=file]{display:none}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -355,6 +363,7 @@
         <button onclick="filterDocs('all')" id="filter-all" style="padding:7px 16px;border-radius:20px;border:2px solid var(--gold);background:var(--gold);color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">Alle</button>
         <button onclick="filterDocs('allgemein')" id="filter-allgemein" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(236,161,8,0.3);background:transparent;color:var(--brown);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">🌍 Allgemein</button>
         <button onclick="filterDocs('kind')" id="filter-kind" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(236,161,8,0.3);background:transparent;color:var(--brown);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">👶 Für Kinder</button>
+        <button onclick="filterDocs('privat')" id="filter-privat" style="padding:7px 16px;border-radius:20px;border:2px solid rgba(108,117,125,0.3);background:transparent;color:#495057;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">🔒 Privat</button>
       </div>
       <div class="section-title">📁 Dokumente <span style="font-size:0.75rem;font-weight:400;color:#a07828">(Tippen = Öffnen · 🗑️ = Löschen)</span></div>
       <div id="docList"></div>
@@ -379,7 +388,9 @@
         <div class="settings-item"><div><div class="settings-label">🔥 Datenbank</div><div class="settings-value">Firebase Firestore · Live</div></div></div>
         <div class="settings-item"><div><div class="settings-label">📱 App Version</div><div class="settings-value">3.0.0 · PWA</div></div></div>
       </div>
-      <div class="section-title">🔐 Elternzugänge</div>
+      <div class="section-title">📁 Akten – Archivierte Kinder</div>
+      <div id="aktenList"><div style="color:#a07828;font-size:0.85rem;text-align:center;padding:12px">Keine archivierten Kinder</div></div>
+      <div class="section-title" style="margin-top:8px">🔐 Elternzugänge</div>
       <div id="elternList"></div>
       <div class="settings-group" style="margin-top:18px">
         <div class="settings-item" style="cursor:pointer" onclick="if(confirm('Wirklich abmelden?'))logout()"><div class="settings-label">🚪 Abmelden</div><div class="settings-value" style="color:var(--red)">→</div></div>
@@ -412,6 +423,7 @@
     <div class="recipient-btns">
       <button class="recipient-btn" id="btn-allgemein" onclick="selectRecipient('allgemein')"><span class="recipient-icon">🌍</span>Allgemein<br/><span style="font-size:0.75rem;opacity:0.8">Alle Eltern</span></button>
       <button class="recipient-btn" id="btn-kind-select" onclick="selectRecipient('kind')"><span class="recipient-icon">👶</span>Für ein Kind<br/><span style="font-size:0.75rem;opacity:0.8">Zeichnung, Bericht…</span></button>
+      <button class="recipient-btn privat-recipient-btn" id="btn-privat" onclick="selectRecipient('privat')"><span class="recipient-icon">🔒</span>Privat (nur für mich)<br/><span style="font-size:0.75rem;opacity:0.8">Interne Akte · 10 Jahre</span></button>
     </div>
     <div id="kindSelect" style="display:none;margin-bottom:16px">
       <label class="form-label">WELCHES KIND?</label>
@@ -495,8 +507,9 @@ let newKindEmoji='🐭',newKindColor='#ffe599';
 // ── Real-time listeners ────────────────────────────────────
 onSnapshot(collection(db,'kinder'),snap=>{
   CHILDREN={};snap.forEach(d=>{CHILDREN[d.id]={id:d.id,...d.data()};});
-  const g=document.getElementById('statGesamt');if(g)g.textContent=Object.keys(CHILDREN).length;
-  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();
+  const aktive=Object.values(CHILDREN).filter(c=>!c.archiviert);
+  const g=document.getElementById('statGesamt');if(g)g.textContent=aktive.length;
+  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();renderAktenList();
 },()=>{const b=document.getElementById('syncBadge');if(b){b.textContent='● Offline';b.className='sync-badge offline';}});
 
 onSnapshot(collection(db,'eltern'),snap=>{
@@ -554,7 +567,7 @@ function updateStats(){
 // ── Child List ─────────────────────────────────────────────
 function renderChildList(){
   const el=document.getElementById('childList');if(!el)return;
-  const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));
+  const sorted=Object.values(CHILDREN).filter(c=>!c.archiviert).sort((a,b)=>a.name.localeCompare(b.name));
   el.innerHTML=sorted.map(c=>{const b=statusBadge(c.status);return`<div class="child-card fade-in" onclick="window.openChild('${c.id}')"><div class="child-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div><div class="child-info"><div class="child-name">${c.name} <span style="font-size:0.8rem;color:#a07828">(${c.age||'?'}J)</span></div><div class="child-status-text">${statusText(c)}</div></div><span class="status-badge ${b.cls}">${b.label}</span></div>`;}).join('');
 }
 
@@ -630,14 +643,24 @@ window.sendMsg=async function(){
 
 // ── Dokumente ──────────────────────────────────────────────
 window.filterDocs=function(f){
-  docFilter=f;['all','allgemein','kind'].forEach(x=>{const b=document.getElementById('filter-'+x);if(b){b.style.background=x===f?'var(--gold)':'transparent';b.style.color=x===f?'white':'var(--brown)';b.style.borderColor=x===f?'var(--gold)':'rgba(236,161,8,0.3)';}});renderDocs();
+  docFilter=f;
+  ['all','allgemein','kind'].forEach(x=>{const b=document.getElementById('filter-'+x);if(b){b.style.background=x===f?'var(--gold)':'transparent';b.style.color=x===f?'white':'var(--brown)';b.style.borderColor=x===f?'var(--gold)':'rgba(236,161,8,0.3)';}});
+  const bp=document.getElementById('filter-privat');if(bp){bp.style.background=f==='privat'?'#495057':'transparent';bp.style.color=f==='privat'?'white':'#495057';bp.style.borderColor=f==='privat'?'#495057':'rgba(108,117,125,0.3)';}
+  renderDocs();
 };
 function renderDocs(){
   const el=document.getElementById('docList');if(!el)return;
-  let fd=DOCS;if(docFilter==='allgemein')fd=DOCS.filter(d=>d.recipient==='allgemein');else if(docFilter==='kind')fd=DOCS.filter(d=>d.recipient!=='allgemein');
+  let fd=DOCS;
+  if(docFilter==='allgemein')fd=DOCS.filter(d=>d.recipient==='allgemein');
+  else if(docFilter==='kind')fd=DOCS.filter(d=>d.recipient!=='allgemein'&&d.recipient!=='privat');
+  else if(docFilter==='privat')fd=DOCS.filter(d=>d.recipient==='privat');
+  else fd=DOCS; // 'all' — show everything incl. privat
   if(!fd.length){el.innerHTML='<div style="text-align:center;color:#a07828;padding:24px;font-size:0.9rem">Noch keine Dokumente</div>';return;}
   el.innerHTML=fd.map(d=>{
-    const tag=d.recipient==='allgemein'?'<span class="doc-tag doc-tag-all">🌍 Allgemein</span>':`<span class="doc-tag doc-tag-kind">👶 ${d.kindName||d.recipient}</span>`;
+    let tag;
+    if(d.recipient==='allgemein')tag='<span class="doc-tag doc-tag-all">🌍 Allgemein</span>';
+    else if(d.recipient==='privat')tag='<span class="doc-tag doc-tag-privat">🔒 Privat</span>';
+    else tag=`<span class="doc-tag doc-tag-kind">👶 ${d.kindName||d.recipient}</span>`;
     const n=d.name.replace(/'/g,"\\'");
     return`<div class="doc-item" onclick="window.openDocPreview('${d.id}')"><div style="font-size:1.8rem">${d.type||'📄'}</div><div style="flex:1;min-width:0"><div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div><div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div></div>${tag}<button class="doc-delete-btn" onclick="event.stopPropagation();window.deleteDocItem('${d.id}','${n}')">🗑️</button></div>`;
   }).join('');
@@ -656,14 +679,15 @@ window.selectRecipient=function(type){
   selectedRecipient=type;
   document.getElementById('btn-allgemein').classList.toggle('selected',type==='allgemein');
   document.getElementById('btn-kind-select').classList.toggle('selected',type==='kind');
+  const bp=document.getElementById('btn-privat');if(bp)bp.classList.toggle('selected',type==='privat');
   if(type==='kind'){document.getElementById('kindSelect').style.display='block';}else{document.getElementById('kindSelect').style.display='none';selectedKind=null;}
   checkUploadReady();
 };
-function checkUploadReady(){const r=selectedRecipient==='allgemein'||(selectedRecipient==='kind'&&document.getElementById('kindSelectDropdown').value);document.getElementById('confirmUploadBtn').disabled=!r;document.getElementById('confirmUploadBtn').style.opacity=r?'1':'0.5';}
+function checkUploadReady(){const r=selectedRecipient==='allgemein'||selectedRecipient==='privat'||(selectedRecipient==='kind'&&document.getElementById('kindSelectDropdown').value);document.getElementById('confirmUploadBtn').disabled=!r;document.getElementById('confirmUploadBtn').style.opacity=r?'1':'0.5';}
 document.addEventListener('change',e=>{if(e.target.id==='kindSelectDropdown'){selectedKind=e.target.value;checkUploadReady();}});
 window.confirmUpload=async function(){
   if(!pendingFiles)return;
-  const recipient=selectedRecipient==='allgemein'?'allgemein':(selectedKind||'allgemein');
+  const recipient=selectedRecipient==='allgemein'?'allgemein':selectedRecipient==='privat'?'privat':(selectedKind||'allgemein');
   const kindName=selectedRecipient==='kind'&&CHILDREN[selectedKind]?CHILDREN[selectedKind].name:null;
   const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
   let uploaded=0;
@@ -696,7 +720,7 @@ window.deleteDocItem=async function(id,name){
 // ── Einstellungen: Kinder verwalten ───────────────────────
 function renderKindMgmtList(){
   const el=document.getElementById('kindMgmtList');if(!el)return;
-  const sorted=Object.values(CHILDREN).sort((a,b)=>a.name.localeCompare(b.name));
+  const sorted=Object.values(CHILDREN).filter(c=>!c.archiviert).sort((a,b)=>a.name.localeCompare(b.name));
   if(!sorted.length){el.innerHTML='<div style="color:#a07828;font-size:0.9rem;text-align:center;padding:16px;background:white;border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow)">Noch keine Kinder eingetragen</div>';return;}
   el.innerHTML=sorted.map(c=>`
     <div class="kind-mgmt-card">
@@ -713,14 +737,41 @@ function renderKindMgmtList(){
 }
 
 window.removeKind=async function(id,name){
-  if(!confirm(`"${name}" wirklich entfernen?\n\nKind und Elternzugang werden gelöscht.\nNachrichten und Dokumente bleiben erhalten.`))return;
-  const batch=writeBatch(db);
-  const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
-  elternSnap.forEach(d=>batch.delete(d.ref));
-  batch.delete(doc(db,'kinder',id));
-  await batch.commit();
-  showToast(`🗑️ ${name} entfernt.`);
+  if(!confirm(`"${name}" archivieren?\n\nDas Kind wird von der Startseite entfernt und in "📁 Akten" verschoben.\nAlle Daten & Dokumente bleiben 10 Jahre erhalten.`))return;
+  try{
+    // Eltern-Login deaktivieren (löschen)
+    const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
+    const batch=writeBatch(db);
+    elternSnap.forEach(d=>batch.delete(d.ref));
+    // Kind als archiviert markieren (NICHT löschen)
+    batch.update(doc(db,'kinder',id),{archiviert:true,archiviertAm:new Date().toISOString()});
+    await batch.commit();
+    showToast(`📁 ${name} archiviert.`);
+  }catch(e){showToast('❌ Fehler: '+e.message);}
 };
+
+window.restoreKind=async function(id,name){
+  if(!confirm(`"${name}" wiederherstellen?\n\nDas Kind erscheint wieder auf der Startseite.`))return;
+  try{
+    await updateDoc(doc(db,'kinder',id),{archiviert:false,archiviertAm:null});
+    showToast(`✅ ${name} wiederhergestellt!`);
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
+
+function renderAktenList(){
+  const el=document.getElementById('aktenList');if(!el)return;
+  const archiviert=Object.values(CHILDREN).filter(c=>c.archiviert===true);
+  if(!archiviert.length){el.innerHTML='<div style="color:#a07828;font-size:0.85rem;text-align:center;padding:12px">Keine archivierten Kinder</div>';return;}
+  el.innerHTML=archiviert.map(c=>`
+    <div class="archiv-card">
+      <div class="archiv-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div>
+      <div class="archiv-info">
+        <div class="archiv-name">${c.name}</div>
+        <div class="archiv-sub">${c.age||'?'} J. · Archiviert ${c.archiviertAm?new Date(c.archiviertAm).toLocaleDateString('de-DE'):''}</div>
+      </div>
+      <button class="btn-restore" onclick="window.restoreKind('${c.id}','${c.name.replace(/'/g,"\\'")}')">↩️ Wiederherstellen</button>
+    </div>`).join('');
+}
 
 // ── Kind hinzufügen ────────────────────────────────────────
 window.openAddKindModal=function(){

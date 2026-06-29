@@ -446,7 +446,7 @@ function startDocsListener(){
   });
 }
 function renderDocs(){
-  const myDocs=allDocs.filter(d=>d.recipient==='allgemein'||d.recipient===SESSION.kindId);
+  const myDocs=allDocs.filter(d=>d.recipient!=='privat'&&(d.recipient==='allgemein'||d.recipient===SESSION.kindId));
   const el=document.getElementById('docsContent');
   if(!myDocs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📄</div>Noch keine Dokumente</div>';return;}
   const tagAll=`<span style="background:#d4edda;color:#155724;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">🌍 Allgemein</span>`;
