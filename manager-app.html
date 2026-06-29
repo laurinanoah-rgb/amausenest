@@ -10,6 +10,7 @@
   <link rel="manifest" href="./manifest.json"/>
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--gold:#ECA108;--yellow:#F9E003;--brown:#875E0A;--cream:#FFF9EC;--gray:#f5f5f5;--text:#2d2006;--white:#fff;--radius:16px;--shadow:0 4px 20px rgba(135,94,10,0.12);--green:#28a745;--red:#dc3545}
@@ -39,9 +40,9 @@
     .topbar-action{background:var(--gold);border:none;padding:8px 16px;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.88rem;color:white;cursor:pointer}
     .scroll-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
     .bottom-nav{background:var(--white);display:flex;border-top:1px solid rgba(236,161,8,0.2);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 6px;cursor:pointer;color:#a07828;transition:color .2s;border:none;background:none;font-family:'Nunito',sans-serif}
-    .nav-icon{font-size:1.25rem}
-    .nav-label{font-size:0.6rem;font-weight:700;margin-top:2px;letter-spacing:.2px}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 1px 5px;cursor:pointer;color:#a07828;transition:color .2s;border:none;background:none;font-family:'Nunito',sans-serif}
+    .nav-icon{font-size:1.2rem;line-height:1}
+    .nav-label{font-size:0.55rem;font-weight:700;margin-top:2px;letter-spacing:.1px}
     .nav-item.active{color:var(--gold)}
     .nav-icon{font-size:1.4rem;margin-bottom:2px}
     .nav-label{font-size:0.68rem;font-weight:700}
@@ -238,6 +239,7 @@
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
       <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -359,6 +361,7 @@
       <button class="nav-item active" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
       <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -401,6 +404,7 @@
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item active" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
       <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -488,6 +492,23 @@
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
       <button class="nav-item active" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
+      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
+    </div>
+  </div>
+
+  <!-- AKTEN SCREEN -->
+  <div id="aktenScreen" class="screen">
+    <div class="topbar"><div class="topbar-title">📁 Akten – Archivierte Kinder</div><div style="width:38px"></div></div>
+    <div class="scroll-content">
+      <div id="aktenScreenList"><div style="color:#a07828;font-size:0.88rem;text-align:center;padding:24px;background:var(--white);border-radius:14px;box-shadow:var(--shadow)">Keine archivierten Kinder vorhanden.</div></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+      <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item active" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
       <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -515,7 +536,12 @@
     </div>
     <div id="kindSelect" style="display:none;margin-bottom:16px">
       <label class="form-label">WELCHES KIND?</label>
-      <select id="kindSelectDropdown" class="form-input" style="margin-bottom:0"><option value="">Kind auswählen…</option></select>
+      <select id="kindSelectDropdown" class="form-input" style="margin-bottom:12px"><option value="">Kind auswählen…</option></select>
+      <label style="display:flex;align-items:center;gap:10px;background:rgba(236,161,8,0.08);border-radius:12px;padding:11px 14px;cursor:pointer;font-weight:700;color:var(--brown);font-size:0.9rem">
+        <input type="checkbox" id="elternSichtbarCheck" checked style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex-shrink:0"/>
+        <span>👁️ Für Eltern sichtbar?</span>
+      </label>
+      <div style="font-size:0.75rem;color:#a07828;margin-top:6px;padding:0 4px">Wenn deaktiviert, sehen Eltern dieses Dokument nicht in ihrer App – es bleibt nur in den Akten.</div>
     </div>
     <div style="background:var(--cream);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:0.85rem;color:var(--brown)">📎 <strong id="uploadFileName">Datei</strong></div>
     <button class="btn btn-gold" onclick="confirmUpload()" id="confirmUploadBtn" disabled style="opacity:0.5">Hochladen ✅</button>
@@ -597,7 +623,7 @@ onSnapshot(collection(db,'kinder'),snap=>{
   CHILDREN={};snap.forEach(d=>{CHILDREN[d.id]={id:d.id,...d.data()};});
   const aktive=Object.values(CHILDREN).filter(c=>!c.archiviert);
   const g=document.getElementById('statGesamt');if(g)g.textContent=aktive.length;
-  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();renderAktenList();renderSteuerRechner();
+  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();renderAktenList();renderSteuerRechner();renderAktenScreen();
 },()=>{const b=document.getElementById('syncBadge');if(b){b.textContent='● Offline';b.className='sync-badge offline';}});
 
 onSnapshot(collection(db,'eltern'),snap=>{
@@ -777,13 +803,14 @@ window.confirmUpload=async function(){
   if(!pendingFiles)return;
   const recipient=selectedRecipient==='allgemein'?'allgemein':selectedRecipient==='privat'?'privat':(selectedKind||'allgemein');
   const kindName=selectedRecipient==='kind'&&CHILDREN[selectedKind]?CHILDREN[selectedKind].name:null;
+  const elternSichtbar=selectedRecipient==='kind'?(document.getElementById('elternSichtbarCheck')?.checked!==false):true;
   const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
   let uploaded=0;
   for(const f of pendingFiles){
     if(f.size>800*1024){showToast('⚠️ '+f.name+' zu groß (max 800 KB)');continue;}
     const type=f.type.includes('pdf')?'📋':f.type.includes('image')?'🖼️':f.type.includes('word')?'📝':'📄';
     const dataUrl=await readFileAsDataUrl(f);
-    await addDoc(collection(db,'dokumente'),{name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,ts:Date.now(),dataUrl});
+    await addDoc(collection(db,'dokumente'),{name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,elternSichtbar,ts:Date.now(),dataUrl});
     uploaded++;
   }
   closeUploadModal();showTab('docs');if(uploaded>0)showToast(`✅ ${uploaded} Datei(en) hochgeladen!`);pendingFiles=null;
@@ -961,8 +988,11 @@ window.removeKind=async function(id,name){
     const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
     const batch=writeBatch(db);
     elternSnap.forEach(d=>batch.delete(d.ref));
-    // Kind als archiviert markieren (NICHT löschen)
+    // Kind als archiviert markieren
     batch.update(doc(db,'kinder',id),{archiviert:true,archiviertAm:new Date().toISOString()});
+    // Kind-spezifische Dokumente als archiviert markieren (in Aktenordner verschieben)
+    const docsSnap=await getDocs(query(collection(db,'dokumente'),where('recipient','==',id)));
+    docsSnap.forEach(d=>batch.update(d.ref,{archiviert:true,archiviertKindId:id}));
     await batch.commit();
     showToast(`📁 ${name} archiviert.`);
   }catch(e){showToast('❌ Fehler: '+e.message);}
@@ -990,6 +1020,76 @@ function renderAktenList(){
       <button class="btn-restore" onclick="window.restoreKind('${c.id}','${c.name.replace(/'/g,"\\'")}')">↩️ Wiederherstellen</button>
     </div>`).join('');
 }
+
+async function renderAktenScreen(){
+  const el=document.getElementById('aktenScreenList');if(!el)return;
+  const archiviert=Object.values(CHILDREN).filter(c=>c.archiviert===true).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!archiviert.length){
+    el.innerHTML='<div style="color:#a07828;font-size:0.88rem;text-align:center;padding:32px;background:var(--white);border-radius:14px;box-shadow:var(--shadow)">📁 Noch keine archivierten Kinder.</div>';
+    return;
+  }
+  // Load archived docs for all archived children
+  const allArchivedDocs=DOCS.filter(d=>d.archiviert===true||Object.values(CHILDREN).filter(c=>c.archiviert).some(c=>c.id===d.recipient));
+  el.innerHTML=archiviert.map(c=>{
+    const kindDocs=DOCS.filter(d=>d.recipient===c.id||d.archiviertKindId===c.id);
+    const nm=c.name.replace(/'/g,"\\'");
+    const archiviertAm=c.archiviertAm?new Date(c.archiviertAm).toLocaleDateString('de-DE'):'–';
+    const docRows=kindDocs.length?kindDocs.map(d=>`
+      <div class="steuer-row" style="padding:8px 0">
+        <span style="font-size:0.85rem;color:var(--text)">${d.type||'📄'} ${d.name}</span>
+        <button class="btn-green-sm" onclick="window.openDocPreview('${d.id}')">👁️</button>
+      </div>`).join(''):'<div style="color:#a07828;font-size:0.82rem;padding:8px 0">Keine Dokumente archiviert.</div>';
+    return`
+    <div class="kind-accordion" id="akc-${c.id}">
+      <div class="kind-acc-header" onclick="window.toggleAktenAcc('${c.id}')">
+        <div style="width:46px;height:46px;border-radius:50%;background:${c.color||'#ffe599'};display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;opacity:.85">${c.emoji||'🐭'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;color:var(--brown)">${c.name}</div>
+          <div style="font-size:0.75rem;color:#a07828">Archiviert: ${archiviertAm} · ${kindDocs.length} Dok.</div>
+        </div>
+        <div class="kind-acc-arrow" id="akcarrow-${c.id}">▾</div>
+      </div>
+      <div class="kind-acc-body" id="akcbody-${c.id}" style="display:none">
+        <div class="kind-acc-section">📋 Stammdaten</div>
+        <div style="font-size:0.85rem;color:var(--text);display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <div><span style="color:#a07828">Alter:</span> ${c.age||'–'} J.</div>
+          <div><span style="color:#a07828">Beginn:</span> ${c.betreuungsBeginn?c.betreuungsBeginn.split('-').reverse().join('.'):'–'}</div>
+        </div>
+        <div class="kind-acc-section">📄 Archivierte Dokumente</div>
+        ${docRows}
+        ${kindDocs.length?`<button class="btn-sm btn-gold" style="width:100%;padding:11px;margin-top:12px" onclick="window.downloadKindZip('${c.id}','${nm}')">⬇️ Alle als ZIP herunterladen</button>`:''}
+        <button class="btn-restore" style="margin-top:10px;width:100%;text-align:center" onclick="window.restoreKind('${c.id}','${nm}')">↩️ Kind wiederherstellen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleAktenAcc=function(id){
+  const body=document.getElementById('akcbody-'+id);
+  const arrow=document.getElementById('akcarrow-'+id);
+  const open=body.style.display==='block';
+  body.style.display=open?'none':'block';
+  arrow.classList.toggle('open',!open);
+};
+
+window.downloadKindZip=async function(id,name){
+  showToast('⏳ ZIP wird erstellt…',4000);
+  const kindDocs=DOCS.filter(d=>d.recipient===id||d.archiviertKindId===id);
+  if(!kindDocs.length){showToast('⚠️ Keine Dokumente vorhanden');return;}
+  try{
+    const zip=new JSZip();
+    for(const d of kindDocs){
+      if(!d.dataUrl)continue;
+      const base64=d.dataUrl.split(',')[1];
+      if(base64)zip.file(d.name,base64,{base64:true});
+    }
+    const blob=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=name+'_Akten.zip';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    showToast('✅ ZIP heruntergeladen!');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
 
 // ── Kind hinzufügen ────────────────────────────────────────
 window.openAddKindModal=function(){
@@ -1365,10 +1465,11 @@ function populateKindDropdown(){
 
 // ── Navigation & Utils ─────────────────────────────────────
 window.showTab=function(tab){
-  const m={dash:'dashScreen',msgs:'msgsScreen',docs:'docsScreen',settings:'settingsScreen',finanzen:'finanzScreen'};
+  const m={dash:'dashScreen',msgs:'msgsScreen',docs:'docsScreen',settings:'settingsScreen',finanzen:'finanzScreen',akten:'aktenScreen'};
   showScreen(m[tab]||'dashScreen');
   if(tab==='msgs')renderMsgList();
   if(tab==='finanzen')renderSteuerRechner();
+  if(tab==='akten')renderAktenScreen();
 };
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
