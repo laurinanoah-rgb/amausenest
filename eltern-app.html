@@ -398,12 +398,14 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 // Für Push-Nachrichten (optional – benötigt VAPID Key in eltern-manifest.json und firebase-messaging-sw.js):
 // import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
 const FC={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest-49e4c.firebaseapp.com",projectId:"mausenest-49e4c",storageBucket:"mausenest-49e4c.firebasestorage.app",messagingSenderId:"174479569482",appId:"1:174479569482:web:f87f709c97aa030c312cb3"};
 const app=initializeApp(FC);
 const db=getFirestore(app);
+const auth=getAuth(app);
 
 let SESSION=null; // {username, kindId, kindName, elternName}
 let KIND_DATA=null;
@@ -467,15 +469,19 @@ window.doLogin=async function(){
   const errEl=document.getElementById('loginErr');
   if(!username||!pass){showToast('⚠️ Bitte alles ausfüllen');return;}
   try{
+    // Anonyme Firebase-Auth-Sitzung starten (für Firestore-Zugriffsregeln)
+    await signInAnonymously(auth);
     const snap=await getDoc(doc(db,'eltern',username));
     if(!snap.exists()||snap.data().pass!==pass){
       errEl.textContent='❌ Benutzername oder Passwort falsch.';
-      errEl.classList.add('show');return;
+      errEl.classList.add('show');
+      signOut(auth);return;
     }
     const d=snap.data();
     if(d.gesperrt){
       errEl.textContent='⛔ Zugang gesperrt. Bitte wende dich an die Tagesmutter.';
-      errEl.classList.add('show');return;
+      errEl.classList.add('show');
+      signOut(auth);return;
     }
     SESSION={username,kindId:d.kind,kindName:d.kindName,elternName:d.name};
     errEl.classList.remove('show');
@@ -1001,7 +1007,7 @@ window.showTab=function(tab){
   if(!_skipPush)history.pushState({tab:tab},'');
 };
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-window.logout=function(){if(chatUnsub)chatUnsub();if(kindUnsub)kindUnsub();if(docsUnsub)docsUnsub();SESSION=null;KIND_DATA=null;showScreen('loginScreen');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';document.getElementById('pushBanner').style.display='none';};
+window.logout=function(){if(chatUnsub)chatUnsub();if(kindUnsub)kindUnsub();if(docsUnsub)docsUnsub();signOut(auth);SESSION=null;KIND_DATA=null;showScreen('loginScreen');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';document.getElementById('pushBanner').style.display='none';};
 
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}

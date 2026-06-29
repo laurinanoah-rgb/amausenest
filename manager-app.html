@@ -847,7 +847,7 @@ const FC={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest
 const app=initializeApp(FC);
 const db=getFirestore(app);
 const auth=getAuth(app);
-const MANAGER={user:'claudia',pass:'mausenest2025',email:'claudia26.giehl@googlemail.com'};
+const MANAGER={user:'claudia',email:'claudia26.giehl@googlemail.com'};
 
 let CHILDREN={},ELTERN={},DOCS=[],currentChildId=null,currentChatId=null,chatUnsub=null,pendingFiles=null,selectedRecipient=null,selectedKind=null;
 // ── Logo für PDFs ──────────────────────────────────────────
@@ -2755,13 +2755,7 @@ window.doLogin=async function(){
     afterLogin();
     return;
   }catch(firebaseErr){
-    // Falls Firebase Auth noch nicht eingerichtet: Fallback auf hardcoded
-    if(u===MANAGER.user&&p===MANAGER.pass){
-      // Firebase Auth Konto erstellen (einmalig)
-      try{await createUserWithEmailAndPassword(auth,MANAGER.email,p);}catch(_){}
-      afterLogin();
-      return;
-    }
+    // Firebase Auth fehlgeschlagen
   }
   err.classList.add('show');
   document.getElementById('loginPass').value='';
