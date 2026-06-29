@@ -779,7 +779,7 @@
   </div>
 </div>
 
-<!-- BESTÄTIGUNGS-MODAL -->
+<!-- BESTÄTIGUNGS-MODAL (ersetzt confirm()) -->
 <div class="modal-overlay" id="confirmModal" style="display:none">
   <div class="modal-box" style="max-width:340px">
     <div class="modal-title" id="confirmModalTitle">Bestätigen</div>
@@ -971,8 +971,7 @@ window.sendAnkuendigung=async function(){
 };
 
 window.deleteAnk=async function(id){
-  const ok=await showConfirm('📁 Kind archivieren',`"${name}" wird von der Startseite entfernt. Alle Daten & Dokumente bleiben erhalten.`,'📁 Archivieren');
-  if(!ok)return;
+  if(!confirm('Ankündigung löschen?'))return;
   try{await deleteDoc(doc(db,'ankuendigungen',id));showToast('🗑️ Gelöscht');}
   catch(e){showToast('❌ '+e.message);}
 };
@@ -1691,11 +1690,7 @@ function showConfirm(title,text,okLabel){
     document.getElementById('confirmModalText').textContent=text;
     const okBtn=document.getElementById('confirmModalOk');
     okBtn.textContent=okLabel||'Bestätigen';
-    okBtn.onclick=()=>{document.getElementById('let _confirmResolve=null;
-window._confirmCancel=function(){document.getElementById('confirmModal').style.display='none';if(_confirmResolve)_confirmResolve(false);};
-function showConfirm(title,text2,okLabel){return new Promise(resolve=>{_confirmResolve=resolve;document.getElementById('confirmModalTitle').textContent=title;document.getElementById('confirmModalText').textContent=text2;const okBtn=document.getElementById('confirmModalOk');okBtn.textContent=okLabel||'OK';okBtn.onclick=()=>{document.getElementById('confirmModal').style.display='none';resolve(true);};document.getElementById('confirmModal').style.display='flex';});}
-
-confirmModal').style.display='none';resolve(true);};
+    okBtn.onclick=()=>{document.getElementById('confirmModal').style.display='none';resolve(true);};
     document.getElementById('confirmModal').style.display='flex';
   });
 }
@@ -1704,13 +1699,10 @@ window.removeKind=async function(id,name){
   const ok=await showConfirm('📁 Kind archivieren',`"${name}" wird von der Startseite entfernt.\nAlle Daten & Dokumente bleiben erhalten.`,'📁 Archivieren');
   if(!ok)return;
   try{
-    // Eltern-Login sperren (nicht löschen – für Wiederherstellung)
     const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
     const batch=writeBatch(db);
     elternSnap.forEach(d=>batch.update(d.ref,{gesperrt:true}));
-    // Kind als archiviert markieren
     batch.update(doc(db,'kinder',id),{archiviert:true,archiviertAm:new Date().toISOString()});
-    // Kind-spezifische Dokumente als archiviert markieren (in Aktenordner verschieben)
     const docsSnap=await getDocs(query(collection(db,'dokumente'),where('recipient','==',id)));
     docsSnap.forEach(d=>batch.update(d.ref,{archiviert:true,archiviertKindId:id}));
     await batch.commit();
@@ -1722,7 +1714,6 @@ window.restoreKind=async function(id,name){
   const ok=await showConfirm('♻️ Kind wiederherstellen',`"${name}" erscheint wieder auf der Startseite.`,'✅ Wiederherstellen');
   if(!ok)return;
   try{
-    // Eltern-Login wieder entsperren
     const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
     const batch=writeBatch(db);
     elternSnap.forEach(d=>batch.update(d.ref,{gesperrt:false}));
