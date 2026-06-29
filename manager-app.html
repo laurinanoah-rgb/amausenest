@@ -779,6 +779,18 @@
   </div>
 </div>
 
+<!-- BESTÄTIGUNGS-MODAL -->
+<div class="modal-overlay" id="confirmModal" style="display:none">
+  <div class="modal-box" style="max-width:340px">
+    <div class="modal-title" id="confirmModalTitle">Bestätigen</div>
+    <div id="confirmModalText" style="font-size:0.88rem;color:#a07828;text-align:center;margin-bottom:20px"></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button id="confirmModalOk" style="padding:14px;border:2px solid var(--red);border-radius:14px;background:rgba(220,53,69,0.08);color:var(--red);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer"></button>
+      <button onclick="window._confirmCancel()" style="width:100%;padding:11px;border:none;background:transparent;color:#a07828;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADD KIND MODAL -->
 <div class="modal-overlay" id="addKindModal">
   <div class="modal-sheet">
@@ -959,7 +971,8 @@ window.sendAnkuendigung=async function(){
 };
 
 window.deleteAnk=async function(id){
-  if(!confirm('Ankündigung löschen?'))return;
+  const ok=await showConfirm('📁 Kind archivieren',`"${name}" wird von der Startseite entfernt. Alle Daten & Dokumente bleiben erhalten.`,'📁 Archivieren');
+  if(!ok)return;
   try{await deleteDoc(doc(db,'ankuendigungen',id));showToast('🗑️ Gelöscht');}
   catch(e){showToast('❌ '+e.message);}
 };
@@ -1665,8 +1678,31 @@ function generateRechnungPDF({kind,eltern,monat,betrag,zusatz,zusatzLbl,year,mon
   return{dataUrl:doc.output('datauristring'),fname};
 }
 
+// ── Bestätigungs-Modal (ersetzt confirm()) ─────────────────
+let _confirmResolve=null;
+window._confirmCancel=function(){
+  document.getElementById('confirmModal').style.display='none';
+  if(_confirmResolve)_confirmResolve(false);
+};
+function showConfirm(title,text,okLabel){
+  return new Promise(resolve=>{
+    _confirmResolve=resolve;
+    document.getElementById('confirmModalTitle').textContent=title;
+    document.getElementById('confirmModalText').textContent=text;
+    const okBtn=document.getElementById('confirmModalOk');
+    okBtn.textContent=okLabel||'Bestätigen';
+    okBtn.onclick=()=>{document.getElementById('let _confirmResolve=null;
+window._confirmCancel=function(){document.getElementById('confirmModal').style.display='none';if(_confirmResolve)_confirmResolve(false);};
+function showConfirm(title,text2,okLabel){return new Promise(resolve=>{_confirmResolve=resolve;document.getElementById('confirmModalTitle').textContent=title;document.getElementById('confirmModalText').textContent=text2;const okBtn=document.getElementById('confirmModalOk');okBtn.textContent=okLabel||'OK';okBtn.onclick=()=>{document.getElementById('confirmModal').style.display='none';resolve(true);};document.getElementById('confirmModal').style.display='flex';});}
+
+confirmModal').style.display='none';resolve(true);};
+    document.getElementById('confirmModal').style.display='flex';
+  });
+}
+
 window.removeKind=async function(id,name){
-  if(!confirm(`"${name}" archivieren?\n\nDas Kind wird von der Startseite entfernt und in "📁 Akten" verschoben.\nAlle Daten & Dokumente bleiben 10 Jahre erhalten.`))return;
+  const ok=await showConfirm('📁 Kind archivieren',`"${name}" wird von der Startseite entfernt.\nAlle Daten & Dokumente bleiben erhalten.`,'📁 Archivieren');
+  if(!ok)return;
   try{
     // Eltern-Login sperren (nicht löschen – für Wiederherstellung)
     const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
@@ -1683,7 +1719,8 @@ window.removeKind=async function(id,name){
 };
 
 window.restoreKind=async function(id,name){
-  if(!confirm(`"${name}" wiederherstellen?\n\nDas Kind erscheint wieder auf der Startseite.`))return;
+  const ok=await showConfirm('♻️ Kind wiederherstellen',`"${name}" erscheint wieder auf der Startseite.`,'✅ Wiederherstellen');
+  if(!ok)return;
   try{
     // Eltern-Login wieder entsperren
     const elternSnap=await getDocs(query(collection(db,'eltern'),where('kind','==',id)));
