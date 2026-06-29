@@ -1451,7 +1451,10 @@ window.confirmAddKind=async function(){
     await setDoc(doc(db,'eltern',username),{name:elternName,email,pass:passwort,kind:kindRef.id,kindName:fullName,ts:Date.now()});
     window.closeAddKindModal();
     showToast(`✅ ${fullName} wurde hinzugefügt!`);
-    setTimeout(()=>generateContractPDF({vorname,familienname,alter,beginn,emoji:newKindEmoji},{name:elternName,email,username}),800);
+    setTimeout(()=>{
+      generateContractPDF({vorname,familienname,alter,beginn,emoji:newKindEmoji},{name:elternName,email,username});
+      setTimeout(()=>generateLoginPDF(fullName,elternName,username,passwort),600);
+    },800);
   }catch(e){console.error(e);showToast('❌ Fehler: '+e.message);}
 };
 
@@ -1545,6 +1548,127 @@ window.printContract=function(kindId){
     {name:ed.name||'',email:ed.email||'',username:eu}
   );
 };
+
+function generateLoginPDF(kindName,elternName,username,passwort){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const PW=210,PH=297,ML=25,MR=25,TW=PW-ML-MR;
+  const today=new Date();
+  const dateStr=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
+  let y=0;
+
+  // ── Goldener Kopfbalken ──
+  doc.setFillColor('#ECA108');doc.rect(0,0,PW,18,'F');
+  doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
+  doc.text('🐭  CLAUDIAS MÄUSENEST  –  Kindertagespflege',ML,11);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');
+  doc.text('claudia@mausenest.de',PW-MR,11,{align:'right'});
+  y=30;
+
+  // ── Titel ──
+  doc.setFontSize(20);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('Eltern-App Zugangsdaten',PW/2,y,{align:'center'});y+=8;
+  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor('#555555');
+  doc.text('Herzlich willkommen in der digitalen Betreuungs-App!',PW/2,y,{align:'center'});y+=5;
+  doc.text('Bitte bewahren Sie diese Zugangsdaten sicher auf.',PW/2,y,{align:'center'});y+=10;
+
+  // ── Trennlinie ──
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.6);doc.line(ML,y,PW-MR,y);y+=10;
+
+  // ── Kind & Eltern Info ──
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('Betreuungskind:',ML,y);
+  doc.setFont('helvetica','normal');doc.setTextColor('#000000');doc.setFontSize(11);
+  doc.text(kindName,ML+38,y);y+=7;
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('Erziehungsberechtigte/r:',ML,y);
+  doc.setFont('helvetica','normal');doc.setTextColor('#000000');doc.setFontSize(11);
+  doc.text(elternName,ML+52,y);y+=12;
+
+  // ── Zugangsdaten Box ──
+  doc.setFillColor('#FFF9EC');doc.roundedRect(ML,y,TW,52,3,3,'F');
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.5);doc.roundedRect(ML,y,TW,52,3,3,'S');
+
+  doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('🔑  Ihre Zugangsdaten',ML+5,y+8);
+
+  // URL
+  doc.setFontSize(8.5);doc.setTextColor('#555555');doc.setFont('helvetica','bold');
+  doc.text('App-Adresse:',ML+5,y+17);
+  doc.setFont('helvetica','normal');doc.setTextColor('#1a5276');
+  doc.text('https://laurinanoah-rgb.github.io/amausenest/eltern-app.html',ML+35,y+17);
+
+  // Username
+  doc.setFontSize(8.5);doc.setTextColor('#555555');doc.setFont('helvetica','bold');
+  doc.text('Benutzername:',ML+5,y+26);
+  doc.setFillColor('#ffffff');doc.roundedRect(ML+35,y+21,70,7,1,1,'F');
+  doc.setDrawColor('#cccccc');doc.setLineWidth(0.3);doc.roundedRect(ML+35,y+21,70,7,1,1,'S');
+  doc.setFont('helvetica','bold');doc.setTextColor('#000000');doc.setFontSize(10);
+  doc.text(username,ML+37,y+26);
+
+  // Password
+  doc.setFontSize(8.5);doc.setTextColor('#555555');doc.setFont('helvetica','bold');
+  doc.text('Passwort:',ML+5,y+37);
+  doc.setFillColor('#ffffff');doc.roundedRect(ML+35,y+32,70,7,1,1,'F');
+  doc.setDrawColor('#cccccc');doc.setLineWidth(0.3);doc.roundedRect(ML+35,y+32,70,7,1,1,'S');
+  doc.setFont('helvetica','bold');doc.setTextColor('#000000');doc.setFontSize(10);
+  doc.text(passwort,ML+37,y+37);
+
+  // Hinweis
+  doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor('#888888');
+  doc.text('Passwort kann jederzeit bei Claudia geändert werden.',ML+5,y+47);
+
+  y+=60;
+
+  // ── Anleitung ──
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.6);doc.line(ML,y,PW-MR,y);y+=8;
+  doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('So melden Sie sich an:',ML,y);y+=7;
+  const steps=[
+    '1.  Öffnen Sie die App-Adresse in Ihrem Smartphone-Browser (Chrome oder Safari empfohlen).',
+    '2.  Geben Sie Ihren Benutzernamen und Ihr Passwort ein.',
+    '3.  Tippen Sie auf „Anmelden".',
+    '4.  Für einfachen Zugang: Speichern Sie die Seite als App auf Ihrem Startbildschirm\n     (iPhone: Teilen → „Zum Home-Bildschirm" / Android: Menü → „Zum Startbildschirm").',
+  ];
+  doc.setFont('helvetica','normal');doc.setTextColor('#000000');doc.setFontSize(9.5);
+  steps.forEach(s=>{
+    const lines=doc.splitTextToSize(s,TW);
+    lines.forEach(l=>{doc.text(l,ML,y);y+=5;});
+    y+=1;
+  });
+
+  y+=6;
+  // ── Was Sie in der App finden ──
+  doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor('#875E0A');
+  doc.text('In der App finden Sie:',ML,y);y+=7;
+  const features=[
+    '🏠  Aktuelle Informationen über Ihr Kind (Ankunft, Schlafen, Abholung)',
+    '💬  Direkten Chat mit Claudia',
+    '📄  Wichtige Dokumente und Mitteilungen',
+    '🔔  Ankündigungen und Schließzeiten',
+    '🤒  Krankmeldung für Ihr Kind',
+  ];
+  doc.setFont('helvetica','normal');doc.setTextColor('#000000');doc.setFontSize(9.5);
+  features.forEach(f=>{doc.text(f,ML+3,y);y+=5.5;});
+
+  y+=8;
+  // ── Datum & Unterschrift ──
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.6);doc.line(ML,y,PW-MR,y);y+=8;
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor('#555555');
+  doc.text('Ausgestellt am: '+dateStr,ML,y);y+=12;
+  doc.setTextColor('#000000');
+  doc.line(ML,y,ML+60,y);doc.line(PW-MR-60,y,PW-MR,y);y+=4;
+  doc.setFontSize(8);doc.setTextColor('#555555');
+  doc.text('Claudia Giehl (Tagespflegeperson)',ML,y);
+  doc.text('Erziehungsberechtigte/r',PW-MR-60,y);
+
+  // ── Footer ──
+  doc.setFillColor('#ECA108');doc.rect(0,PH-10,PW,10,'F');
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor('#ffffff');
+  doc.text('Claudias Mäusenest – Kindertagespflege | Diese Zugangsdaten sind vertraulich zu behandeln.',PW/2,PH-4,{align:'center'});
+
+  doc.save('Eltern-Login_'+kindName.replace(/ /g,'_')+'.pdf');
+}
 
 function generateContractPDF(k,e){
   const {jsPDF}=window.jspdf;
