@@ -591,6 +591,19 @@
         <div class="steuer-hint">💡 <strong>Sachkostenpauschale</strong>: Typischerweise 300% des Mindeststundensatzes × Betreuungsstunden. Abstimmung mit Steuerberater empfohlen.</div>
       </div>
       <div class="steuer-card">
+        <div class="steuer-title">⛪ Kirchensteuer (optional)</div>
+        <div class="steuer-row">
+          <label style="display:flex;align-items:center;gap:8px;color:var(--brown);font-size:0.88rem;font-weight:600;cursor:pointer">
+            <input type="checkbox" id="kirchensteuerCheck" onchange="calcSteuer()" style="width:16px;height:16px;accent-color:var(--gold)"/>
+            Kirchensteuer berechnen
+          </label>
+          <select id="kirchensteuerRate" onchange="calcSteuer()" style="border:2px solid rgba(236,161,8,0.3);border-radius:10px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;color:var(--brown);background:var(--white);outline:none">
+            <option value="8">8 % (Bayern)</option>
+            <option value="9">9 % (übrige Bundesländer)</option>
+          </select>
+        </div>
+      </div>
+      <div class="steuer-card">
         <div class="steuer-title">📈 Jahresschätzung (EStG §32a 2024)</div>
         <div class="steuer-result-grid">
           <div class="steuer-kpi">
@@ -607,14 +620,23 @@
           </div>
           <div class="steuer-kpi red">
             <div class="steuer-kpi-val" id="res-est">0 €</div>
-            <div class="steuer-kpi-lbl">Geschätzte ESt (2024)</div>
+            <div class="steuer-kpi-lbl">Einkommensteuer/Jahr</div>
+          </div>
+          <div class="steuer-kpi red">
+            <div class="steuer-kpi-val" id="res-kst">0 €</div>
+            <div class="steuer-kpi-lbl">Kirchensteuer/Jahr</div>
+          </div>
+          <div class="steuer-kpi red">
+            <div class="steuer-kpi-val" id="res-soli">0 €</div>
+            <div class="steuer-kpi-lbl">Solidaritätszuschlag</div>
           </div>
           <div class="steuer-kpi green" style="grid-column:1/-1">
             <div class="steuer-kpi-val" id="res-netto">0 €</div>
-            <div class="steuer-kpi-lbl">Netto pro Monat (nach ESt)</div>
+            <div class="steuer-kpi-lbl">Netto pro Monat (nach Steuer)</div>
           </div>
         </div>
-        <div class="steuer-hint">⚠️ Grobe Schätzung – kein Ersatz für Steuerberatung. SV-Beiträge nicht enthalten.</div>
+        <div id="grundfreibetragHint" class="steuer-hint" style="display:none">✅ Ihr zu versteuerndes Einkommen liegt unter dem <strong>Grundfreibetrag (11.604 €/Jahr)</strong> – es fällt keine Einkommensteuer an.</div>
+        <div class="steuer-hint">⚠️ Grobe Schätzung – kein Ersatz für Steuerberatung. Sozialversicherungsbeiträge, persönliche Freibeträge und Sonderausgaben sind nicht enthalten. Soli entfällt seit 2021 für die meisten Steuerpflichtigen (Freigrenze: ~18.130 € ESt/Jahr).</div>
       </div>
 
       <!-- Rechnungsgenerator -->
@@ -830,7 +852,7 @@ onSnapshot(collection(db,'kinder'),snap=>{
 },()=>{const b=document.getElementById('syncBadge');if(b){b.textContent='● Offline';b.className='sync-badge offline';}});
 
 onSnapshot(collection(db,'eltern'),snap=>{
-  ELTERN={};snap.forEach(d=>{ELTERN[d.id]={id:d.id,...d.data()};});renderElternList();
+  ELTERN={};snap.forEach(d=>{ELTERN[d.id]={id:d.id,...d.data()};});renderElternList();renderKindMgmtList();
 });
 
 onSnapshot(collection(db,'dokumente'),snap=>{
@@ -1275,14 +1297,19 @@ function renderKindMgmtList(){
       <div class="kind-acc-body" id="body-${c.id}" style="display:none">
 
         <div class="kind-acc-section">🔑 Eltern-Login</div>
-        <div style="background:var(--cream);border-radius:10px;padding:9px 12px;font-size:0.84rem;color:var(--brown);margin-bottom:8px">
-          Benutzername: <strong>${eu||'— kein Login —'}</strong>
+        ${eu?`
+        <div style="background:var(--cream);border-radius:10px;padding:10px 12px;font-size:0.84rem;color:var(--brown);margin-bottom:8px;line-height:1.8">
+          <div>👤 <strong>Benutzername:</strong> ${eu}</div>
+          <div>📧 <strong>E-Mail:</strong> ${ed.email||'—'}</div>
+          <div>🔑 <strong>Passwort:</strong> ${ed.pass||'—'}</div>
         </div>
-        ${eu?`<div class="pass-row" style="margin-bottom:4px">
+        <div style="font-size:0.74rem;color:#a07828;font-weight:700;margin-bottom:4px">PASSWORT ÄNDERN</div>
+        <div class="pass-row" style="margin-bottom:4px">
           <input class="pass-input" id="pass-${eu}" type="text" value="${ed.pass||''}" placeholder="Neues Passwort…"/>
-          <button class="btn-sm btn-gold" onclick="window.savePass('${eu}')">💾</button>
-        </div>`:
-        '<div style="font-size:0.8rem;color:#a07828;margin-bottom:4px">Noch kein Elternzugang angelegt.</div>'}
+          <button class="btn-sm btn-gold" onclick="window.savePass('${eu}')">✉️ Speichern & Mail</button>
+        </div>
+        <div style="font-size:0.72rem;color:#a07828;margin-bottom:4px">Speichert neues Passwort und öffnet automatisch eine E-Mail an die Eltern.</div>`
+        :'<div style="font-size:0.8rem;color:#a07828;margin-bottom:4px">Noch kein Elternzugang angelegt.</div>'}
 
         <div class="kind-acc-section">✏️ Stammdaten</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
@@ -1331,6 +1358,10 @@ window.saveKindStamm=async function(id){
   if(!age){showToast('⚠️ Alter eingeben!');return;}
   try{
     await updateDoc(doc(db,'kinder',id),{age,betreuungsBeginn:beginn||null,pflegegeld});
+    // localStorage sync damit Finanzen-Tab sofort den neuen Wert zeigt
+    if(pflegegeld>0)localStorage.setItem('mausenest_pflegegeld_'+id,String(pflegegeld));
+    else localStorage.removeItem('mausenest_pflegegeld_'+id);
+    renderSteuerRechner();
     showToast('✅ Stammdaten gespeichert!');
   }catch(e){showToast('❌ Fehler: '+e.message);}
 };
@@ -1398,14 +1429,12 @@ function calcSteuer(){
     const inp=document.getElementById('sg-'+c.id);
     const val=parseFloat(inp?.value||c.pflegegeld||0);
     monthlyGross+=val;
-    // In localStorage speichern
     if(inp&&inp.value!=='')localStorage.setItem('mausenest_pflegegeld_'+c.id,inp.value);
   });
   const skpEl=document.getElementById('steuerSKP');
   const sonstEl=document.getElementById('steuerSonstige');
   const skp=parseFloat(skpEl?.value||0);
   const sonstige=parseFloat(sonstEl?.value||0);
-  // Ausgaben persistieren
   if(skpEl&&skpEl.value!=='')localStorage.setItem('mausenest_skp',skpEl.value);
   if(sonstEl&&sonstEl.value!=='')localStorage.setItem('mausenest_sonstige',sonstEl.value);
   const monthlyAusgaben=skp+sonstige;
@@ -1413,16 +1442,28 @@ function calcSteuer(){
   const jahresAusgaben=monthlyAusgaben*12;
   const zvE=Math.max(0,jahresGross-jahresAusgaben);
   const est=calcESt2024(zvE);
-  const jahresNetto=zvE-est;
+  // Kirchensteuer
+  const kstCheck=document.getElementById('kirchensteuerCheck');
+  const kstRate=parseFloat(document.getElementById('kirchensteuerRate')?.value||8);
+  const kst=kstCheck?.checked?Math.round(est*kstRate/100):0;
+  // Solidaritätszuschlag (seit 2021 entfällt er für die meisten; Freigrenze ~18.130 €)
+  const soli=est>18130?Math.round(Math.min((est-18130)*0.119,est*0.055)):0;
+  const gesamtSteuer=est+kst+soli;
+  const jahresNetto=zvE-gesamtSteuer;
   const monatsNetto=jahresNetto/12;
 
   const g=document.getElementById('steuerGesamt');if(g)g.textContent=(monthlyGross).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=fmt(v);};
-  set('res-jahresEinnahmen',jahresGross);
-  set('res-ausgaben',jahresAusgaben);
-  set('res-zve',zvE);
-  set('res-est',est);
-  set('res-netto',monatsNetto);
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=fmt(v);};
+  setEl('res-jahresEinnahmen',jahresGross);
+  setEl('res-ausgaben',jahresAusgaben);
+  setEl('res-zve',zvE);
+  setEl('res-est',est);
+  setEl('res-kst',kst);
+  setEl('res-soli',soli);
+  setEl('res-netto',monatsNetto);
+  // Grundfreibetrag-Hinweis
+  const hint=document.getElementById('grundfreibetragHint');
+  if(hint)hint.style.display=(zvE>0&&zvE<=11604)?'block':'none';
 }
 
 // ── Rechnungsgenerator ────────────────────────────────────
@@ -2618,7 +2659,18 @@ function renderElternList(){
   if(!sorted.length){el.innerHTML='<div style="color:#a07828;font-size:0.9rem;text-align:center;padding:16px">Lade…</div>';return;}
   el.innerHTML=sorted.map(e=>{const c=CHILDREN[e.kind];return`<div class="eltern-card"><div class="eltern-card-header"><div class="eltern-avatar" style="background:${c?c.color:'var(--cream)'}">${c?c.emoji:'👤'}</div><div><div class="eltern-name">${e.name}</div><div class="eltern-kind">Kind: ${c?c.name:e.kindName||e.kind} · Login: ${e.id}</div></div></div><div class="pass-row"><input class="pass-input" id="pass-${e.id}" type="text" value="${e.pass||''}" placeholder="Neues Passwort…"/><button class="btn-sm btn-gold" onclick="window.savePass('${e.id}')">💾</button></div></div>`;}).join('');
 }
-window.savePass=async function(id){const v=document.getElementById('pass-'+id).value.trim();if(!v||v.length<4){showToast('❌ Mind. 4 Zeichen!');return;}await updateDoc(doc(db,'eltern',id),{pass:v});showToast('✅ Passwort gespeichert!');};
+window.savePass=async function(id){
+  const v=document.getElementById('pass-'+id).value.trim();
+  if(!v||v.length<4){showToast('❌ Mind. 4 Zeichen!');return;}
+  await updateDoc(doc(db,'eltern',id),{pass:v});
+  showToast('✅ Passwort gespeichert!');
+  const ed=ELTERN[id]||{};
+  if(ed.email){
+    const subj=encodeURIComponent('🐭 Mäusenest – Ihre Login-Zugangsdaten');
+    const body=encodeURIComponent(`Liebe/r ${ed.name},\n\nIhre Zugangsdaten für die Mäusenest Eltern-App wurden aktualisiert:\n\n👤 Benutzername: ${id}\n🔑 Neues Passwort: ${v}\n\n🌐 App: https://laurinanoah-rgb.github.io/amausenest/eltern-app.html\n\nBitte speichern Sie diese Zugangsdaten sicher ab.\n\nMit freundlichen Grüßen\nClaudia – Claudias Mäusenest`);
+    window.open('mailto:'+ed.email+'?subject='+subj+'&body='+body,'_blank');
+  }
+};
 
 function populateKindDropdown(){
   const sel=document.getElementById('kindSelectDropdown');if(!sel)return;
