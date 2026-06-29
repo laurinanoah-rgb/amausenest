@@ -591,6 +591,30 @@
         <div class="steuer-hint">💡 <strong>Sachkostenpauschale</strong>: Typischerweise 300% des Mindeststundensatzes × Betreuungsstunden. Abstimmung mit Steuerberater empfohlen.</div>
       </div>
       <div class="steuer-card">
+        <div class="steuer-title">🏛️ Jugendamt-Zahlung (optional)</div>
+        <div class="steuer-row">
+          <label style="display:flex;align-items:center;gap:8px;color:var(--brown);font-size:0.88rem;font-weight:600;cursor:pointer">
+            <input type="checkbox" id="jugendamtCheck" onchange="calcSteuer()" style="width:16px;height:16px;accent-color:var(--gold)"/>
+            Pflegegeld vom Jugendamt
+          </label>
+        </div>
+        <div id="jugendamtDetails" style="display:none">
+          <div class="steuer-row" style="margin-top:6px">
+            <span class="steuer-row-label">Steuerfreier Anteil (€/Monat)</span>
+            <input class="steuer-pflegegeld" id="jugendamtFrei" type="number" min="0" step="0.01" placeholder="0" oninput="calcSteuer()"/>
+          </div>
+          <div class="steuer-hint">💡 Teile des Jugendamt-Pflegegeldes können steuerfrei sein. Den genauen Betrag erfragen Sie bei Ihrem Finanzamt oder Steuerberater.</div>
+        </div>
+      </div>
+      <div class="steuer-card">
+        <div class="steuer-title">💼 Weitere Einkünfte (optional)</div>
+        <div class="steuer-row">
+          <span class="steuer-row-label">Andere Einnahmen brutto (€/Monat)</span>
+          <input class="steuer-pflegegeld" id="andereEinkuenfte" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
+        </div>
+        <div class="steuer-hint">z. B. Minijob, Nebentätigkeit, Teilzeit-Einkommen. Nur eigene Einkünfte angeben (bei Einzelveranlagung).</div>
+      </div>
+      <div class="steuer-card">
         <div class="steuer-title">⛪ Kirchensteuer (optional)</div>
         <div class="steuer-row">
           <label style="display:flex;align-items:center;gap:8px;color:var(--brown);font-size:0.88rem;font-weight:600;cursor:pointer">
@@ -613,6 +637,14 @@
           <div class="steuer-kpi">
             <div class="steuer-kpi-val" id="res-ausgaben">0 €</div>
             <div class="steuer-kpi-lbl">Betriebsausgaben/Jahr</div>
+          </div>
+          <div class="steuer-kpi">
+            <div class="steuer-kpi-val" id="res-andereEink">0 €</div>
+            <div class="steuer-kpi-lbl">Weitere Einkünfte/Jahr</div>
+          </div>
+          <div class="steuer-kpi">
+            <div class="steuer-kpi-val" id="res-jugFrei">0 €</div>
+            <div class="steuer-kpi-lbl">JA-steuerfreier Anteil/Jahr</div>
           </div>
           <div class="steuer-kpi">
             <div class="steuer-kpi-val" id="res-zve">0 €</div>
@@ -1358,9 +1390,10 @@ window.saveKindStamm=async function(id){
   if(!age){showToast('⚠️ Alter eingeben!');return;}
   try{
     await updateDoc(doc(db,'kinder',id),{age,betreuungsBeginn:beginn||null,pflegegeld});
-    // localStorage sync damit Finanzen-Tab sofort den neuen Wert zeigt
-    if(pflegegeld>0)localStorage.setItem('mausenest_pflegegeld_'+id,String(pflegegeld));
-    else localStorage.removeItem('mausenest_pflegegeld_'+id);
+    // Optimistic update: CHILDREN sofort mit neuem Pflegegeld aktualisieren
+    if(CHILDREN[id])CHILDREN[id].pflegegeld=pflegegeld;
+    // localStorage-Override löschen → renderSteuerRechner nimmt direkt den CHILDREN-Wert
+    localStorage.removeItem('mausenest_pflegegeld_'+id);
     renderSteuerRechner();
     showToast('✅ Stammdaten gespeichert!');
   }catch(e){showToast('❌ Fehler: '+e.message);}
@@ -1440,13 +1473,23 @@ function calcSteuer(){
   const monthlyAusgaben=skp+sonstige;
   const jahresGross=monthlyGross*12;
   const jahresAusgaben=monthlyAusgaben*12;
-  const zvE=Math.max(0,jahresGross-jahresAusgaben);
+  // Jugendamt steuerfreier Anteil
+  const jugCheck=document.getElementById('jugendamtCheck');
+  const jugDetailsEl=document.getElementById('jugendamtDetails');
+  if(jugDetailsEl)jugDetailsEl.style.display=jugCheck?.checked?'block':'none';
+  const jugFreiMonat=jugCheck?.checked?parseFloat(document.getElementById('jugendamtFrei')?.value||0):0;
+  const jugFreiJahr=jugFreiMonat*12;
+  // Weitere Einkünfte
+  const andereMonat=parseFloat(document.getElementById('andereEinkuenfte')?.value||0);
+  const andereJahr=andereMonat*12;
+  // ZvE: Pflegegeld + Weitere Einkünfte - Jugendamt-Freistellung - Ausgaben
+  const zvE=Math.max(0,jahresGross+andereJahr-jugFreiJahr-jahresAusgaben);
   const est=calcESt2024(zvE);
   // Kirchensteuer
   const kstCheck=document.getElementById('kirchensteuerCheck');
   const kstRate=parseFloat(document.getElementById('kirchensteuerRate')?.value||8);
   const kst=kstCheck?.checked?Math.round(est*kstRate/100):0;
-  // Solidaritätszuschlag (seit 2021 entfällt er für die meisten; Freigrenze ~18.130 €)
+  // Solidaritätszuschlag (seit 2021 entfällt er für die meisten; Freigrenze ~18.130 €/Jahr ESt)
   const soli=est>18130?Math.round(Math.min((est-18130)*0.119,est*0.055)):0;
   const gesamtSteuer=est+kst+soli;
   const jahresNetto=zvE-gesamtSteuer;
@@ -1456,6 +1499,8 @@ function calcSteuer(){
   const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=fmt(v);};
   setEl('res-jahresEinnahmen',jahresGross);
   setEl('res-ausgaben',jahresAusgaben);
+  setEl('res-andereEink',andereJahr);
+  setEl('res-jugFrei',jugFreiJahr);
   setEl('res-zve',zvE);
   setEl('res-est',est);
   setEl('res-kst',kst);
