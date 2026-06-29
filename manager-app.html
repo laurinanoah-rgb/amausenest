@@ -155,6 +155,23 @@
     .unfall-tag{background:#fff3cd;padding:2px 8px;border-radius:8px}
     .btn-unfall{width:100%;padding:13px;border:2px solid var(--red);border-radius:30px;background:rgba(220,53,69,0.07);color:var(--red);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.97rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:4px}
     .btn-unfall:active{background:rgba(220,53,69,0.15)}
+    /* Steuerrechner */
+    .steuer-card{background:var(--white);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+    .steuer-title{font-weight:800;color:var(--brown);font-size:0.88rem;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .steuer-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(236,161,8,0.1);font-size:0.88rem}
+    .steuer-row:last-child{border-bottom:none}
+    .steuer-row-label{color:var(--brown);font-weight:600}
+    .steuer-row-val{font-weight:800;color:var(--text)}
+    .steuer-pflegegeld{width:90px;padding:6px 10px;border:2px solid rgba(236,161,8,0.3);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:700;text-align:right;outline:none}
+    .steuer-pflegegeld:focus{border-color:var(--gold)}
+    .steuer-total-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0 4px;font-weight:800;font-size:0.95rem;color:var(--brown);border-top:2px solid rgba(236,161,8,0.2);margin-top:4px}
+    .steuer-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+    .steuer-kpi{background:var(--cream);border-radius:12px;padding:12px 10px;text-align:center}
+    .steuer-kpi-val{font-size:1.2rem;font-weight:900;color:var(--brown)}
+    .steuer-kpi-lbl{font-size:0.72rem;color:#a07828;margin-top:3px}
+    .steuer-kpi.green .steuer-kpi-val{color:var(--green)}
+    .steuer-kpi.red .steuer-kpi-val{color:var(--red)}
+    .steuer-hint{font-size:0.76rem;color:#a07828;margin-top:12px;padding:8px 10px;background:rgba(236,161,8,0.07);border-radius:10px;line-height:1.5}
     .select-field{width:100%;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:12px;font-size:0.95rem;font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);outline:none;margin-bottom:14px}
     .select-field:focus{border-color:var(--gold)}
     .radio-group{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
@@ -397,6 +414,55 @@
       </div>
       <div class="section-title">📁 Akten – Archivierte Kinder</div>
       <div id="aktenList"><div style="color:#a07828;font-size:0.85rem;text-align:center;padding:12px">Keine archivierten Kinder</div></div>
+      <!-- STEUERRECHNER -->
+      <div class="section-title" style="margin-top:24px">💰 Steuer & Finanzen</div>
+      <div class="steuer-card">
+        <div class="steuer-title">📊 Pflegegeld pro Kind (Monat)</div>
+        <div id="steuerKinderList"><div style="color:#a07828;font-size:0.85rem;text-align:center;padding:8px">Keine aktiven Kinder</div></div>
+        <div class="steuer-total-row">
+          <span>Monatliche Einnahmen</span>
+          <span id="steuerGesamt" style="color:var(--green)">0,00 €</span>
+        </div>
+      </div>
+      <div class="steuer-card">
+        <div class="steuer-title">📉 Betriebsausgaben</div>
+        <div class="steuer-row">
+          <span class="steuer-row-label">Sachkostenpauschale (€/Mon.)</span>
+          <input class="steuer-pflegegeld" id="steuerSKP" type="number" min="0" step="0.01" placeholder="0" oninput="calcSteuer()"/>
+        </div>
+        <div class="steuer-row">
+          <span class="steuer-row-label">Sonstige Ausgaben (€/Mon.)</span>
+          <input class="steuer-pflegegeld" id="steuerSonstige" type="number" min="0" step="0.01" placeholder="0" oninput="calcSteuer()"/>
+        </div>
+        <div class="steuer-hint">💡 Die <strong>Sachkostenpauschale</strong> für Kindertagespflege beträgt laut Finanzamt typischerweise 300% des Mindeststundensatzes × Betreuungsstunden. Bitte mit Ihrem Steuerberater abstimmen.</div>
+      </div>
+      <div class="steuer-card" id="steuerResultCard">
+        <div class="steuer-title">📈 Jahresübersicht (Schätzung)</div>
+        <div class="steuer-result-grid">
+          <div class="steuer-kpi">
+            <div class="steuer-kpi-val" id="res-jahresEinnahmen">0 €</div>
+            <div class="steuer-kpi-lbl">Jahreseinnahmen brutto</div>
+          </div>
+          <div class="steuer-kpi">
+            <div class="steuer-kpi-val" id="res-ausgaben">0 €</div>
+            <div class="steuer-kpi-lbl">Betriebsausgaben/Jahr</div>
+          </div>
+          <div class="steuer-kpi">
+            <div class="steuer-kpi-val" id="res-zve">0 €</div>
+            <div class="steuer-kpi-lbl">Zu versteuerndes Eink.</div>
+          </div>
+          <div class="steuer-kpi red">
+            <div class="steuer-kpi-val" id="res-est">0 €</div>
+            <div class="steuer-kpi-lbl">Geschätzte ESt (2024)</div>
+          </div>
+          <div class="steuer-kpi green" style="grid-column:1/-1">
+            <div class="steuer-kpi-val" id="res-netto">0 €</div>
+            <div class="steuer-kpi-lbl">Netto pro Monat (nach ESt)</div>
+          </div>
+        </div>
+        <div class="steuer-hint">⚠️ Dies ist eine grobe Schätzung (EStG Grundtarif 2024, §32a). Keine Steuerberatung. Sozialversicherungsbeiträge nicht berücksichtigt.</div>
+      </div>
+
       <div class="settings-group" style="margin-top:18px">
         <div class="settings-item" style="cursor:pointer" onclick="if(confirm('Wirklich abmelden?'))logout()"><div class="settings-label">🚪 Abmelden</div><div class="settings-value" style="color:var(--red)">→</div></div>
       </div>
@@ -514,7 +580,7 @@ onSnapshot(collection(db,'kinder'),snap=>{
   CHILDREN={};snap.forEach(d=>{CHILDREN[d.id]={id:d.id,...d.data()};});
   const aktive=Object.values(CHILDREN).filter(c=>!c.archiviert);
   const g=document.getElementById('statGesamt');if(g)g.textContent=aktive.length;
-  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();renderAktenList();
+  updateStats();renderChildList();renderKindMgmtList();populateKindDropdown();renderAktenList();renderSteuerRechner();
 },()=>{const b=document.getElementById('syncBadge');if(b){b.textContent='● Offline';b.className='sync-badge offline';}});
 
 onSnapshot(collection(db,'eltern'),snap=>{
@@ -767,6 +833,10 @@ function renderKindMgmtList(){
             <label class="form-label" style="font-size:0.72rem">BETREUUNGSBEGINN</label>
             <input class="form-input" id="edit-beginn-${c.id}" type="date" value="${c.betreuungsBeginn||''}" style="margin-bottom:0;padding:10px 12px"/>
           </div>
+          <div style="grid-column:1/-1">
+            <label class="form-label" style="font-size:0.72rem">PFLEGEGELD (€/MONAT)</label>
+            <input class="form-input" id="edit-pflegegeld-${c.id}" type="number" min="0" step="0.01" value="${c.pflegegeld||''}" placeholder="z.B. 650" style="margin-bottom:0;padding:10px 12px"/>
+          </div>
         </div>
         <button class="btn-sm btn-gold" style="width:100%;padding:11px;margin-bottom:4px" onclick="window.saveKindStamm('${c.id}')">💾 Stammdaten speichern</button>
 
@@ -796,9 +866,10 @@ window.toggleKindAcc=function(id){
 window.saveKindStamm=async function(id){
   const age=document.getElementById('edit-age-'+id).value.trim();
   const beginn=document.getElementById('edit-beginn-'+id).value;
+  const pflegegeld=parseFloat(document.getElementById('edit-pflegegeld-'+id).value)||0;
   if(!age){showToast('⚠️ Alter eingeben!');return;}
   try{
-    await updateDoc(doc(db,'kinder',id),{age,betreuungsBeginn:beginn||null});
+    await updateDoc(doc(db,'kinder',id),{age,betreuungsBeginn:beginn||null,pflegegeld});
     showToast('✅ Stammdaten gespeichert!');
   }catch(e){showToast('❌ Fehler: '+e.message);}
 };
@@ -814,6 +885,57 @@ window.setKindColor=async function(id,color,el){
   el.classList.add('selected');
   try{await updateDoc(doc(db,'kinder',id),{color});}catch(e){showToast('❌ '+e.message);}
 };
+
+// ── Steuerrechner ───────────────────────────────────────────
+function calcESt2024(zvE){
+  // §32a EStG Grundtarif 2024 (Grundfreibetrag 11.604 €)
+  if(zvE<=11604)return 0;
+  if(zvE<=17005){const y=(zvE-11604)/10000;return Math.round((979.18*y+1400)*y);}
+  if(zvE<=66760){const z=(zvE-17005)/10000;return Math.round((192.59*z+2397)*z+966.53);}
+  if(zvE<=277825)return Math.round(0.42*zvE-10638.05);
+  return Math.round(0.45*zvE-18936.88);
+}
+
+function fmt(n){return n.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';}
+
+function renderSteuerRechner(){
+  const el=document.getElementById('steuerKinderList');if(!el)return;
+  const active=Object.values(CHILDREN).filter(c=>!c.archiviert).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!active.length){el.innerHTML='<div style="color:#a07828;font-size:0.85rem;text-align:center;padding:8px">Keine aktiven Kinder</div>';calcSteuer();return;}
+  el.innerHTML=active.map(c=>`
+    <div class="steuer-row">
+      <span class="steuer-row-label">${c.emoji||'🐭'} ${c.name}</span>
+      <input class="steuer-pflegegeld" id="sg-${c.id}" type="number" min="0" step="0.01"
+        value="${c.pflegegeld||''}" placeholder="0" oninput="calcSteuer()"/>
+    </div>`).join('');
+  calcSteuer();
+}
+
+function calcSteuer(){
+  const active=Object.values(CHILDREN).filter(c=>!c.archiviert);
+  let monthlyGross=0;
+  active.forEach(c=>{
+    const inp=document.getElementById('sg-'+c.id);
+    monthlyGross+=parseFloat(inp?.value||c.pflegegeld||0);
+  });
+  const skp=parseFloat(document.getElementById('steuerSKP')?.value||0);
+  const sonstige=parseFloat(document.getElementById('steuerSonstige')?.value||0);
+  const monthlyAusgaben=skp+sonstige;
+  const jahresGross=monthlyGross*12;
+  const jahresAusgaben=monthlyAusgaben*12;
+  const zvE=Math.max(0,jahresGross-jahresAusgaben);
+  const est=calcESt2024(zvE);
+  const jahresNetto=zvE-est;
+  const monatsNetto=jahresNetto/12;
+
+  const g=document.getElementById('steuerGesamt');if(g)g.textContent=(monthlyGross).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=fmt(v);};
+  set('res-jahresEinnahmen',jahresGross);
+  set('res-ausgaben',jahresAusgaben);
+  set('res-zve',zvE);
+  set('res-est',est);
+  set('res-netto',monatsNetto);
+}
 
 window.removeKind=async function(id,name){
   if(!confirm(`"${name}" archivieren?\n\nDas Kind wird von der Startseite entfernt und in "📁 Akten" verschoben.\nAlle Daten & Dokumente bleiben 10 Jahre erhalten.`))return;
