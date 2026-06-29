@@ -510,6 +510,7 @@ function startSession(){
   // Listeners
   startKindListener();startChatListener();startDocsListener();loadElternUnfallberichte();startSchlisstageListener();startKrankmeldungListener();startAnkuendigungListener();
   showScreen('homeScreen');
+  history.replaceState({tab:'home'},'');
   // Push-Banner (sofern noch nicht erlaubt)
   if('Notification' in window&&Notification.permission==='default'){
     document.getElementById('pushBanner').style.display='flex';
@@ -1006,10 +1007,12 @@ window.elternDownloadUnfallPDF=function(b){
 };
 
 // ── Navigation ─────────────────────────────────────────────
+let _skipPush=false;
 window.showTab=function(tab){
   const map={home:'homeScreen',cal:'calScreen',chat:'chatScreen',docs:'docsScreen'};
   showScreen(map[tab]||'homeScreen');
   if(tab==='cal')renderCal();
+  if(!_skipPush)history.pushState({tab:tab},'');
 };
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 window.logout=function(){if(chatUnsub)chatUnsub();if(kindUnsub)kindUnsub();if(docsUnsub)docsUnsub();SESSION=null;KIND_DATA=null;showScreen('loginScreen');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';document.getElementById('pushBanner').style.display='none';};
@@ -1017,6 +1020,16 @@ window.logout=function(){if(chatUnsub)chatUnsub();if(kindUnsub)kindUnsub();if(do
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePreview();});
+// ── Hardware-Zurück-Taste (Android) ───────────────────────
+window.addEventListener('popstate',function(e){
+  // Preview-Modal schließen falls offen
+  if(document.getElementById('previewModal')&&document.getElementById('previewModal').classList.contains('active')){
+    closePreview();history.pushState(e.state,'');return;
+  }
+  const s=e.state;
+  if(!s||!s.tab){history.pushState({tab:'home'},'');_skipPush=true;showTab('home');_skipPush=false;return;}
+  _skipPush=true;showTab(s.tab);_skipPush=false;
+});
 </script>
 </body>
 </html>

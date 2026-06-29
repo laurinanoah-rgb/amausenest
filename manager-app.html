@@ -1821,9 +1821,10 @@ function renderAktenKindView(){
 window.openKindAkten=function(kindId){
   AKTEN_VIEW='kind';AKTEN_KIND_ID=kindId;AKTEN_OPEN_ORDNER=null;
   renderAktenKindView();
+  history.pushState({screen:'akten',view:'kind',kindId:kindId},'');
 };
-window.aktenBack=function(){AKTEN_VIEW='main';AKTEN_OPEN_ORDNER=null;renderAktenMainView();};
-window.openInfomappe=function(){AKTEN_VIEW='infomappe';AKTEN_OPEN_ORDNER=null;renderAktenInfomappeView();};
+window.aktenBack=function(){history.back();};
+window.openInfomappe=function(){AKTEN_VIEW='infomappe';AKTEN_OPEN_ORDNER=null;renderAktenInfomappeView();history.pushState({screen:'akten',view:'infomappe'},'');};
 
 function renderAktenInfomappeView(){
   const el=document.getElementById('aktenContent');if(!el)return;
@@ -2636,18 +2637,21 @@ function populateKindDropdown(){
 }
 
 // ── Navigation & Utils ─────────────────────────────────────
+let _skipPush=false;
 window.showTab=function(tab){
   const m={dash:'dashScreen',msgs:'msgsScreen',docs:'aktenScreen',settings:'settingsScreen',finanzen:'finanzScreen',akten:'aktenScreen'};
   showScreen(m[tab]||'dashScreen');
   if(tab==='msgs')renderMsgList();
   if(tab==='finanzen')renderSteuerRechner();
-  if(tab==='akten'||tab==='docs'){AKTEN_VIEW='main';renderAkten();}
+  if(tab==='akten'||tab==='docs'){AKTEN_VIEW='main';AKTEN_OPEN_ORDNER=null;renderAkten();}
+  if(!_skipPush)history.pushState({screen:tab,view:'main'},'');
 };
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
 
 function afterLogin(){
   showScreen('dashScreen');
+  history.replaceState({screen:'dash',view:'main'},'');
   const now=new Date();
   const days=['So','Mo','Di','Mi','Do','Fr','Sa'],months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   document.getElementById('dashDate').textContent=days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()]+' '+now.getFullYear();
@@ -2688,6 +2692,22 @@ window.forgotPassword=async function(){
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
 window.logout=function(){if(chatUnsub)chatUnsub();showScreen('loginScreen');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';};
 window.goBack=function(){window.showTab('dash');};
+// ── Hardware-Zurück-Taste (Android) ───────────────────────
+window.addEventListener('popstate',function(e){
+  // Preview-Modal schließen falls offen
+  const pm=document.getElementById('docPreviewModal');
+  if(pm&&pm.classList.contains('active')){window.closeDocPreview();history.pushState(e.state,'');return;}
+  const s=e.state;
+  if(!s){history.pushState({screen:'dash',view:'main'},'');_skipPush=true;showTab('dash');_skipPush=false;return;}
+  _skipPush=true;
+  if(s.screen==='akten'||s.screen==='docs'){
+    showScreen('aktenScreen');
+    if(s.view==='kind'&&s.kindId){AKTEN_VIEW='kind';AKTEN_KIND_ID=s.kindId;AKTEN_OPEN_ORDNER=null;renderAktenKindView();}
+    else if(s.view==='infomappe'){AKTEN_VIEW='infomappe';AKTEN_OPEN_ORDNER=null;renderAktenInfomappeView();}
+    else{AKTEN_VIEW='main';AKTEN_OPEN_ORDNER=null;renderAktenMainView();}
+  }else{showTab(s.screen||'dash');}
+  _skipPush=false;
+});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeDocPreview();});
 // ── Service Worker + Update-Banner ────────────────────────
 let swReg=null;
