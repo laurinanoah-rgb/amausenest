@@ -1459,10 +1459,10 @@ window.confirmAddKind=async function(){
 };
 
 // ── Unfallberichte ─────────────────────────────────────────
-function selectRadio(groupId,el,cls){
+window.selectRadio=function(groupId,el,cls){
   document.querySelectorAll('#'+groupId+' .radio-opt').forEach(d=>{d.className=cls;});
   el.className=cls+' sel';
-}
+};
 
 window.openUnfallModal=function(){
   const modal=document.getElementById('unfallModal');

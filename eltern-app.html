@@ -127,6 +127,32 @@
     .push-banner-sub{font-size:0.78rem;color:rgba(255,255,255,0.85);margin-top:2px}
     /* INSTALL BANNER */
     .install-banner{background:var(--white);border:2px solid rgba(236,161,8,0.3);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+    /* INFO SECTIONS */
+    .info-section{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+    .info-section-header{padding:14px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(236,161,8,0.12)}
+    .info-section-icon{font-size:1.5rem}
+    .info-section-title{font-family:'Chelsea Market',cursive;font-size:1rem;color:var(--brown);flex:1}
+    .info-section-count{background:var(--gold);color:white;font-size:0.72rem;font-weight:800;border-radius:20px;padding:2px 8px}
+    .info-section-body{padding:12px 16px 14px}
+    .ank-item{padding:10px 12px;border-radius:10px;margin-bottom:8px;border-left:4px solid var(--gold);background:var(--cream)}
+    .ank-item:last-child{margin-bottom:0}
+    .ank-item.wichtig{border-left-color:#fd7e14;background:#fff8f2}
+    .ank-item.dringend{border-left-color:#dc3545;background:#fff5f5}
+    .ank-item-titel{font-weight:800;color:var(--brown);font-size:0.88rem;margin-bottom:2px}
+    .ank-item-text{font-size:0.82rem;color:var(--text);line-height:1.45}
+    .ank-item-meta{font-size:0.7rem;color:#a07828;margin-top:4px}
+    .schlies-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(236,161,8,0.1)}
+    .schlies-item:last-child{border-bottom:none;padding-bottom:0}
+    .schlies-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px}
+    .schlies-dates{font-weight:800;font-size:0.85rem;color:var(--brown)}
+    .schlies-grund{font-size:0.78rem;color:#a07828;margin-top:1px}
+    .unfall-alert{background:linear-gradient(135deg,#dc3545,#c0392b);border-radius:14px;padding:14px 16px;margin-bottom:14px;color:white;box-shadow:0 4px 20px rgba(220,53,69,0.35)}
+    .unfall-alert-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .unfall-alert-title{font-weight:900;font-size:0.95rem}
+    .unfall-alert-item{background:rgba(255,255,255,0.15);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:0.83rem;line-height:1.45}
+    .unfall-alert-item:last-child{margin-bottom:0}
+    .unfall-alert-date{font-weight:800;margin-bottom:2px;font-size:0.85rem}
+    .quick-section-title{font-size:0.72rem;font-weight:800;color:#a07828;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;margin-top:16px}
     /* TOAST */
     .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:0.88rem;font-weight:700;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1}
@@ -168,42 +194,24 @@
         <div class="home-greeting" id="homeGreeting">Willkommen!</div>
         <div class="home-child" id="homeChildName"></div>
       </div>
-      <!-- Push-Benachrichtigungen -->
-      <div id="pushBanner" class="push-banner" onclick="requestPush()" style="display:none">
-        <div style="font-size:2rem">🔔</div>
-        <div class="push-banner-text">
-          <div class="push-banner-title">Push-Benachrichtigungen aktivieren</div>
-          <div class="push-banner-sub">Bleiben Sie immer informiert über Ihr Kind</div>
-        </div>
-        <div style="color:white;font-size:1.2rem">→</div>
-      </div>
-      <!-- Install Banner (PWA) -->
-      <div id="installBanner" class="install-banner" style="display:none">
-        <div style="font-size:2rem">📱</div>
-        <div style="flex:1">
-          <div style="font-weight:800;color:var(--brown);font-size:0.92rem">Als App installieren</div>
-          <div style="font-size:0.78rem;color:#a07828;margin-top:2px">Schneller Zugriff direkt vom Homescreen</div>
-        </div>
-        <button onclick="installPWA()" style="background:var(--gold);border:none;padding:8px 16px;border-radius:20px;color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">Installieren</button>
-      </div>
-      <!-- Status-Karte -->
+
+      <!-- Status-Karte Kind -->
       <div id="childStatusCard">
         <div class="empty-state"><div class="empty-state-icon">🐭</div>Lade…</div>
       </div>
-      <!-- Schnellzugriff -->
-      <div class="section-title mt-12">⚡ Schnellzugriff</div>
-      <div class="quick-grid">
-        <button class="quick-card" onclick="showTab('cal')"><div class="quick-icon">📅</div><div class="quick-label">Kalender</div><div class="quick-sub">Anwesenheit</div></button>
-        <button class="quick-card" onclick="showTab('chat')"><div class="quick-icon">💬</div><div class="quick-label">Nachrichten</div><div class="quick-sub">Mit Claudia</div></button>
-        <button class="quick-card" onclick="showTab('docs')"><div class="quick-icon">📄</div><div class="quick-label">Dokumente</div><div class="quick-sub">Fotos &amp; PDFs</div></button>
-        <button class="quick-card" onclick="showInfo()"><div class="quick-icon">ℹ️</div><div class="quick-label">Info</div><div class="quick-sub">Kontakt &amp; Zeiten</div></button>
+
+      <!-- 🚨 Unfallbenachrichtigungen – direkt unter Kind-Status -->
+      <div id="unfallSection" style="display:none">
+        <div class="unfall-alert">
+          <div class="unfall-alert-header">
+            <span style="font-size:1.5rem">🚨</span>
+            <span class="unfall-alert-title">Unfallbenachrichtigung</span>
+          </div>
+          <div id="elternUnfallList"></div>
+        </div>
       </div>
-      <button class="btn-krank" onclick="window.openKrankModal()">🤒 Kind krankmelden</button>
-      <!-- Ankündigungen -->
-      <div id="ankSection" style="display:none">
-        <div id="ankElternList"></div>
-      </div>
-      <!-- Claudia krank Banner -->
+
+      <!-- 🤒 Claudia krank – ebenfalls sehr wichtig -->
       <div id="claudiaKrankBannerEltern" class="claudia-krank-banner" style="display:none">
         <div style="font-size:2.2rem;flex-shrink:0">🤒</div>
         <div>
@@ -211,15 +219,56 @@
           <div style="font-size:0.82rem;opacity:.9;margin-top:3px">Leider keine Betreuung heute. Bitte anderweitig planen.</div>
         </div>
       </div>
-      <!-- Schließzeiten Banner -->
-      <div id="schliessBanner" style="display:none;background:#fff3cd;border-radius:14px;padding:13px 16px;margin-bottom:10px;border-left:4px solid #ECA108">
-        <div style="font-weight:800;color:#875E0A;font-size:0.9rem;margin-bottom:4px">📅 Geplante Schließzeiten</div>
-        <div id="schliessBannerContent"></div>
+
+      <!-- ⚡ Schnellzugriff -->
+      <div class="quick-section-title">⚡ Schnellzugriff</div>
+      <div class="quick-grid">
+        <button class="quick-card" onclick="showTab('cal')"><div class="quick-icon">📅</div><div class="quick-label">Kalender</div><div class="quick-sub">Anwesenheit</div></button>
+        <button class="quick-card" onclick="showTab('chat')"><div class="quick-icon">💬</div><div class="quick-label">Nachrichten</div><div class="quick-sub">Mit Claudia</div></button>
+        <button class="quick-card" onclick="showTab('docs')"><div class="quick-icon">📄</div><div class="quick-label">Dokumente</div><div class="quick-sub">Fotos &amp; PDFs</div></button>
+        <button class="quick-card" onclick="showInfo()"><div class="quick-icon">ℹ️</div><div class="quick-label">Info</div><div class="quick-sub">Kontakt &amp; Zeiten</div></button>
       </div>
-      <!-- Unfallberichte -->
-      <div id="unfallSection" style="display:none">
-        <div class="section-title mt-12">🚨 Unfallberichte</div>
-        <div id="elternUnfallList"></div>
+      <button class="btn-krank" onclick="window.openKrankModal()">🤒 Kind krankmelden</button>
+
+      <!-- 📢 Ankündigungen -->
+      <div id="ankSection" style="display:none">
+        <div class="info-section">
+          <div class="info-section-header">
+            <div class="info-section-icon">📢</div>
+            <div class="info-section-title">Ankündigungen</div>
+            <div class="info-section-count" id="ankCount">0</div>
+          </div>
+          <div class="info-section-body" id="ankElternList"></div>
+        </div>
+      </div>
+
+      <!-- 📅 Schließzeiten -->
+      <div id="schliessBanner" style="display:none">
+        <div class="info-section">
+          <div class="info-section-header">
+            <div class="info-section-icon">📅</div>
+            <div class="info-section-title">Geplante Schließzeiten</div>
+          </div>
+          <div class="info-section-body" id="schliessBannerContent"></div>
+        </div>
+      </div>
+
+      <!-- Push & Install (untergeordnet) -->
+      <div id="pushBanner" class="push-banner" onclick="requestPush()" style="display:none;margin-top:6px">
+        <div style="font-size:1.6rem">🔔</div>
+        <div class="push-banner-text">
+          <div class="push-banner-title">Push-Benachrichtigungen aktivieren</div>
+          <div class="push-banner-sub">Bleiben Sie immer informiert über Ihr Kind</div>
+        </div>
+        <div style="color:white;font-size:1.2rem">→</div>
+      </div>
+      <div id="installBanner" class="install-banner" style="display:none">
+        <div style="font-size:2rem">📱</div>
+        <div style="flex:1">
+          <div style="font-weight:800;color:var(--brown);font-size:0.92rem">Als App installieren</div>
+          <div style="font-size:0.78rem;color:#a07828;margin-top:2px">Schneller Zugriff direkt vom Homescreen</div>
+        </div>
+        <button onclick="installPWA()" style="background:var(--gold);border:none;padding:8px 16px;border-radius:20px;color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">Installieren</button>
       </div>
     </div>
     <div class="bottom-nav">
@@ -544,16 +593,15 @@ async function loadElternUnfallberichte(){
     if(!berichte.length){sec.style.display='none';return;}
     sec.style.display='block';
     el.innerHTML=berichte.map(b=>`
-      <div class="unfall-card">
-        <div class="unfall-card-date">🚨 ${b.datum} um ${b.uhrzeit} Uhr · ${b.ort}</div>
-        <div class="unfall-card-body">${b.hergang}</div>
-        <div>
-          ${b.koerperteil?`<span class="unfall-tag">📍 ${b.koerperteil}</span>`:''}
-          ${b.verletzungsart?`<span class="unfall-tag">🩹 ${b.verletzungsart}</span>`:''}
-          ${b.arztEmpfohlen?`<span class="unfall-tag">🏥 Arzt: ${b.arztEmpfohlen}</span>`:''}
-          ${b.ersteHilfe?`<span class="unfall-tag">💊 ${b.ersteHilfe}</span>`:''}
+      <div class="unfall-alert-item">
+        <div class="unfall-alert-date">${b.datum?b.datum.split('-').reverse().join('.'):'?'} um ${b.uhrzeit||'?'} Uhr · ${b.ort||''}</div>
+        <div style="margin-bottom:6px">${b.hergang}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${b.koerperteil?`<span style="background:rgba(255,255,255,0.2);border-radius:8px;padding:2px 8px;font-size:0.75rem">📍 ${b.koerperteil}</span>`:''}
+          ${b.verletzungsart?`<span style="background:rgba(255,255,255,0.2);border-radius:8px;padding:2px 8px;font-size:0.75rem">🩹 ${b.verletzungsart}</span>`:''}
+          ${b.arztEmpfohlen?`<span style="background:rgba(255,255,255,0.2);border-radius:8px;padding:2px 8px;font-size:0.75rem">🏥 Arzt: ${b.arztEmpfohlen}</span>`:''}
         </div>
-        <div style="margin-top:6px;font-size:0.72rem;color:#bbb">Dokumentiert von ${b.erstelltVon}</div>
+        <div style="margin-top:6px;font-size:0.72rem;opacity:.75">Dokumentiert von ${b.erstelltVon||'Claudia'}</div>
       </div>`).join('');
   }catch(e){sec.style.display='none';}
 }
@@ -603,11 +651,13 @@ function startAnkuendigungListener(){
     if(!sec||!list)return;
     if(!anks.length){sec.style.display='none';return;}
     const PRIO={normal:'📋 Normal',wichtig:'⚠️ Wichtig',dringend:'🚨 Dringend'};
+    const countEl=document.getElementById('ankCount');
+    if(countEl)countEl.textContent=anks.length;
     list.innerHTML=anks.map(a=>`
-      <div class="ank-eltern-card ${a.prioritaet||'normal'}">
-        <div class="ank-eltern-titel">${a.titel||'Ankündigung'}</div>
-        <div class="ank-eltern-text">${a.text||''}</div>
-        <div class="ank-eltern-meta">${PRIO[a.prioritaet]||'📋 Normal'} · ${a.datum||''}</div>
+      <div class="ank-item ${a.prioritaet||'normal'}">
+        <div class="ank-item-titel">${a.titel||'Ankündigung'}</div>
+        <div class="ank-item-text">${a.text||''}</div>
+        <div class="ank-item-meta">${PRIO[a.prioritaet]||'📋 Normal'}${a.datum?' · '+a.datum:''}</div>
       </div>`).join('');
     sec.style.display='block';
   });
@@ -629,8 +679,12 @@ function startSchlisstageListener(){
     const fmtD=d=>{if(!d)return'–';const[y,m,t]=d.split('-');return`${t}.${m}.${y}`;};
     const LBLS={urlaub:'🏖️ Urlaub',schliesstag:'🔒 Schließtag',feiertag:'🎉 Feiertag'};
     content.innerHTML=upcoming.map(s=>`
-      <div style="font-size:0.83rem;color:#875E0A;margin-top:4px">
-        <strong>${LBLS[s.typ]||s.typ}</strong>: ${fmtD(s.start)} – ${fmtD(s.end)}${s.grund?' · '+s.grund:''}
+      <div class="schlies-item">
+        <div class="schlies-dot"></div>
+        <div>
+          <div class="schlies-dates">${LBLS[s.typ]||'📅'} · ${fmtD(s.start)} – ${fmtD(s.end)}</div>
+          ${s.grund?`<div class="schlies-grund">${s.grund}</div>`:''}
+        </div>
       </div>`).join('');
     banner.style.display='block';
   });
