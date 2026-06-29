@@ -1835,34 +1835,27 @@ function renderAktenInfomappeView(){
 
   INFOMAPPE_DEFS.forEach(ord=>{
     const ordDocs=docs.filter(d=>d.kategorie===ord.id);
+    const count=ordDocs.length;
     const isOpen=AKTEN_OPEN_ORDNER===ord.id;
-    h+=`<div class="ak-ordner" style="--ord-color:${ord.color}">
-      <button class="ak-ordner-hdr" onclick="window.toggleAktenOrdner('${ord.id}')">
-        <span style="font-size:1.4rem">${ord.icon}</span>
-        <span class="ak-ordner-label">${ord.label}</span>
-        <span class="ak-ordner-count">${ordDocs.length}</span>
-        <span class="ak-ordner-arrow${isOpen?' open':''}">▾</span>
-      </button>`;
+    let bodyHtml='';
     if(isOpen){
-      h+=`<div class="ak-ordner-body">
+      bodyHtml=`<div class="ak-ordner-body">
         <button class="ak-upload-btn" onclick="window.aktenUpload(null,'${ord.id}',true)">📤 <span>Datei hochladen</span></button>`;
-      if(!ordDocs.length){h+='<div class="ak-empty">Noch leer</div>';}
-      else{
-        ordDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{
-          const vis=d.elternSichtbar===false?'🔒':'👁️';
-          h+=`<div class="ak-doc-row">
-            <span style="font-size:1.4rem">${d.type||'📄'}</span>
-            <div style="flex:1;min-width:0">
-              <div class="ak-doc-name" onclick="window.openDocPreview('${d.id}')">${escHtml(d.name)}</div>
-              <div class="ak-doc-meta">${d.date||''} · ${d.size||''} · ${vis}</div>
-            </div>
-            <button class="ak-doc-del" onclick="window.deleteDoc('${d.id}')">🗑️</button>
-          </div>`;
-        });
-      }
-      h+='</div>';
+      if(!count){bodyHtml+='<div class="ak-empty">Noch leer</div>';}
+      else ordDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=docRow(d,false);});
+      bodyHtml+='</div>';
     }
-    h+='</div>';
+    h+=`<div class="ak-ordner-card">
+      <div class="ak-ordner-header" onclick="window.toggleAktenOrdner('${ord.id}')">
+        <div class="ak-ordner-icon">${ord.icon}</div>
+        <div style="flex:1">
+          <div class="ak-ordner-label">${ord.label}</div>
+          <div class="ak-ordner-count">${count} ${count===1?'Dokument':'Dokumente'}</div>
+        </div>
+        <div class="ak-ordner-arrow${isOpen?' open':''}">▾</div>
+      </div>
+      ${bodyHtml}
+    </div>`;
   });
 
   el.innerHTML=h||'<div class="ak-empty">Keine Dokumente</div>';
@@ -1870,7 +1863,7 @@ function renderAktenInfomappeView(){
 window.toggleAktenArchiv=function(){AKTEN_ARCHIV_OPEN=!AKTEN_ARCHIV_OPEN;renderAktenMainView();};
 window.toggleAktenOrdner=function(id){
   AKTEN_OPEN_ORDNER=AKTEN_OPEN_ORDNER===id?null:id;
-  renderAktenKindView();
+  renderAkten();
 };
 window.aktenUpload=function(kindId,kategorie,isInfomappe){
   pendingUploadKindId=kindId;pendingUploadKategorie=kategorie;pendingUploadIsInfomappe=!!isInfomappe;

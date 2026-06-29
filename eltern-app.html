@@ -111,9 +111,28 @@
     .cs-item{text-align:center}
     .cs-num{font-family:'Chelsea Market',cursive;font-size:1.8rem;color:var(--gold)}
     .cs-lbl{font-size:0.72rem;color:#a07828;font-weight:700}
-    /* DOKUMENTE */
+    /* DOKUMENTE / AKTEN */
     .doc-item{background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s}
     .doc-item:active{background:var(--cream)}
+    /* Akten folder cards (same style as manager) */
+    .ak-ordner-card{background:var(--white);border-radius:16px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+    .ak-ordner-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
+    .ak-ordner-icon{font-size:1.5rem;line-height:1}
+    .ak-ordner-label{font-weight:800;color:var(--brown);font-size:0.95rem}
+    .ak-ordner-count{font-size:0.75rem;color:#a07828;margin-top:2px}
+    .ak-ordner-arrow{color:var(--gold);font-size:1.1rem;transition:transform .2s;margin-left:auto}
+    .ak-ordner-arrow.open{transform:rotate(180deg)}
+    .ak-ordner-body{padding:0 12px 12px}
+    .ak-doc-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--cream);border-radius:12px;margin-bottom:6px}
+    .ak-doc-icon{font-size:1.4rem;line-height:1;flex-shrink:0}
+    .ak-doc-info{flex:1;min-width:0}
+    .ak-doc-name{font-weight:700;color:var(--brown);font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ak-doc-date{font-size:0.73rem;color:#a07828;margin-top:2px}
+    .ak-doc-btns{display:flex;gap:6px;flex-shrink:0}
+    .ak-doc-btn{background:var(--white);border:none;border-radius:9px;width:34px;height:34px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+    .ak-empty{color:#a07828;font-size:0.85rem;padding:12px 4px;text-align:center}
+    .ak-section-lbl{font-size:0.7rem;font-weight:800;color:#a07828;letter-spacing:.08em;text-transform:uppercase;padding:6px 4px 8px}
+    .ak-infomappe-btn{width:100%;background:linear-gradient(135deg,#fff9ec,#fff3d4);border:2px solid rgba(236,161,8,0.35);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left;margin-bottom:18px}
     /* PREVIEW */
     .preview-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.95);flex-direction:column}
     .preview-modal.active{display:flex}
@@ -242,7 +261,7 @@
       <div class="quick-grid">
         <button class="quick-card" onclick="showTab('cal')"><div class="quick-icon">📅</div><div class="quick-label">Kalender</div><div class="quick-sub">Anwesenheit</div></button>
         <button class="quick-card" onclick="showTab('chat')"><div class="quick-icon">💬</div><div class="quick-label">Nachrichten</div><div class="quick-sub">Mit Claudia</div></button>
-        <button class="quick-card" onclick="showTab('docs')"><div class="quick-icon">📄</div><div class="quick-label">Dokumente</div><div class="quick-sub">Fotos &amp; PDFs</div></button>
+        <button class="quick-card" onclick="showTab('docs')"><div class="quick-icon">📁</div><div class="quick-label">Akten</div><div class="quick-sub">Fotos &amp; PDFs</div></button>
         <button class="quick-card" onclick="showInfo()"><div class="quick-icon">ℹ️</div><div class="quick-label">Info</div><div class="quick-sub">Kontakt &amp; Zeiten</div></button>
       </div>
       <button class="btn-krank" onclick="window.openKrankModal()">🤒 Kind krankmelden</button>
@@ -284,7 +303,7 @@
       <button class="nav-item active" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
       <button class="nav-item" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
     </div>
   </div>
 
@@ -313,7 +332,7 @@
       <button class="nav-item" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item active" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
       <button class="nav-item" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
     </div>
   </div>
 
@@ -331,7 +350,7 @@
       <button class="nav-item" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
       <button class="nav-item active" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
-      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
     </div>
   </div>
 
@@ -339,7 +358,7 @@
   <div id="docsScreen" class="screen">
     <div class="topbar">
       <div style="width:38px"></div>
-      <div class="topbar-title">📄 Dokumente</div>
+      <div class="topbar-title">📁 Akten</div>
       <button onclick="window.downloadMeineDokZip()" style="background:rgba(236,161,8,0.15);border:none;padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">⬇️ ZIP</button>
     </div>
     <div class="scroll-content" id="docsContent">
@@ -349,7 +368,7 @@
       <button class="nav-item" onclick="showTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('cal')"><div class="nav-icon">📅</div><div class="nav-label">Kalender</div></button>
       <button class="nav-item" onclick="showTab('chat')"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></button>
-      <button class="nav-item active" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+      <button class="nav-item active" onclick="showTab('docs')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
     </div>
   </div>
 
@@ -409,6 +428,23 @@ let calViewMonth=new Date().getMonth();
 let chatUnsub=null,kindUnsub=null,docsUnsub=null;
 let deferredInstallPrompt=null;
 let allDocs=[];
+let elternOpenOrdner=null;
+const ORDNER_DEFS=[
+  {id:'vertrag',       icon:'📋', label:'Verträge'},
+  {id:'login',         icon:'🔑', label:'Login-Dokumente'},
+  {id:'rechnung',      icon:'🧾', label:'Rechnungen'},
+  {id:'unfallbericht', icon:'🚨', label:'Unfallberichte'},
+  {id:'krankmeldung',  icon:'🤒', label:'Krankmeldungen'},
+  {id:'anwesenheit',   icon:'📅', label:'Anwesenheit'},
+  {id:'sonstiges',     icon:'📁', label:'Sonstiges'},
+];
+const INFOMAPPE_DEFS=[
+  {id:'speisekarte', icon:'🍽️', label:'Speisekarte'},
+  {id:'wochenplan',  icon:'📆', label:'Wochenplan'},
+  {id:'hausordnung', icon:'📜', label:'Hausordnung'},
+  {id:'notfall',     icon:'🆘', label:'Notfallkontakte'},
+  {id:'sonstiges',   icon:'📋', label:'Sonstiges'},
+];
 
 // PWA Install
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;document.getElementById('installBanner').style.display='flex';});
@@ -569,84 +605,154 @@ window.sendMsg=async function(){
   input.value='';
 };
 
-// ── Dokumente ──────────────────────────────────────────────
+// ── Akten ──────────────────────────────────────────────────
 function startDocsListener(){
   if(docsUnsub)docsUnsub();
   docsUnsub=onSnapshot(collection(db,'dokumente'),snap=>{
     allDocs=[];snap.forEach(d=>allDocs.push({id:d.id,...d.data()}));
-    allDocs.sort((a,b)=>(b.ts||0)-(a.ts||0));renderDocs();
+    allDocs.sort((a,b)=>(b.ts||0)-(a.ts||0));renderElternAkten();
   });
 }
-function renderDocs(){
-  const el=document.getElementById('docsContent');
-  // Meine Dokumente (für dieses Kind oder allgemein, sichtbar)
-  const myDocs=allDocs.filter(d=>d.recipient!=='privat'&&d.recipient!=='infomappe'&&d.archiviert!==true&&d.elternSichtbar!==false&&(d.recipient==='allgemein'||d.recipient===SESSION.kindId));
-  // Infomappe (von Claudia geteilt, elternSichtbar)
+window.toggleElternOrdner=function(id){
+  elternOpenOrdner=elternOpenOrdner===id?null:id;
+  renderElternAkten();
+};
+function elternDocRow(d){
+  return`<div class="ak-doc-row">
+    <div class="ak-doc-icon">${d.type||'📄'}</div>
+    <div class="ak-doc-info">
+      <div class="ak-doc-name">${escHtml(d.name)}</div>
+      <div class="ak-doc-date">${d.date||''}</div>
+    </div>
+    <div class="ak-doc-btns">
+      <button class="ak-doc-btn" onclick="openPreview('${d.id}')">👁️</button>
+      <button class="ak-doc-btn" onclick="window.elternDownloadDoc('${d.id}')">⬇️</button>
+    </div>
+  </div>`;
+}
+window.elternDownloadDoc=function(id){
+  const d=allDocs.find(x=>x.id===id);if(!d||!d.dataUrl)return showToast('❌ Datei nicht verfügbar');
+  const a=document.createElement('a');a.href=d.dataUrl;a.download=d.name;a.click();
+};
+function renderElternAkten(){
+  const el=document.getElementById('docsContent');if(!el)return;
+  const myDocs=allDocs.filter(d=>d.archiviert!==true&&d.elternSichtbar!==false&&d.recipient===SESSION.kindId);
   const infoDocs=allDocs.filter(d=>d.recipient==='infomappe'&&d.elternSichtbar!==false&&d.archiviert!==true);
-
-  if(!myDocs.length&&!infoDocs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📄</div>Noch keine Dokumente</div>';return;}
-
-  const tagAll=`<span style="background:#d4edda;color:#155724;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">🌍 Allgemein</span>`;
-  const tagKind=`<span style="background:#cce5ff;color:#004085;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">👶 Für Sie</span>`;
 
   let h='';
 
+  // ── Meine Akten (Ordner-Struktur) ─────────────────────────
+  h+=`<div class="ak-section-lbl">Meine Akten</div>`;
+  ORDNER_DEFS.forEach(ord=>{
+    const docs=myDocs.filter(d=>d.kategorie===ord.id);
+    const count=docs.length;
+    const isOpen=elternOpenOrdner===ord.id;
+    let bodyHtml='';
+    if(isOpen){
+      bodyHtml=`<div class="ak-ordner-body">`;
+      if(!count){bodyHtml+='<div class="ak-empty">Noch leer</div>';}
+      else docs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=elternDocRow(d);});
+      bodyHtml+='</div>';
+    }
+    h+=`<div class="ak-ordner-card">
+      <div class="ak-ordner-header" onclick="window.toggleElternOrdner('${ord.id}')">
+        <div class="ak-ordner-icon">${ord.icon}</div>
+        <div style="flex:1">
+          <div class="ak-ordner-label">${ord.label}</div>
+          <div class="ak-ordner-count">${count} ${count===1?'Dokument':'Dokumente'}</div>
+        </div>
+        <div class="ak-ordner-arrow${isOpen?' open':''}">▾</div>
+      </div>
+      ${bodyHtml}
+    </div>`;
+  });
+
   // ── Infomappe ─────────────────────────────────────────────
   if(infoDocs.length){
-    h+=`<div style="padding:10px 16px 6px;font-size:0.7rem;font-weight:800;color:#a07828;letter-spacing:.08em;text-transform:uppercase">📋 Infomappe</div>`;
-    h+=infoDocs.map(d=>`
-      <div class="doc-item fade-in" onclick="openPreview('${d.id}')">
-        <div style="font-size:2rem">${d.type||'📄'}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(d.name)}</div>
-          <div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div>
+    h+=`<div class="ak-section-lbl" style="margin-top:8px">Infomappe</div>`;
+    INFOMAPPE_DEFS.forEach(ord=>{
+      const docs=infoDocs.filter(d=>d.kategorie===ord.id);
+      const count=docs.length;
+      if(!count)return;
+      const folderId='info_'+ord.id;
+      const isOpen=elternOpenOrdner===folderId;
+      let bodyHtml='';
+      if(isOpen){
+        bodyHtml=`<div class="ak-ordner-body">`;
+        docs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=elternDocRow(d);});
+        bodyHtml+='</div>';
+      }
+      h+=`<div class="ak-ordner-card">
+        <div class="ak-ordner-header" onclick="window.toggleElternOrdner('${folderId}')">
+          <div class="ak-ordner-icon">${ord.icon}</div>
+          <div style="flex:1">
+            <div class="ak-ordner-label">${ord.label}</div>
+            <div class="ak-ordner-count">${count} ${count===1?'Dokument':'Dokumente'}</div>
+          </div>
+          <div class="ak-ordner-arrow${isOpen?' open':''}">▾</div>
         </div>
-        <span style="background:#fff3cd;color:#856404;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">📋 Info</span>
-      </div>`).join('');
+        ${bodyHtml}
+      </div>`;
+    });
+    // Ungekategorisierte Infomappe-Docs (ohne INFOMAPPE_DEFS-Match)
+    const knownInfoIds=INFOMAPPE_DEFS.map(o=>o.id);
+    const andere=infoDocs.filter(d=>!knownInfoIds.includes(d.kategorie));
+    if(andere.length){
+      const folderId='info_andere';
+      const isOpen=elternOpenOrdner===folderId;
+      let bodyHtml='';
+      if(isOpen){
+        bodyHtml=`<div class="ak-ordner-body">`;
+        andere.forEach(d=>{bodyHtml+=elternDocRow(d);});
+        bodyHtml+='</div>';
+      }
+      h+=`<div class="ak-ordner-card">
+        <div class="ak-ordner-header" onclick="window.toggleElternOrdner('${folderId}')">
+          <div class="ak-ordner-icon">📋</div>
+          <div style="flex:1">
+            <div class="ak-ordner-label">Sonstiges</div>
+            <div class="ak-ordner-count">${andere.length} ${andere.length===1?'Dokument':'Dokumente'}</div>
+          </div>
+          <div class="ak-ordner-arrow${isOpen?' open':''}">▾</div>
+        </div>
+        ${bodyHtml}
+      </div>`;
+    }
   }
 
-  // ── Meine Dokumente ───────────────────────────────────────
-  if(myDocs.length){
-    h+=`<div style="padding:${infoDocs.length?'14px':'10px'} 16px 6px;font-size:0.7rem;font-weight:800;color:#a07828;letter-spacing:.08em;text-transform:uppercase">📄 Meine Dokumente</div>`;
-    h+=myDocs.map(d=>`
-      <div class="doc-item fade-in" onclick="openPreview('${d.id}')">
-        <div style="font-size:2rem">${d.type||'📄'}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(d.name)}</div>
-          <div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div>
-        </div>
-        ${d.recipient==='allgemein'?tagAll:tagKind}
-      </div>`).join('');
-  }
-
-  el.innerHTML=h;
+  el.innerHTML=h||'<div class="empty-state"><div class="empty-state-icon">📁</div>Noch keine Dokumente</div>';
 }
 
 // ── ZIP-Download für Eltern (mit Ordnerstruktur, kein Delete) ──
 window.downloadMeineDokZip=async function(){
-  const ORDNER=[
-    {id:'vertrag',label:'Verträge'},{id:'login',label:'Login-Dokumente'},
-    {id:'rechnung',label:'Rechnungen'},{id:'unfallbericht',label:'Unfallberichte'},
-    {id:'krankmeldung',label:'Krankmeldungen'},{id:'anwesenheit',label:'Anwesenheit'},
-    {id:'sonstiges',label:'Sonstiges'},
-  ];
-  const kindName=SESSION.kindName||'Dokumente';
-  const myDocs=allDocs.filter(d=>d.recipient!=='privat'&&d.recipient!=='infomappe'&&d.archiviert!==true&&d.elternSichtbar!==false&&(d.recipient==='allgemein'||d.recipient===SESSION.kindId));
-  if(!myDocs.length){showToast('⚠️ Keine Dokumente vorhanden');return;}
+  const kindName=SESSION.kindName||'Akten';
+  const myDocs=allDocs.filter(d=>d.archiviert!==true&&d.elternSichtbar!==false&&d.recipient===SESSION.kindId);
+  const infoDocs=allDocs.filter(d=>d.recipient==='infomappe'&&d.elternSichtbar!==false&&d.archiviert!==true);
+  if(!myDocs.length&&!infoDocs.length){showToast('⚠️ Keine Dokumente vorhanden');return;}
   showToast('⏳ ZIP wird erstellt…',4000);
   try{
     const zip=new JSZip();
     const root=zip.folder('Eltern-'+kindName);
+    // Meine Akten mit Ordnerstruktur
     const folderMap={};
-    ORDNER.forEach(o=>{folderMap[o.id]=root.folder(o.label);});
+    ORDNER_DEFS.forEach(o=>{folderMap[o.id]=root.folder(o.label);});
     let count=0;
     for(const d of myDocs){
       if(!d.dataUrl)continue;
-      const base64=d.dataUrl.split(',')[1];
-      if(!base64)continue;
+      const base64=d.dataUrl.split(',')[1];if(!base64)continue;
       const kat=d.kategorie||'sonstiges';
-      const folder=folderMap[kat]||folderMap['sonstiges'];
-      folder.file(d.name,base64,{base64:true});count++;
+      (folderMap[kat]||folderMap['sonstiges']).file(d.name,base64,{base64:true});count++;
+    }
+    // Infomappe Ordner
+    if(infoDocs.length){
+      const infoFolderMap={};
+      INFOMAPPE_DEFS.forEach(o=>{infoFolderMap[o.id]=root.folder('Infomappe/'+o.label);});
+      const infoSonstiges=root.folder('Infomappe/Sonstiges');
+      for(const d of infoDocs){
+        if(!d.dataUrl)continue;
+        const base64=d.dataUrl.split(',')[1];if(!base64)continue;
+        (infoFolderMap[d.kategorie]||infoSonstiges).file(d.name,base64,{base64:true});count++;
+      }
     }
     if(!count){showToast('⚠️ Keine Dateien mit Inhalt');return;}
     const blob=await zip.generateAsync({type:'blob'});

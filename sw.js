@@ -1,5 +1,5 @@
 // Mäusenest Manager – Service Worker
-const CACHE_NAME = 'mausenest-v3';
+const CACHE_NAME = 'mausenest-v4';
 const ASSETS = [
 './manager-app.html',
 './eltern-app.html',
