@@ -13,6 +13,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--gold:#ECA108;--brown:#875E0A;--cream:#FFF9EC;--white:#fff;--gray:#f5f5f5;--text:#2d2006;--radius:16px;--shadow:0 4px 20px rgba(135,94,10,0.12);--green:#28a745;--red:#dc3545;--blue:#007bff}
@@ -331,7 +332,11 @@
 
   <!-- DOKUMENTE -->
   <div id="docsScreen" class="screen">
-    <div class="topbar"><div class="topbar-title">📄 Dokumente</div><div style="width:38px"></div></div>
+    <div class="topbar">
+      <div style="width:38px"></div>
+      <div class="topbar-title">📄 Dokumente</div>
+      <button onclick="window.downloadMeineDokZip()" style="background:rgba(236,161,8,0.15);border:none;padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">⬇️ ZIP</button>
+    </div>
     <div class="scroll-content" id="docsContent">
       <div class="empty-state"><div class="empty-state-icon">📄</div>Lade…</div>
     </div>
@@ -541,21 +546,84 @@ function startDocsListener(){
   });
 }
 function renderDocs(){
-  const myDocs=allDocs.filter(d=>d.recipient!=='privat'&&d.archiviert!==true&&d.elternSichtbar!==false&&(d.recipient==='allgemein'||d.recipient===SESSION.kindId));
   const el=document.getElementById('docsContent');
-  if(!myDocs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📄</div>Noch keine Dokumente</div>';return;}
+  // Meine Dokumente (für dieses Kind oder allgemein, sichtbar)
+  const myDocs=allDocs.filter(d=>d.recipient!=='privat'&&d.recipient!=='infomappe'&&d.archiviert!==true&&d.elternSichtbar!==false&&(d.recipient==='allgemein'||d.recipient===SESSION.kindId));
+  // Infomappe (von Claudia geteilt, elternSichtbar)
+  const infoDocs=allDocs.filter(d=>d.recipient==='infomappe'&&d.elternSichtbar!==false&&d.archiviert!==true);
+
+  if(!myDocs.length&&!infoDocs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📄</div>Noch keine Dokumente</div>';return;}
+
   const tagAll=`<span style="background:#d4edda;color:#155724;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">🌍 Allgemein</span>`;
   const tagKind=`<span style="background:#cce5ff;color:#004085;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">👶 Für Sie</span>`;
-  el.innerHTML=myDocs.map(d=>`
-    <div class="doc-item fade-in" onclick="openPreview('${d.id}')">
-      <div style="font-size:2rem">${d.type||'📄'}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(d.name)}</div>
-        <div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div>
-      </div>
-      ${d.recipient==='allgemein'?tagAll:tagKind}
-    </div>`).join('');
+
+  let h='';
+
+  // ── Infomappe ─────────────────────────────────────────────
+  if(infoDocs.length){
+    h+=`<div style="padding:10px 16px 6px;font-size:0.7rem;font-weight:800;color:#a07828;letter-spacing:.08em;text-transform:uppercase">📋 Infomappe</div>`;
+    h+=infoDocs.map(d=>`
+      <div class="doc-item fade-in" onclick="openPreview('${d.id}')">
+        <div style="font-size:2rem">${d.type||'📄'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(d.name)}</div>
+          <div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div>
+        </div>
+        <span style="background:#fff3cd;color:#856404;padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:700">📋 Info</span>
+      </div>`).join('');
+  }
+
+  // ── Meine Dokumente ───────────────────────────────────────
+  if(myDocs.length){
+    h+=`<div style="padding:${infoDocs.length?'14px':'10px'} 16px 6px;font-size:0.7rem;font-weight:800;color:#a07828;letter-spacing:.08em;text-transform:uppercase">📄 Meine Dokumente</div>`;
+    h+=myDocs.map(d=>`
+      <div class="doc-item fade-in" onclick="openPreview('${d.id}')">
+        <div style="font-size:2rem">${d.type||'📄'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;color:var(--brown);font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(d.name)}</div>
+          <div style="font-size:0.75rem;color:#a07828;margin-top:2px">${d.date||''} · ${d.size||''}</div>
+        </div>
+        ${d.recipient==='allgemein'?tagAll:tagKind}
+      </div>`).join('');
+  }
+
+  el.innerHTML=h;
 }
+
+// ── ZIP-Download für Eltern (mit Ordnerstruktur, kein Delete) ──
+window.downloadMeineDokZip=async function(){
+  const ORDNER=[
+    {id:'vertrag',label:'Verträge'},{id:'login',label:'Login-Dokumente'},
+    {id:'rechnung',label:'Rechnungen'},{id:'unfallbericht',label:'Unfallberichte'},
+    {id:'krankmeldung',label:'Krankmeldungen'},{id:'anwesenheit',label:'Anwesenheit'},
+    {id:'sonstiges',label:'Sonstiges'},
+  ];
+  const kindName=SESSION.kindName||'Dokumente';
+  const myDocs=allDocs.filter(d=>d.recipient!=='privat'&&d.recipient!=='infomappe'&&d.archiviert!==true&&d.elternSichtbar!==false&&(d.recipient==='allgemein'||d.recipient===SESSION.kindId));
+  if(!myDocs.length){showToast('⚠️ Keine Dokumente vorhanden');return;}
+  showToast('⏳ ZIP wird erstellt…',4000);
+  try{
+    const zip=new JSZip();
+    const root=zip.folder('Eltern-'+kindName);
+    const folderMap={};
+    ORDNER.forEach(o=>{folderMap[o.id]=root.folder(o.label);});
+    let count=0;
+    for(const d of myDocs){
+      if(!d.dataUrl)continue;
+      const base64=d.dataUrl.split(',')[1];
+      if(!base64)continue;
+      const kat=d.kategorie||'sonstiges';
+      const folder=folderMap[kat]||folderMap['sonstiges'];
+      folder.file(d.name,base64,{base64:true});count++;
+    }
+    if(!count){showToast('⚠️ Keine Dateien mit Inhalt');return;}
+    const blob=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='Eltern-'+kindName+'_Akten.zip';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    showToast('✅ ZIP heruntergeladen!');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
 window.openPreview=function(id){
   const d=allDocs.find(x=>x.id===id);if(!d)return;
   document.getElementById('previewDocName').textContent=d.name;

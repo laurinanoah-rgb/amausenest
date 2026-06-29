@@ -710,6 +710,19 @@
   </div>
 </div>
 
+<!-- PRIVACY MODAL (Privat / Elternsichtbar) -->
+<div class="modal-overlay" id="privacyModal">
+  <div class="modal-box" style="max-width:340px">
+    <div class="modal-title">🔒 Sichtbarkeit</div>
+    <div style="font-size:0.88rem;color:#a07828;text-align:center;margin-bottom:20px">Soll diese Datei für Eltern sichtbar sein?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <button onclick="window._setPrivacy(true)" style="padding:14px;border:2px solid var(--gold);border-radius:14px;background:var(--cream);color:var(--brown);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer">👁️ Für Eltern sichtbar</button>
+      <button onclick="window._setPrivacy(false)" style="padding:14px;border:2px solid #6c757d;border-radius:14px;background:#f8f9fa;color:#495057;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer">🔒 Privat (nur Claudia)</button>
+    </div>
+    <button onclick="window._cancelPrivacy()" style="width:100%;padding:11px;border:none;background:transparent;color:#a07828;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer">Abbrechen</button>
+  </div>
+</div>
+
 <!-- ADD KIND MODAL -->
 <div class="modal-overlay" id="addKindModal">
   <div class="modal-sheet">
@@ -783,7 +796,7 @@ let CHILDREN={},ELTERN={},DOCS=[],currentChildId=null,currentChatId=null,chatUns
 let newKindEmoji='🐭',newKindColor='#ffe599';
 // ── Akten State ────────────────────────────────────────────
 let AKTEN_VIEW='main',AKTEN_KIND_ID=null,AKTEN_OPEN_ORDNER=null,AKTEN_ARCHIV_OPEN=false;
-let pendingUploadKindId=null,pendingUploadKategorie=null;
+let pendingUploadKindId=null,pendingUploadKategorie=null,pendingUploadElternSichtbar=true,pendingUploadIsInfomappe=false;
 const ORDNER_DEFS=[
   {id:'vertrag',       icon:'📋', label:'Verträge',          color:'#875E0A'},
   {id:'login',         icon:'🔑', label:'Login-Dokumente',   color:'#0056b3'},
@@ -792,6 +805,13 @@ const ORDNER_DEFS=[
   {id:'krankmeldung',  icon:'🤒', label:'Krankmeldungen',    color:'#e67e22'},
   {id:'anwesenheit',   icon:'📅', label:'Anwesenheit',       color:'#27ae60'},
   {id:'sonstiges',     icon:'📁', label:'Sonstiges',         color:'#6c757d'},
+];
+const INFOMAPPE_DEFS=[
+  {id:'speisekarte', icon:'🍽️', label:'Speisekarte',       color:'#c0392b'},
+  {id:'wochenplan',  icon:'📆', label:'Wochenplan',         color:'#2980b9'},
+  {id:'hausordnung', icon:'📜', label:'Hausordnung',        color:'#8e44ad'},
+  {id:'notfall',     icon:'🆘', label:'Notfallkontakte',    color:'#e74c3c'},
+  {id:'sonstiges',   icon:'📋', label:'Sonstiges',          color:'#7f8c8d'},
 ];
 
 // ── Real-time listeners ────────────────────────────────────
@@ -1162,8 +1182,9 @@ window.handleFileSelect=function(e){
 window._confirmAktenUpload=async function(){
   if(!pendingFiles)return;
   const kindId=pendingUploadKindId;const kat=pendingUploadKategorie;
-  pendingUploadKindId=null;pendingUploadKategorie=null;
-  const recipient=kindId||'allgemein';
+  const isInfomappe=pendingUploadIsInfomappe;const elternSichtbar=pendingUploadElternSichtbar;
+  pendingUploadKindId=null;pendingUploadKategorie=null;pendingUploadIsInfomappe=false;pendingUploadElternSichtbar=true;
+  const recipient=isInfomappe?'infomappe':(kindId||'allgemein');
   const kindName=kindId&&CHILDREN[kindId]?CHILDREN[kindId].name:null;
   const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
   let uploaded=0;
@@ -1171,7 +1192,7 @@ window._confirmAktenUpload=async function(){
     if(f.size>800*1024){showToast('⚠️ '+f.name+' zu groß (max 800 KB)');continue;}
     const type=f.type.includes('pdf')?'📋':f.type.includes('image')?'🖼️':f.type.includes('word')?'📝':'📄';
     const dataUrl=await readFileAsDataUrl(f);
-    const docData={name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,elternSichtbar:true,ts:Date.now(),dataUrl};
+    const docData={name:f.name,type,size:(f.size/1024).toFixed(0)+' KB',date,recipient,kindName,elternSichtbar,ts:Date.now(),dataUrl};
     if(kat)docData.kategorie=kat;
     await addDoc(collection(db,'dokumente'),docData);uploaded++;
   }
@@ -1579,6 +1600,7 @@ window.restoreKind=async function(id,name){
 // ── NEUES AKTEN-SYSTEM ─────────────────────────────────────
 function renderAkten(){
   if(AKTEN_VIEW==='kind'&&AKTEN_KIND_ID)renderAktenKindView();
+  else if(AKTEN_VIEW==='infomappe')renderAktenInfomappeView();
   else renderAktenMainView();
 }
 
@@ -1652,7 +1674,20 @@ function renderAktenMainView(){
     h+='</div>';
   }
 
-  // Allgemein & Privat ausgeblendet (nur in Kind-Ordnern sichtbar)
+  // ── Infomappe ────────────────────────────────────────────
+  const infoDocs=DOCS.filter(d=>d.recipient==='infomappe');
+  const infoCount=infoDocs.length;
+  h+=`<div style="margin-bottom:18px">
+    <div class="ak-section-lbl">INFOMAPPE</div>
+    <button onclick="window.openInfomappe()" style="width:100%;background:linear-gradient(135deg,#fff9ec,#fff3d4);border:2px solid rgba(236,161,8,0.35);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left">
+      <div style="font-size:2rem;line-height:1">📋</div>
+      <div style="flex:1">
+        <div style="font-weight:800;color:var(--brown);font-size:1rem">Infomappe</div>
+        <div style="font-size:0.78rem;color:#a07828;margin-top:2px">Speisekarte, Wochenplan, Hausordnung … · ${infoCount} Dok.</div>
+      </div>
+      <span style="color:#a07828;font-size:1.1rem">→</span>
+    </button>
+  </div>`;
 
   // Archiv
   h+=`<button class="ak-archiv-toggle" onclick="window.toggleAktenArchiv()">
@@ -1766,14 +1801,68 @@ window.openKindAkten=function(kindId){
   renderAktenKindView();
 };
 window.aktenBack=function(){AKTEN_VIEW='main';AKTEN_OPEN_ORDNER=null;renderAktenMainView();};
+window.openInfomappe=function(){AKTEN_VIEW='infomappe';AKTEN_OPEN_ORDNER=null;renderAktenInfomappeView();};
+
+function renderAktenInfomappeView(){
+  const el=document.getElementById('aktenContent');if(!el)return;
+  document.getElementById('aktenTopbarTitle').textContent='📋 Infomappe';
+  document.getElementById('aktenTopbarLeft').innerHTML=`<button class="topbar-back" onclick="window.aktenBack()">←</button>`;
+  document.getElementById('aktenTopbarRight').innerHTML=`<button onclick="window.downloadInfomappeZip()" style="background:var(--cream);border:none;padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">⬇️ ZIP</button>`;
+
+  const docs=DOCS.filter(d=>d.recipient==='infomappe');
+  let h='';
+
+  INFOMAPPE_DEFS.forEach(ord=>{
+    const ordDocs=docs.filter(d=>d.kategorie===ord.id);
+    const isOpen=AKTEN_OPEN_ORDNER===ord.id;
+    h+=`<div class="ak-ordner" style="--ord-color:${ord.color}">
+      <button class="ak-ordner-hdr" onclick="window.toggleAktenOrdner('${ord.id}')">
+        <span style="font-size:1.4rem">${ord.icon}</span>
+        <span class="ak-ordner-label">${ord.label}</span>
+        <span class="ak-ordner-count">${ordDocs.length}</span>
+        <span class="ak-ordner-arrow${isOpen?' open':''}">▾</span>
+      </button>`;
+    if(isOpen){
+      h+=`<div class="ak-ordner-body">
+        <button class="ak-upload-btn" onclick="window.aktenUpload(null,'${ord.id}',true)">📤 <span>Datei hochladen</span></button>`;
+      if(!ordDocs.length){h+='<div class="ak-empty">Noch leer</div>';}
+      else{
+        ordDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{
+          const vis=d.elternSichtbar===false?'🔒':'👁️';
+          h+=`<div class="ak-doc-row">
+            <span style="font-size:1.4rem">${d.type||'📄'}</span>
+            <div style="flex:1;min-width:0">
+              <div class="ak-doc-name" onclick="window.openDocPreview('${d.id}')">${escHtml(d.name)}</div>
+              <div class="ak-doc-meta">${d.date||''} · ${d.size||''} · ${vis}</div>
+            </div>
+            <button class="ak-doc-del" onclick="window.deleteDoc('${d.id}')">🗑️</button>
+          </div>`;
+        });
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+
+  el.innerHTML=h||'<div class="ak-empty">Keine Dokumente</div>';
+}
 window.toggleAktenArchiv=function(){AKTEN_ARCHIV_OPEN=!AKTEN_ARCHIV_OPEN;renderAktenMainView();};
 window.toggleAktenOrdner=function(id){
   AKTEN_OPEN_ORDNER=AKTEN_OPEN_ORDNER===id?null:id;
   renderAktenKindView();
 };
-window.aktenUpload=function(kindId,kategorie){
-  pendingUploadKindId=kindId;pendingUploadKategorie=kategorie;
+window.aktenUpload=function(kindId,kategorie,isInfomappe){
+  pendingUploadKindId=kindId;pendingUploadKategorie=kategorie;pendingUploadIsInfomappe=!!isInfomappe;
+  document.getElementById('privacyModal').classList.add('active');
+};
+window._setPrivacy=function(elternSichtbar){
+  pendingUploadElternSichtbar=elternSichtbar;
+  document.getElementById('privacyModal').classList.remove('active');
   document.getElementById('fileInput').click();
+};
+window._cancelPrivacy=function(){
+  pendingUploadKindId=null;pendingUploadKategorie=null;pendingUploadIsInfomappe=false;
+  document.getElementById('privacyModal').classList.remove('active');
 };
 window.downloadDoc=function(id){
   const d=DOCS.find(x=>x.id===id);if(!d||!d.dataUrl){showToast('⚠️ Keine Datei verfügbar');return;}
@@ -1786,14 +1875,50 @@ window.downloadKindZip=async function(id,name){
   if(!kindDocs.length){showToast('⚠️ Keine Dokumente vorhanden');return;}
   try{
     const zip=new JSZip();
+    const root=zip.folder('Eltern-'+name);
+    // Ordner nach ORDNER_DEFS anlegen
+    const folderMap={};
+    ORDNER_DEFS.forEach(o=>{folderMap[o.id]=root.folder(o.label);});
+    let count=0;
     for(const d of kindDocs){
       if(!d.dataUrl)continue;
       const base64=d.dataUrl.split(',')[1];
-      if(base64)zip.file(d.name,base64,{base64:true});
+      if(!base64)continue;
+      const kat=d.kategorie||'sonstiges';
+      const folder=folderMap[kat]||folderMap['sonstiges'];
+      // Dateiname eindeutig halten bei Duplikaten
+      folder.file(d.name,base64,{base64:true});count++;
     }
+    if(!count){showToast('⚠️ Keine Dateien mit Inhalt');return;}
     const blob=await zip.generateAsync({type:'blob'});
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=name+'_Akten.zip';a.click();
+    const a=document.createElement('a');a.href=url;a.download='Eltern-'+name+'_Akten.zip';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    showToast('✅ ZIP heruntergeladen!');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
+window.downloadInfomappeZip=async function(){
+  showToast('⏳ ZIP wird erstellt…',4000);
+  const docs=DOCS.filter(d=>d.recipient==='infomappe');
+  if(!docs.length){showToast('⚠️ Keine Dokumente vorhanden');return;}
+  try{
+    const zip=new JSZip();
+    const root=zip.folder('Infomappe');
+    const folderMap={};
+    INFOMAPPE_DEFS.forEach(o=>{folderMap[o.id]=root.folder(o.label);});
+    let count=0;
+    for(const d of docs){
+      if(!d.dataUrl)continue;
+      const base64=d.dataUrl.split(',')[1];
+      if(!base64)continue;
+      const kat=d.kategorie||'sonstiges';
+      const folder=folderMap[kat]||folderMap['sonstiges'];
+      folder.file(d.name,base64,{base64:true});count++;
+    }
+    if(!count){showToast('⚠️ Keine Dateien mit Inhalt');return;}
+    const blob=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='Infomappe_Mäusenest.zip';a.click();
     setTimeout(()=>URL.revokeObjectURL(url),5000);
     showToast('✅ ZIP heruntergeladen!');
   }catch(e){showToast('❌ Fehler: '+e.message);}
