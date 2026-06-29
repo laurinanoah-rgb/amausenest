@@ -455,8 +455,10 @@ window.installPWA=function(){if(deferredInstallPrompt){deferredInstallPrompt.pro
 
 // ── Service Worker + Update-Banner ────────────────────────
 let swReg=null;
-window.applyUpdate=function(){
-  if(swReg&&swReg.waiting){swReg.waiting.postMessage({type:'SKIP_WAITING'});}
+window.applyUpdate=async function(){
+  // Immer aktuellen Registrierungs-Stand holen (auch wenn swReg noch null)
+  const r=swReg||(await navigator.serviceWorker.getRegistration().catch(()=>null));
+  if(r&&r.waiting){r.waiting.postMessage({type:'SKIP_WAITING'});}
   else{window.location.reload();}
 };
 if('serviceWorker' in navigator){
