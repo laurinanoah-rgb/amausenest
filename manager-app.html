@@ -523,7 +523,7 @@
       <div class="settings-group">
         <div class="settings-item"><div><div class="settings-label">👤 Benutzerin</div><div class="settings-value">Claudia Giehl</div></div></div>
         <div class="settings-item"><div><div class="settings-label">🔥 Datenbank</div><div class="settings-value">Firebase Firestore · Live</div></div></div>
-        <div class="settings-item"><div><div class="settings-label">📱 App Version</div><div class="settings-value">3.0.0 · PWA</div></div></div>
+        <div class="settings-item"><div><div class="settings-label">📱 App Version</div><div class="settings-value" id="appVersionLabel">4.0.0 · PWA</div></div></div>
         <div class="settings-item" style="cursor:pointer" onclick="if(confirm('Wirklich abmelden?'))logout()"><div class="settings-label">🚪 Abmelden</div><div class="settings-value" style="color:var(--red)">→</div></div>
       </div>
 
@@ -2716,6 +2716,8 @@ window.applyUpdate=async function(){
   if(r&&r.waiting){r.waiting.postMessage({type:'SKIP_WAITING'});}
   else{window.location.reload();}
 };
+// SW-Cache-Version in Einstellungen anzeigen
+caches.keys().then(keys=>{const lbl=document.getElementById('appVersionLabel');if(lbl&&keys.length){lbl.textContent='4.0.0 · PWA · '+keys[keys.length-1];}});
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('./sw.js').then(reg=>{
