@@ -1533,10 +1533,157 @@ async function loadUnfallberichte(kindId){
           ${b.ersteHilfe?`<span class="unfall-tag">💊 ${b.ersteHilfe}</span>`:''}
           ${b.elternBenachrichtigt?`<span class="unfall-tag">📞 Eltern: ${b.elternBenachrichtigt} Uhr</span>`:''}
         </div>
-        <div style="margin-top:6px;font-size:0.72rem;color:#bbb">Erstellt von ${b.erstelltVon} · ${new Date(b.erstelltAm).toLocaleString('de-DE')}</div>
+        <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.72rem;color:#bbb">Erstellt von ${b.erstelltVon} · ${new Date(b.erstelltAm).toLocaleString('de-DE')}</span>
+          <button onclick="window.downloadUnfallPDF('${b.id}')" style="font-size:0.75rem;padding:3px 10px;border-radius:8px;border:1px solid #c0392b;background:#fff0ee;color:#c0392b;cursor:pointer;font-weight:700">📄 PDF</button>
+        </div>
       </div>`).join('');
   }catch(e){el.innerHTML='<div style="color:#a07828;font-size:0.85rem">Fehler beim Laden</div>';}
 }
+
+// ── Unfallbericht als PDF ──────────────────────────────────
+function generateUnfallPDF(b){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const PW=210,PH=297,ML=20,MR=20,MT=18,TW=PW-ML-MR;
+  let y=MT;
+
+  function checkPage(need=10){if(y+need>PH-18){doc.addPage();y=MT;}}
+  function hline(yy,col='#ECA108',lw=0.5){doc.setDrawColor(col);doc.setLineWidth(lw);doc.line(ML,yy,PW-MR,yy);}
+  function gold(){doc.setTextColor('#875E0A');}
+  function black(){doc.setTextColor('#000000');}
+  function gray(){doc.setTextColor('#555555');}
+  function red(){doc.setTextColor('#c0392b');}
+
+  function field(label,value,x,yy,maxW=80){
+    doc.setFontSize(7.5);doc.setFont('helvetica','bold');gold();
+    doc.text(label,x,yy);
+    doc.setFont('helvetica','normal');black();doc.setFontSize(9.5);
+    const lines=doc.splitTextToSize(value||'—',maxW);
+    doc.text(lines,x,yy+4.5);
+    return 4.5+lines.length*4.5;
+  }
+
+  function box(label,content,fill='#FFF9EC',border='#ECA108'){
+    checkPage(30);
+    const lines=doc.splitTextToSize(content||'—',TW-8);
+    const h=10+lines.length*4.8;
+    doc.setFillColor(fill);doc.roundedRect(ML,y,TW,h,2,2,'F');
+    doc.setDrawColor(border);doc.setLineWidth(0.4);doc.roundedRect(ML,y,TW,h,2,2,'S');
+    doc.setFontSize(7.5);doc.setFont('helvetica','bold');gold();
+    doc.text(label,ML+4,y+5);
+    doc.setFont('helvetica','normal');black();doc.setFontSize(9.5);
+    lines.forEach(l=>{doc.text(l,ML+4,y+10);y+=4.8;});
+    y+=14;
+  }
+
+  // ── Kopf ──
+  doc.setFillColor('#c0392b');doc.rect(0,0,PW,14,'F');
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor('#ffffff');
+  doc.text('🚨  UNFALLBERICHT  –  CLAUDIAS MÄUSENEST',ML,9.5);
+  doc.text('Kindertagespflege',PW-MR,9.5,{align:'right'});
+  y=22;
+
+  // ── Titel ──
+  doc.setFontSize(15);doc.setFont('helvetica','bold');doc.setTextColor('#c0392b');
+  doc.text('UNFALLBERICHT',PW/2,y,{align:'center'});y+=5;
+  doc.setFontSize(8.5);doc.setFont('helvetica','normal');gray();
+  doc.text('Gemäß § 45 SGB VII – Kindertagespflege nach § 22 ff. SGB VIII',PW/2,y,{align:'center'});y+=5;
+  hline(y);y+=6;
+
+  // ── Stammdaten ──
+  const datumFormatted=b.datum?b.datum.split('-').reverse().join('.'):'—';
+  const erstelltFormatted=b.erstelltAm?new Date(b.erstelltAm).toLocaleString('de-DE'):'—';
+
+  doc.setFillColor('#FFF0EE');doc.roundedRect(ML,y,TW,22,2,2,'F');
+  doc.setDrawColor('#c0392b');doc.setLineWidth(0.4);doc.roundedRect(ML,y,TW,22,2,2,'S');
+
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');red();
+  doc.text('BETROFFENES KIND',ML+4,y+5);
+  doc.setFont('helvetica','normal');black();doc.setFontSize(11);doc.setFont('helvetica','bold');
+  doc.text(b.kindName||'—',ML+4,y+11);
+
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');red();
+  doc.text('DATUM & UHRZEIT',PW/2+2,y+5);
+  doc.setFont('helvetica','normal');black();doc.setFontSize(10);
+  doc.text(datumFormatted+' um '+b.uhrzeit+' Uhr',PW/2+2,y+11);
+
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');red();
+  doc.text('ORT DES UNFALLS',ML+4,y+17);
+  doc.setFont('helvetica','normal');black();doc.setFontSize(9.5);
+  doc.text(b.ort||'—',ML+4,y+21.5);
+
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');red();
+  doc.text('BERICHT ERSTELLT VON',PW/2+2,y+17);
+  doc.setFont('helvetica','normal');black();doc.setFontSize(9.5);
+  doc.text((b.erstelltVon||'Claudia Giehl')+' · '+erstelltFormatted,PW/2+2,y+21.5);
+
+  y+=28;
+
+  // ── Hergang ──
+  box('UNFALLHERGANG (DETAILLIERTE BESCHREIBUNG)',b.hergang,'#FFF0EE','#c0392b');
+
+  // ── Verletzung ──
+  checkPage(20);
+  doc.setFillColor('#ffffff');doc.roundedRect(ML,y,TW/2-2,18,2,2,'F');
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.4);doc.roundedRect(ML,y,TW/2-2,18,2,2,'S');
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');gold();doc.text('KÖRPERTEIL',ML+4,y+5);
+  black();doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.text(b.koerperteil||'—',ML+4,y+11);
+
+  doc.setFillColor('#ffffff');doc.roundedRect(ML+TW/2+2,y,TW/2-2,18,2,2,'F');
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.4);doc.roundedRect(ML+TW/2+2,y,TW/2-2,18,2,2,'S');
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');gold();doc.text('VERLETZUNGSART',ML+TW/2+6,y+5);
+  black();doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.text(b.verletzungsart||'—',ML+TW/2+6,y+11);
+  y+=24;
+
+  // ── Erste Hilfe ──
+  box('ERSTE-HILFE-MAßNAHMEN',b.ersteHilfe);
+
+  // ── Arzt & Eltern ──
+  checkPage(20);
+  doc.setFillColor('#ffffff');doc.roundedRect(ML,y,TW/2-2,18,2,2,'F');
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.4);doc.roundedRect(ML,y,TW/2-2,18,2,2,'S');
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');gold();doc.text('ARZTBESUCH EMPFOHLEN',ML+4,y+5);
+  black();doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.text(b.arztEmpfohlen||'—',ML+4,y+11);
+
+  doc.setFillColor('#ffffff');doc.roundedRect(ML+TW/2+2,y,TW/2-2,18,2,2,'F');
+  doc.setDrawColor('#ECA108');doc.setLineWidth(0.4);doc.roundedRect(ML+TW/2+2,y,TW/2-2,18,2,2,'S');
+  doc.setFontSize(7.5);doc.setFont('helvetica','bold');gold();doc.text('ELTERN BENACHRICHTIGT UM',ML+TW/2+6,y+5);
+  black();doc.setFontSize(9.5);doc.setFont('helvetica','normal');
+  doc.text(b.elternBenachrichtigt?(b.elternBenachrichtigt+' Uhr'):'—',ML+TW/2+6,y+11);
+  y+=24;
+
+  // ── Zeugen ──
+  if(b.zeugen){box('ZEUGEN',b.zeugen);}
+
+  // ── Unterschrift ──
+  checkPage(35);
+  y+=4;
+  hline(y);y+=8;
+  doc.setFontSize(9.5);doc.setFont('helvetica','normal');black();
+  doc.text('Dieser Bericht wurde nach bestem Wissen und Gewissen ausgefüllt.',ML,y);y+=8;
+  doc.setDrawColor('#555555');doc.setLineWidth(0.3);
+  doc.line(ML,y+12,ML+65,y+12);doc.line(PW-MR-65,y+12,PW-MR,y+12);
+  doc.setFontSize(8);gray();
+  doc.text('Ort, Datum',ML,y+16);
+  doc.text('Claudia Giehl – Kindertagespflegeperson',PW-MR-65,y+16);
+  y+=24;
+
+  // ── Footer ──
+  doc.setFillColor('#c0392b');doc.rect(0,PH-10,PW,10,'F');
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor('#ffffff');
+  doc.text('Claudias Mäusenest – Kindertagespflege | Unfallbericht vertraulich behandeln',PW/2,PH-4,{align:'center'});
+
+  const fname='Unfallbericht_'+((b.kindName||'Kind').replace(/ /g,'_'))+'_'+((b.datum||'').replace(/-/g,''))+'.pdf';
+  doc.save(fname);
+}
+
+window.downloadUnfallPDF=async function(id){
+  try{
+    const snap=await getDoc(doc(db,'unfallberichte',id));
+    if(snap.exists())generateUnfallPDF({id:snap.id,...snap.data()});
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
 
 // ── Vertrag als PDF herunterladen ──────────────────────────
 window.printContract=function(kindId){
