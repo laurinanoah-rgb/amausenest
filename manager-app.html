@@ -190,6 +190,19 @@
     .ss-del:active{color:var(--red)}
     .ss-form{background:var(--cream);border-radius:14px;padding:14px;margin-bottom:12px}
     .ss-section-lbl{font-size:0.72rem;font-weight:800;color:var(--brown);letter-spacing:.5px;margin:12px 0 6px;text-transform:uppercase}
+    /* Krankmeldung */
+    .krank-banner{background:linear-gradient(135deg,#dc3545,#c82333);color:white;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(220,53,69,0.35)}
+    .krank-banner-icon{font-size:2rem;flex-shrink:0}
+    .krank-banner-text{flex:1}
+    .krank-banner-title{font-weight:800;font-size:0.95rem}
+    .krank-banner-sub{font-size:0.78rem;opacity:.85;margin-top:2px}
+    .krank-btn-gesund{background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);color:white;padding:7px 14px;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.82rem;cursor:pointer;flex-shrink:0}
+    .krank-card{background:var(--white);border-radius:12px;padding:11px 14px;margin-bottom:8px;box-shadow:var(--shadow);border-left:4px solid #dc3545;display:flex;align-items:center;gap:10px}
+    .krank-card-info{flex:1}
+    .krank-card-name{font-weight:800;color:var(--brown);font-size:0.9rem}
+    .krank-card-date{font-size:0.78rem;color:#a07828;margin-top:2px}
+    .btn-krank-melden{width:100%;padding:13px;background:rgba(220,53,69,0.07);border:2px solid rgba(220,53,69,0.3);border-radius:30px;color:#dc3545;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.92rem;cursor:pointer;margin-top:4px;transition:background .2s}
+    .btn-krank-melden:active{background:rgba(220,53,69,0.15)}
     .select-field{width:100%;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:12px;font-size:0.95rem;font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);outline:none;margin-bottom:14px}
     .select-field:focus{border-color:var(--gold)}
     .radio-group{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
@@ -246,8 +259,23 @@
         <div class="stat-box"><div class="stat-num" id="statSchlaeft">0</div><div class="stat-lbl">Schläft</div></div>
         <div class="stat-box"><div class="stat-num" id="statGesamt">0</div><div class="stat-lbl">Gesamt</div></div>
       </div>
+      <!-- Claudia krank Banner -->
+      <div id="claudiaKrankBanner" style="display:none" class="krank-banner">
+        <div class="krank-banner-icon">🤒</div>
+        <div class="krank-banner-text">
+          <div class="krank-banner-title">Sie sind heute als krank gemeldet</div>
+          <div class="krank-banner-sub">Eltern wurden benachrichtigt · Keine Betreuung</div>
+        </div>
+        <button class="krank-btn-gesund" onclick="window.claudiaGesund()">✅ Gesund</button>
+      </div>
+      <!-- Krankmeldungen der Eltern -->
+      <div id="elternKrankSection" style="display:none">
+        <div class="section-title">🤒 Krankmeldungen Eltern</div>
+        <div id="elternKrankList"></div>
+      </div>
       <div class="section-title">👶 Kinder heute</div>
       <div id="childList"></div>
+      <button class="btn-krank-melden" onclick="window.claudiaKrankmelden()">🤒 Als krank melden (Betreuung heute geschlossen)</button>
     </div>
     <div class="bottom-nav">
       <button class="nav-item active" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
@@ -681,6 +709,66 @@ onSnapshot(collection(db,'dokumente'),snap=>{
   DOCS=[];snap.forEach(d=>DOCS.push({id:d.id,...d.data()}));
   DOCS.sort((a,b)=>(b.ts||0)-(a.ts||0));renderDocs();
 });
+
+// ── Krankmeldungen ─────────────────────────────────────────
+let KRANKMELDUNGEN=[];
+let claudiaKrankId=null;
+
+onSnapshot(collection(db,'krankmeldungen'),snap=>{
+  KRANKMELDUNGEN=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderKrankmeldungen();
+});
+
+function renderKrankmeldungen(){
+  const today=new Date().toISOString().split('T')[0];
+  // Claudia krank?
+  const claudiaHeute=KRANKMELDUNGEN.find(k=>k.typ==='claudia'&&k.datum===today);
+  claudiaKrankId=claudiaHeute?.id||null;
+  const banner=document.getElementById('claudiaKrankBanner');
+  const krankmBtn=document.querySelector('.btn-krank-melden');
+  if(banner){banner.style.display=claudiaHeute?'flex':'none';}
+  if(krankmBtn){krankmBtn.style.display=claudiaHeute?'none':'block';}
+  // Eltern-Krankmeldungen heute
+  const kindKrank=KRANKMELDUNGEN.filter(k=>k.typ==='kind'&&k.datum===today);
+  const sec=document.getElementById('elternKrankSection');
+  const list=document.getElementById('elternKrankList');
+  if(sec&&list){
+    if(!kindKrank.length){sec.style.display='none';return;}
+    sec.style.display='block';
+    list.innerHTML=kindKrank.map(k=>`
+      <div class="krank-card">
+        <div style="font-size:1.5rem">🤒</div>
+        <div class="krank-card-info">
+          <div class="krank-card-name">${k.kindName||'Unbekannt'}</div>
+          <div class="krank-card-date">${k.datum?k.datum.split('-').reverse().join('.'):'heute'}${k.notiz?' · '+k.notiz:''}</div>
+        </div>
+        <button onclick="window.deleteKrankmeldung('${k.id}')" style="background:none;border:none;color:#ccc;font-size:1.1rem;cursor:pointer">✕</button>
+      </div>`).join('');
+  }
+}
+
+window.claudiaKrankmelden=async function(){
+  const today=new Date().toISOString().split('T')[0];
+  if(!confirm('Als krank melden?\n\nEltern sehen in ihrer App eine Warnung:\n"Claudia ist heute krank – keine Betreuung!"'))return;
+  try{
+    await addDoc(collection(db,'krankmeldungen'),{typ:'claudia',datum:today,ts:Date.now(),erstelltVon:'Claudia Giehl'});
+    showToast('🤒 Krankmeldung gespeichert. Eltern werden informiert.');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
+
+window.claudiaGesund=async function(){
+  if(!claudiaKrankId)return;
+  if(!confirm('Als wieder gesund markieren?'))return;
+  try{
+    await deleteDoc(doc(db,'krankmeldungen',claudiaKrankId));
+    showToast('✅ Gesundmeldung gespeichert!');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
+
+window.deleteKrankmeldung=async function(id){
+  try{await deleteDoc(doc(db,'krankmeldungen',id));showToast('🗑️ Krankmeldung gelöscht');}
+  catch(e){showToast('❌ '+e.message);}
+};
 
 // ── Urlaubs- & Schließtage ─────────────────────────────────
 let SCHLISSTAGE=[];
