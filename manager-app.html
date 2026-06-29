@@ -300,6 +300,7 @@
       <label class="form-label">PASSWORT</label>
       <input class="form-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"/>
       <button class="btn btn-gold" onclick="doLogin()">🔑 Einloggen</button>
+      <button onclick="window.forgotPassword()" style="margin-top:12px;background:none;border:none;color:#a07828;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:underline">Passwort vergessen?</button>
     </div>
   </div>
 
@@ -742,10 +743,13 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, doc, onSnapshot, addDoc, query, where, updateDoc, deleteDoc, getDocs, writeBatch, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const FC={apiKey:"AIzaSyDN5bGV96Mu5NLr737Muqm2rvRUhXp2Lnw",authDomain:"mausenest-49e4c.firebaseapp.com",projectId:"mausenest-49e4c",storageBucket:"mausenest-49e4c.firebasestorage.app",messagingSenderId:"174479569482",appId:"1:174479569482:web:f87f709c97aa030c312cb3"};
-const db=getFirestore(initializeApp(FC));
-const MANAGER={user:'claudia',pass:'mausenest2025'};
+const app=initializeApp(FC);
+const db=getFirestore(app);
+const auth=getAuth(app);
+const MANAGER={user:'claudia',pass:'mausenest2025',email:'claudia26.giehl@googlemail.com'};
 
 let CHILDREN={},ELTERN={},DOCS=[],currentChildId=null,currentChatId=null,chatUnsub=null,pendingFiles=null,selectedRecipient=null,selectedKind=null;
 let newKindEmoji='🐭',newKindColor='#ffe599';
@@ -2293,16 +2297,44 @@ window.showTab=function(tab){
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
 
+function afterLogin(){
+  showScreen('dashScreen');
+  const now=new Date();
+  const days=['So','Mo','Di','Mi','Do','Fr','Sa'],months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  document.getElementById('dashDate').textContent=days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()]+' '+now.getFullYear();
+  checkMidnightReset();
+}
 window.doLogin=async function(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value;
-  if(u===MANAGER.user&&p===MANAGER.pass){
-    showScreen('dashScreen');
-    const now=new Date();
-    const days=['So','Mo','Di','Mi','Do','Fr','Sa'],months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-    document.getElementById('dashDate').textContent=days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()]+' '+now.getFullYear();
-    await checkMidnightReset();
-  }else{document.getElementById('loginErr').classList.add('show');document.getElementById('loginPass').value='';}
+  const err=document.getElementById('loginErr');
+  err.classList.remove('show');
+  // Versuche Firebase Auth zuerst
+  try{
+    await signInWithEmailAndPassword(auth,MANAGER.email,p);
+    afterLogin();
+    return;
+  }catch(firebaseErr){
+    // Falls Firebase Auth noch nicht eingerichtet: Fallback auf hardcoded
+    if(u===MANAGER.user&&p===MANAGER.pass){
+      // Firebase Auth Konto erstellen (einmalig)
+      try{await createUserWithEmailAndPassword(auth,MANAGER.email,p);}catch(_){}
+      afterLogin();
+      return;
+    }
+  }
+  err.classList.add('show');
+  document.getElementById('loginPass').value='';
+};
+window.forgotPassword=async function(){
+  const confirmReset=confirm('Eine E-Mail zum Zurücksetzen des Passworts wird an\n\nclaudia26.giehl@googlemail.com\n\ngesendet. Fortfahren?');
+  if(!confirmReset)return;
+  try{
+    await sendPasswordResetEmail(auth,MANAGER.email);
+    alert('✅ E-Mail wurde gesendet!\n\nBitte prüfe dein Postfach bei:\nclaudia26.giehl@googlemail.com\n\nKlicke auf den Link in der E-Mail, um ein neues Passwort zu setzen.');
+  }catch(e){
+    alert('❌ Fehler: '+e.message);
+  }
 };
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
 window.logout=function(){if(chatUnsub)chatUnsub();showScreen('loginScreen');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';};
