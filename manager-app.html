@@ -1639,8 +1639,8 @@ window.confirmAddKind=async function(){
     window.closeAddKindModal();
     showToast(`✅ ${fullName} wurde hinzugefügt!`);
     setTimeout(()=>{
-      generateContractPDF({vorname,familienname,alter,beginn,emoji:newKindEmoji},{name:elternName,email,username});
-      setTimeout(()=>generateLoginPDF(fullName,elternName,username,passwort),600);
+      generateContractPDF({vorname,familienname,alter,beginn,emoji:newKindEmoji},{name:elternName,email,username},kindRef.id);
+      setTimeout(()=>generateLoginPDF(fullName,elternName,username,passwort,kindRef.id),600);
     },800);
   }catch(e){console.error(e);showToast('❌ Fehler: '+e.message);}
 };
@@ -1899,11 +1899,12 @@ window.printContract=function(kindId){
   const ed=ELTERN[eu]||{};
   generateContractPDF(
     {vorname:c.vorname||c.name.split(' ')[0],familienname:c.familienname||c.name.split(' ').slice(1).join(' '),alter:c.age||'__',beginn:c.betreuungsBeginn||'',emoji:c.emoji||'🐭'},
-    {name:ed.name||'',email:ed.email||'',username:eu}
+    {name:ed.name||'',email:ed.email||'',username:eu},
+    kindId
   );
 };
 
-function generateLoginPDF(kindName,elternName,username,passwort){
+function generateLoginPDF(kindName,elternName,username,passwort,kindId){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   const PW=210,PH=297,ML=25,MR=25,TW=PW-ML-MR;
@@ -2021,10 +2022,22 @@ function generateLoginPDF(kindName,elternName,username,passwort){
   doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor('#ffffff');
   doc.text('Claudias Mäusenest – Kindertagespflege | Diese Zugangsdaten sind vertraulich zu behandeln.',PW/2,PH-4,{align:'center'});
 
-  doc.save('Eltern-Login_'+kindName.replace(/ /g,'_')+'.pdf');
+  const loginFname='Eltern-Login_'+kindName.replace(/ /g,'_')+'.pdf';
+  doc.save(loginFname);
+  if(kindId){
+    try{
+      const dataUrl=doc.output('datauristring');
+      const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
+      addDoc(collection(db,'dokumente'),{
+        name:loginFname,type:'🔑',size:'PDF',date,dataUrl,
+        recipient:kindId,kindName,elternSichtbar:false,archiviert:false,
+        kategorie:'login',ts:Date.now()
+      }).catch(e=>console.warn('Login-PDF Archivierung:',e));
+    }catch(e){console.warn('Login-PDF Archivierung:',e);}
+  }
 }
 
-function generateContractPDF(k,e){
+function generateContractPDF(k,e,kindId){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   const PW=210,PH=297,ML=20,MR=20,MT=18,TW=PW-ML-MR;
@@ -2197,6 +2210,18 @@ function generateContractPDF(k,e){
   const fname='Betreuungsvertrag_'+(k.vorname||'Vorlage')+'_'+(k.familienname||'').trim()+'.pdf';
   doc.save(fname);
   showToast('📄 PDF wird heruntergeladen…',2500);
+  if(kindId){
+    try{
+      const dataUrl=doc.output('datauristring');
+      const now=new Date();const date=now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();
+      const kName=((k.vorname||'')+ ' '+(k.familienname||'')).trim();
+      addDoc(collection(db,'dokumente'),{
+        name:fname,type:'📋',size:'PDF',date,dataUrl,
+        recipient:kindId,kindName:kName,elternSichtbar:true,archiviert:false,
+        kategorie:'vertrag',ts:Date.now()
+      }).catch(e=>console.warn('Vertrag Archivierung:',e));
+    }catch(e){console.warn('Vertrag Archivierung:',e);}
+  }
 }
 
 function makeContractHTML(k,e,today,beginn){return`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"/><title>Betreuungsvertrag – ${k.vorname} ${k.familienname}</title><style>*{box-sizing:border-box}body{font-family:'Times New Roman',serif;font-size:11pt;line-height:1.65;color:#000;margin:0;padding:28px 36px}h1{font-size:17pt;text-align:center;margin-bottom:4px}h2{font-size:12pt;text-align:center;color:#555;margin-bottom:6px;font-weight:normal}.sub{text-align:center;font-size:10pt;color:#777;border-bottom:2px solid #ECA108;padding-bottom:14px;margin-bottom:20px}.parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0;border:1px solid #ccc;padding:16px;border-radius:6px}.pl{font-size:9pt;text-transform:uppercase;letter-spacing:1px;color:#875E0A;font-weight:bold;margin-bottom:8px;font-family:Arial,sans-serif}h3{font-family:Arial,sans-serif;font-size:10.5pt;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:3px}p{margin:5px 0 8px}.ib{background:#FFF9EC;border-left:4px solid #ECA108;padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0;font-size:10pt}.sg{margin-top:48px;page-break-inside:avoid}.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:24px}.sl{border-top:1px solid #000;padding-top:6px;font-size:9.5pt;color:#555}.sn{font-weight:bold;margin-top:10px;font-size:10pt}.ft{margin-top:32px;font-size:8.5pt;color:#888;border-top:1px solid #ddd;padding-top:10px;text-align:center}ul{margin:6px 0;padding-left:24px}li{margin-bottom:4px}.nb{page-break-inside:avoid}@media print{body{padding:16px 24px;font-size:10.5pt}button{display:none!important}}</style></head><body>
