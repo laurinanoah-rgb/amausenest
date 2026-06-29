@@ -39,7 +39,9 @@
     .topbar-action{background:var(--gold);border:none;padding:8px 16px;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.88rem;color:white;cursor:pointer}
     .scroll-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
     .bottom-nav{background:var(--white);display:flex;border-top:1px solid rgba(236,161,8,0.2);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;cursor:pointer;color:#a07828;transition:color .2s;border:none;background:none;font-family:'Nunito',sans-serif}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 6px;cursor:pointer;color:#a07828;transition:color .2s;border:none;background:none;font-family:'Nunito',sans-serif}
+    .nav-icon{font-size:1.25rem}
+    .nav-label{font-size:0.6rem;font-weight:700;margin-top:2px;letter-spacing:.2px}
     .nav-item.active{color:var(--gold)}
     .nav-icon{font-size:1.4rem;margin-bottom:2px}
     .nav-label{font-size:0.68rem;font-weight:700}
@@ -235,7 +237,8 @@
       <button class="nav-item active" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einstellungen</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
 
@@ -355,7 +358,8 @@
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item active" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einstellungen</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
 
@@ -396,7 +400,8 @@
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item active" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einstellungen</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
 
@@ -414,8 +419,23 @@
       </div>
       <div class="section-title">📁 Akten – Archivierte Kinder</div>
       <div id="aktenList"><div style="color:#a07828;font-size:0.85rem;text-align:center;padding:12px">Keine archivierten Kinder</div></div>
-      <!-- STEUERRECHNER -->
-      <div class="section-title" style="margin-top:24px">💰 Steuer & Finanzen</div>
+      <div class="settings-group" style="margin-top:18px">
+        <div class="settings-item" style="cursor:pointer" onclick="if(confirm('Wirklich abmelden?'))logout()"><div class="settings-label">🚪 Abmelden</div><div class="settings-value" style="color:var(--red)">→</div></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+      <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
+      <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
+      <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item active" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
+    </div>
+  </div>
+
+  <!-- FINANZEN SCREEN -->
+  <div id="finanzScreen" class="screen">
+    <div class="topbar"><div class="topbar-title">💰 Steuer & Finanzen</div><div style="width:38px"></div></div>
+    <div class="scroll-content">
       <div class="steuer-card">
         <div class="steuer-title">📊 Pflegegeld pro Kind (Monat)</div>
         <div id="steuerKinderList"><div style="color:#a07828;font-size:0.85rem;text-align:center;padding:8px">Keine aktiven Kinder</div></div>
@@ -425,19 +445,19 @@
         </div>
       </div>
       <div class="steuer-card">
-        <div class="steuer-title">📉 Betriebsausgaben</div>
+        <div class="steuer-title">📉 Betriebsausgaben (monatlich)</div>
         <div class="steuer-row">
-          <span class="steuer-row-label">Sachkostenpauschale (€/Mon.)</span>
-          <input class="steuer-pflegegeld" id="steuerSKP" type="number" min="0" step="0.01" placeholder="0" oninput="calcSteuer()"/>
+          <span class="steuer-row-label">Sachkostenpauschale</span>
+          <input class="steuer-pflegegeld" id="steuerSKP" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
         </div>
         <div class="steuer-row">
-          <span class="steuer-row-label">Sonstige Ausgaben (€/Mon.)</span>
-          <input class="steuer-pflegegeld" id="steuerSonstige" type="number" min="0" step="0.01" placeholder="0" oninput="calcSteuer()"/>
+          <span class="steuer-row-label">Sonstige Ausgaben</span>
+          <input class="steuer-pflegegeld" id="steuerSonstige" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
         </div>
-        <div class="steuer-hint">💡 Die <strong>Sachkostenpauschale</strong> für Kindertagespflege beträgt laut Finanzamt typischerweise 300% des Mindeststundensatzes × Betreuungsstunden. Bitte mit Ihrem Steuerberater abstimmen.</div>
+        <div class="steuer-hint">💡 <strong>Sachkostenpauschale</strong>: Typischerweise 300% des Mindeststundensatzes × Betreuungsstunden. Abstimmung mit Steuerberater empfohlen.</div>
       </div>
-      <div class="steuer-card" id="steuerResultCard">
-        <div class="steuer-title">📈 Jahresübersicht (Schätzung)</div>
+      <div class="steuer-card">
+        <div class="steuer-title">📈 Jahresschätzung (EStG §32a 2024)</div>
         <div class="steuer-result-grid">
           <div class="steuer-kpi">
             <div class="steuer-kpi-val" id="res-jahresEinnahmen">0 €</div>
@@ -460,18 +480,15 @@
             <div class="steuer-kpi-lbl">Netto pro Monat (nach ESt)</div>
           </div>
         </div>
-        <div class="steuer-hint">⚠️ Dies ist eine grobe Schätzung (EStG Grundtarif 2024, §32a). Keine Steuerberatung. Sozialversicherungsbeiträge nicht berücksichtigt.</div>
-      </div>
-
-      <div class="settings-group" style="margin-top:18px">
-        <div class="settings-item" style="cursor:pointer" onclick="if(confirm('Wirklich abmelden?'))logout()"><div class="settings-label">🚪 Abmelden</div><div class="settings-value" style="color:var(--red)">→</div></div>
+        <div class="steuer-hint">⚠️ Grobe Schätzung – kein Ersatz für Steuerberatung. SV-Beiträge nicht enthalten.</div>
       </div>
     </div>
     <div class="bottom-nav">
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
-      <button class="nav-item active" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einstellungen</div></button>
+      <button class="nav-item active" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
 
@@ -1348,8 +1365,10 @@ function populateKindDropdown(){
 
 // ── Navigation & Utils ─────────────────────────────────────
 window.showTab=function(tab){
-  const m={dash:'dashScreen',msgs:'msgsScreen',docs:'docsScreen',settings:'settingsScreen'};
-  showScreen(m[tab]||'dashScreen');if(tab==='msgs')renderMsgList();
+  const m={dash:'dashScreen',msgs:'msgsScreen',docs:'docsScreen',settings:'settingsScreen',finanzen:'finanzScreen'};
+  showScreen(m[tab]||'dashScreen');
+  if(tab==='msgs')renderMsgList();
+  if(tab==='finanzen')renderSteuerRechner();
 };
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
