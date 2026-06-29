@@ -175,6 +175,21 @@
     .steuer-kpi.green .steuer-kpi-val{color:var(--green)}
     .steuer-kpi.red .steuer-kpi-val{color:var(--red)}
     .steuer-hint{font-size:0.76rem;color:#a07828;margin-top:12px;padding:8px 10px;background:rgba(236,161,8,0.07);border-radius:10px;line-height:1.5}
+    /* Urlaubsplaner */
+    .ss-card{background:var(--white);border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);border-left:4px solid var(--gold);display:flex;align-items:flex-start;gap:10px}
+    .ss-card.past{opacity:0.55;border-left-color:#ccc}
+    .ss-info{flex:1;min-width:0}
+    .ss-head{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap}
+    .ss-tag{padding:2px 8px;border-radius:8px;font-size:0.72rem;font-weight:800;letter-spacing:.3px}
+    .ss-tag-urlaub{background:rgba(236,161,8,0.15);color:var(--brown)}
+    .ss-tag-schliesstag{background:rgba(220,53,69,0.1);color:var(--red)}
+    .ss-tag-feiertag{background:rgba(40,167,69,0.1);color:var(--green)}
+    .ss-dates{font-weight:800;font-size:0.88rem;color:var(--brown)}
+    .ss-grund{font-size:0.8rem;color:#a07828;margin-top:3px}
+    .ss-del{flex-shrink:0;background:none;border:none;font-size:1.1rem;cursor:pointer;color:#ccc;padding:4px}
+    .ss-del:active{color:var(--red)}
+    .ss-form{background:var(--cream);border-radius:14px;padding:14px;margin-bottom:12px}
+    .ss-section-lbl{font-size:0.72rem;font-weight:800;color:var(--brown);letter-spacing:.5px;margin:12px 0 6px;text-transform:uppercase}
     .select-field{width:100%;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:12px;font-size:0.95rem;font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);outline:none;margin-bottom:14px}
     .select-field:focus{border-color:var(--gold)}
     .radio-group{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
@@ -413,25 +428,57 @@
   <div id="settingsScreen" class="screen">
     <div class="topbar"><div class="topbar-title">⚙️ Einstellungen</div><div style="width:38px"></div></div>
     <div class="scroll-content">
-      <div class="section-title">👶 Kinder verwalten</div>
-      <div id="kindMgmtList"></div>
-      <button onclick="window.openAddKindModal()" style="width:100%;padding:14px;border:2px dashed rgba(236,161,8,0.4);border-radius:14px;background:rgba(236,161,8,0.04);color:var(--brown);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer;margin-bottom:24px">+ Neues Kind hinzufügen</button>
+
+      <!-- 1. Allgemeine Informationen -->
+      <div class="section-title">ℹ️ Allgemeine Informationen</div>
       <div class="settings-group">
         <div class="settings-item"><div><div class="settings-label">👤 Benutzerin</div><div class="settings-value">Claudia Giehl</div></div></div>
         <div class="settings-item"><div><div class="settings-label">🔥 Datenbank</div><div class="settings-value">Firebase Firestore · Live</div></div></div>
         <div class="settings-item"><div><div class="settings-label">📱 App Version</div><div class="settings-value">3.0.0 · PWA</div></div></div>
-      </div>
-      <div class="section-title">📁 Akten – Archivierte Kinder</div>
-      <div id="aktenList"><div style="color:#a07828;font-size:0.85rem;text-align:center;padding:12px">Keine archivierten Kinder</div></div>
-      <div class="settings-group" style="margin-top:18px">
         <div class="settings-item" style="cursor:pointer" onclick="if(confirm('Wirklich abmelden?'))logout()"><div class="settings-label">🚪 Abmelden</div><div class="settings-value" style="color:var(--red)">→</div></div>
       </div>
+
+      <!-- 2. Kinder verwalten -->
+      <div class="section-title" style="margin-top:8px">👶 Kinder verwalten</div>
+      <div id="kindMgmtList"></div>
+      <button onclick="window.openAddKindModal()" style="width:100%;padding:14px;border:2px dashed rgba(236,161,8,0.4);border-radius:14px;background:rgba(236,161,8,0.04);color:var(--brown);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer;margin-bottom:8px">+ Neues Kind hinzufügen</button>
+
+      <!-- 3. Urlaubsplanung -->
+      <div class="section-title" style="margin-top:8px">🏖️ Urlaubs- & Schließtage</div>
+      <div id="schlisstageList"></div>
+      <button onclick="window.toggleAddSS()" style="width:100%;padding:13px;border:2px dashed rgba(236,161,8,0.4);border-radius:14px;background:rgba(236,161,8,0.04);color:var(--brown);font-family:'Nunito',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;margin-bottom:8px">+ Schließzeit / Urlaub eintragen</button>
+      <div id="addSSForm" style="display:none" class="ss-form">
+        <div class="ss-section-lbl">TYP</div>
+        <select id="ssTyp" class="form-input" style="margin-bottom:0;padding:10px 12px">
+          <option value="urlaub">🏖️ Urlaub (Claudia)</option>
+          <option value="schliesstag">🔒 Schließtag</option>
+          <option value="feiertag">🎉 Feiertag / Brückentag</option>
+        </select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+          <div>
+            <div class="ss-section-lbl">VON</div>
+            <input class="form-input" id="ssStart" type="date" style="margin-bottom:0;padding:10px 12px"/>
+          </div>
+          <div>
+            <div class="ss-section-lbl">BIS</div>
+            <input class="form-input" id="ssEnd" type="date" style="margin-bottom:0;padding:10px 12px"/>
+          </div>
+        </div>
+        <div class="ss-section-lbl">GRUND / BEZEICHNUNG (optional)</div>
+        <input class="form-input" id="ssGrund" type="text" placeholder="z.B. Sommerurlaub, Fortbildung…" style="margin-bottom:10px;padding:10px 12px"/>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-gold" style="padding:12px" onclick="window.addSchlisstag()">✅ Speichern</button>
+          <button onclick="window.toggleAddSS()" style="padding:12px;border:2px solid rgba(236,161,8,0.3);border-radius:30px;background:transparent;color:var(--brown);font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer">Abbrechen</button>
+        </div>
+      </div>
+      <div id="aktenList" style="display:none"></div>
     </div>
     <div class="bottom-nav">
       <button class="nav-item" onclick="showTab('dash')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
       <button class="nav-item" onclick="showTab('msgs')"><div class="nav-icon">💬</div><div class="nav-label">Nachrichten</div></button>
       <button class="nav-item" onclick="showTab('docs')"><div class="nav-icon">📄</div><div class="nav-label">Dokumente</div></button>
       <button class="nav-item" onclick="showTab('finanzen')"><div class="nav-icon">💰</div><div class="nav-label">Finanzen</div></button>
+      <button class="nav-item" onclick="showTab('akten')"><div class="nav-icon">📁</div><div class="nav-label">Akten</div></button>
       <button class="nav-item active" onclick="showTab('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Einst.</div></button>
     </div>
   </div>
@@ -634,6 +681,76 @@ onSnapshot(collection(db,'dokumente'),snap=>{
   DOCS=[];snap.forEach(d=>DOCS.push({id:d.id,...d.data()}));
   DOCS.sort((a,b)=>(b.ts||0)-(a.ts||0));renderDocs();
 });
+
+// ── Urlaubs- & Schließtage ─────────────────────────────────
+let SCHLISSTAGE=[];
+onSnapshot(collection(db,'schlisstage'),snap=>{
+  SCHLISSTAGE=snap.docs.map(d=>({id:d.id,...d.data()}))
+    .sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+  renderSchlisstage();
+});
+
+const SS_LABELS={urlaub:'🏖️ Urlaub',schliesstag:'🔒 Schließtag',feiertag:'🎉 Feiertag'};
+const SS_TAG_CLS={urlaub:'ss-tag-urlaub',schliesstag:'ss-tag-schliesstag',feiertag:'ss-tag-feiertag'};
+
+function fmtDate(d){if(!d)return'–';const[y,m,t]=d.split('-');return`${t}.${m}.${y}`;}
+
+function renderSchlisstage(){
+  const el=document.getElementById('schlisstageList');if(!el)return;
+  const today=new Date().toISOString().split('T')[0];
+  if(!SCHLISSTAGE.length){
+    el.innerHTML='<div style="color:#a07828;font-size:0.85rem;text-align:center;padding:12px;background:var(--white);border-radius:12px;margin-bottom:8px">Noch keine Einträge</div>';
+    return;
+  }
+  const upcoming=SCHLISSTAGE.filter(s=>s.end>=today);
+  const past=SCHLISSTAGE.filter(s=>s.end<today);
+  const card=(s,isPast)=>`
+    <div class="ss-card${isPast?' past':''}">
+      <div class="ss-info">
+        <div class="ss-head">
+          <span class="ss-tag ${SS_TAG_CLS[s.typ]||'ss-tag-schliesstag'}">${SS_LABELS[s.typ]||s.typ}</span>
+        </div>
+        <div class="ss-dates">${fmtDate(s.start)} – ${fmtDate(s.end)}</div>
+        ${s.grund?`<div class="ss-grund">${s.grund}</div>`:''}
+      </div>
+      <button class="ss-del" onclick="window.deleteSchlisstag('${s.id}')" title="Löschen">✕</button>
+    </div>`;
+  let html='';
+  if(upcoming.length){html+=`<div style="font-size:0.75rem;font-weight:800;color:var(--brown);letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase">Geplant / Bevorstehend</div>`;html+=upcoming.map(s=>card(s,false)).join('');}
+  if(past.length){html+=`<div style="font-size:0.75rem;font-weight:800;color:#a07828;letter-spacing:.5px;margin:10px 0 6px;text-transform:uppercase">Vergangen</div>`;html+=past.map(s=>card(s,true)).join('');}
+  el.innerHTML=html;
+}
+
+window.toggleAddSS=function(){
+  const f=document.getElementById('addSSForm');
+  f.style.display=f.style.display==='none'?'block':'none';
+  if(f.style.display==='block'){
+    const today=new Date().toISOString().split('T')[0];
+    document.getElementById('ssStart').value=today;
+    document.getElementById('ssEnd').value=today;
+    document.getElementById('ssGrund').value='';
+  }
+};
+
+window.addSchlisstag=async function(){
+  const typ=document.getElementById('ssTyp').value;
+  const start=document.getElementById('ssStart').value;
+  const end=document.getElementById('ssEnd').value;
+  const grund=document.getElementById('ssGrund').value.trim();
+  if(!start||!end){showToast('⚠️ Bitte Datum eingeben!');return;}
+  if(end<start){showToast('⚠️ Enddatum muss nach Startdatum liegen!');return;}
+  try{
+    await addDoc(collection(db,'schlisstage'),{typ,start,end,grund,ts:Date.now()});
+    window.toggleAddSS();
+    showToast('✅ Schließzeit gespeichert!');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+};
+
+window.deleteSchlisstag=async function(id){
+  if(!confirm('Eintrag wirklich löschen?'))return;
+  try{await deleteDoc(doc(db,'schlisstage',id));showToast('🗑️ Gelöscht');}
+  catch(e){showToast('❌ Fehler: '+e.message);}
+};
 
 // ── Midnight Reset ─────────────────────────────────────────
 async function checkMidnightReset(){

@@ -187,6 +187,11 @@
         <button class="quick-card" onclick="showTab('docs')"><div class="quick-icon">📄</div><div class="quick-label">Dokumente</div><div class="quick-sub">Fotos &amp; PDFs</div></button>
         <button class="quick-card" onclick="showInfo()"><div class="quick-icon">ℹ️</div><div class="quick-label">Info</div><div class="quick-sub">Kontakt &amp; Zeiten</div></button>
       </div>
+      <!-- Schließzeiten Banner -->
+      <div id="schliessBanner" style="display:none;background:#fff3cd;border-radius:14px;padding:13px 16px;margin-bottom:10px;border-left:4px solid #ECA108">
+        <div style="font-weight:800;color:#875E0A;font-size:0.9rem;margin-bottom:4px">📅 Geplante Schließzeiten</div>
+        <div id="schliessBannerContent"></div>
+      </div>
       <!-- Unfallberichte -->
       <div id="unfallSection" style="display:none">
         <div class="section-title mt-12">🚨 Unfallberichte</div>
@@ -334,7 +339,7 @@ function startSession(){
   document.getElementById('homeGreeting').textContent=gr+', '+SESSION.elternName+'! 👋';
   document.getElementById('homeChildName').textContent='Kind: '+SESSION.kindName;
   // Listeners
-  startKindListener();startChatListener();startDocsListener();loadElternUnfallberichte();
+  startKindListener();startChatListener();startDocsListener();loadElternUnfallberichte();startSchlisstageListener();
   showScreen('homeScreen');
   // Push-Banner (sofern noch nicht erlaubt)
   if('Notification' in window&&Notification.permission==='default'){
@@ -513,6 +518,29 @@ async function loadElternUnfallberichte(){
         <div style="margin-top:6px;font-size:0.72rem;color:#bbb">Dokumentiert von ${b.erstelltVon}</div>
       </div>`).join('');
   }catch(e){sec.style.display='none';}
+}
+
+// ── Schließtage für Eltern ─────────────────────────────────
+function startSchlisstageListener(){
+  onSnapshot(collection(db,'schlisstage'),snap=>{
+    const today=new Date().toISOString().split('T')[0];
+    const in30=new Date(Date.now()+30*24*60*60*1000).toISOString().split('T')[0];
+    const upcoming=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(s=>s.end>=today)
+      .sort((a,b)=>a.start.localeCompare(b.start))
+      .slice(0,4);
+    const banner=document.getElementById('schliessBanner');
+    const content=document.getElementById('schliessBannerContent');
+    if(!banner||!content)return;
+    if(!upcoming.length){banner.style.display='none';return;}
+    const fmtD=d=>{if(!d)return'–';const[y,m,t]=d.split('-');return`${t}.${m}.${y}`;};
+    const LBLS={urlaub:'🏖️ Urlaub',schliesstag:'🔒 Schließtag',feiertag:'🎉 Feiertag'};
+    content.innerHTML=upcoming.map(s=>`
+      <div style="font-size:0.83rem;color:#875E0A;margin-top:4px">
+        <strong>${LBLS[s.typ]||s.typ}</strong>: ${fmtD(s.start)} – ${fmtD(s.end)}${s.grund?' · '+s.grund:''}
+      </div>`).join('');
+    banner.style.display='block';
+  });
 }
 
 // ── Info ───────────────────────────────────────────────────
