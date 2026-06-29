@@ -1352,8 +1352,12 @@ async function renderAktenScreen(){
     const nm=c.name.replace(/'/g,"\\'");
     const archiviertAm=c.archiviertAm?new Date(c.archiviertAm).toLocaleDateString('de-DE'):'–';
     const docRows=kindDocs.length?kindDocs.map(d=>`
-      <div class="steuer-row" style="padding:8px 0">
-        <span style="font-size:0.85rem;color:var(--text)">${d.type||'📄'} ${d.name}</span>
+      <div class="steuer-row" style="padding:8px 0;align-items:center">
+        <div style="flex:1;min-width:0">
+          ${d.kategorie==='unfallbericht'?'<span style="font-size:0.7rem;font-weight:800;background:#fff0ee;color:#c0392b;border-radius:6px;padding:1px 6px;margin-right:6px">🚨 UNFALL</span>':''}
+          <span style="font-size:0.85rem;color:var(--text)">${d.name}</span>
+          ${!d.elternSichtbar?'<span style="font-size:0.7rem;color:#aaa;margin-left:6px">🔒</span>':''}
+        </div>
         <button class="btn-green-sm" onclick="window.openDocPreview('${d.id}')">👁️</button>
       </div>`).join(''):'<div style="color:#a07828;font-size:0.82rem;padding:8px 0">Keine Dokumente archiviert.</div>';
     return`
@@ -1504,9 +1508,28 @@ window.submitUnfall=async function(){
     erstelltAm:new Date().toISOString()
   };
   try{
-    await addDoc(collection(db,'unfallberichte'),data);
+    const unfallRef=await addDoc(collection(db,'unfallberichte'),data);
+    // PDF generieren und dauerhaft im Kind-Akten-Ordner ablegen
+    try{
+      const {dataUrl,fname}=generateUnfallPDF({...data,id:unfallRef.id},true);
+      const df=data.datum?data.datum.split('-').reverse().join('.'):'';
+      await addDoc(collection(db,'dokumente'),{
+        name:fname,
+        type:'📋',
+        size:'PDF',
+        date:df,
+        dataUrl,
+        recipient:data.kindId,
+        kindName:data.kindName,
+        elternSichtbar:true,
+        archiviert:false,
+        kategorie:'unfallbericht',
+        unfallberichtId:unfallRef.id,
+        ts:Date.now()
+      });
+    }catch(pdfErr){console.warn('PDF-Archivierung fehlgeschlagen:',pdfErr);}
     window.closeUnfallModal();
-    showToast('✅ Unfallbericht gespeichert!');
+    showToast('✅ Unfallbericht gespeichert & in Akten hinterlegt!');
     loadUnfallberichte(currentChildId);
   }catch(e){showToast('❌ Fehler: '+e.message);}
 };
@@ -1542,7 +1565,7 @@ async function loadUnfallberichte(kindId){
 }
 
 // ── Unfallbericht als PDF ──────────────────────────────────
-function generateUnfallPDF(b){
+function generateUnfallPDF(b,returnBase64=false){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   const PW=210,PH=297,ML=20,MR=20,MT=18,TW=PW-ML-MR;
@@ -1675,6 +1698,7 @@ function generateUnfallPDF(b){
   doc.text('Claudias Mäusenest – Kindertagespflege | Unfallbericht vertraulich behandeln',PW/2,PH-4,{align:'center'});
 
   const fname='Unfallbericht_'+((b.kindName||'Kind').replace(/ /g,'_'))+'_'+((b.datum||'').replace(/-/g,''))+'.pdf';
+  if(returnBase64)return{dataUrl:doc.output('datauristring'),fname};
   doc.save(fname);
 }
 
