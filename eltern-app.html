@@ -607,7 +607,7 @@ window.sendMsg=async function(){
 // ── Akten ──────────────────────────────────────────────────
 function startDocsListener(){
   if(docsUnsub)docsUnsub();
-  docsUnsub=onSnapshot(collection(db,'dokumente'),snap=>{
+  docsUnsub=onSnapshot(query(collection(db,'dokumente'),where('elternSichtbar','==',true)),snap=>{
     allDocs=[];snap.forEach(d=>allDocs.push({id:d.id,...d.data()}));
     allDocs.sort((a,b)=>(b.ts||0)-(a.ts||0));renderElternAkten();
   });
