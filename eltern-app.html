@@ -820,9 +820,17 @@ async function loadElternUnfallberichte(){
   const sec=document.getElementById('unfallSection');
   if(!el||!sec)return;
   try{
+    const todayStr=new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const snap=await getDocs(collection(db,'unfallberichte'));
     const berichte=[];
-    snap.forEach(d=>{const data=d.data();if(data.kindId===SESSION.kindId)berichte.push({id:d.id,...data});});
+    snap.forEach(d=>{
+      const data=d.data();
+      if(data.kindId===SESSION.kindId){
+        // Nur Berichte von heute anzeigen (verschwindet automatisch um Mitternacht)
+        const erstelltDatum=(data.erstelltAm||'').split('T')[0];
+        if(erstelltDatum===todayStr)berichte.push({id:d.id,...data});
+      }
+    });
     berichte.sort((a,b)=>b.erstelltAm.localeCompare(a.erstelltAm));
     if(!berichte.length){sec.style.display='none';return;}
     sec.style.display='block';

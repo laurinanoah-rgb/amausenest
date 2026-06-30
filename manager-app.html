@@ -608,11 +608,46 @@
       </div>
       <div class="steuer-card">
         <div class="steuer-title">💼 Weitere Einkünfte (optional)</div>
+        <!-- Minijob -->
         <div class="steuer-row">
-          <span class="steuer-row-label">Andere Einnahmen brutto (€/Monat)</span>
-          <input class="steuer-pflegegeld" id="andereEinkuenfte" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
+          <label style="display:flex;align-items:center;gap:8px;color:var(--brown);font-size:0.88rem;font-weight:600;cursor:pointer">
+            <input type="checkbox" id="weitMinijobCheck" onchange="calcSteuer()" style="width:16px;height:16px;accent-color:var(--gold)"/>
+            💶 Minijob
+          </label>
         </div>
-        <div class="steuer-hint">z. B. Minijob, Nebentätigkeit, Teilzeit-Einkommen. Nur eigene Einkünfte angeben (bei Einzelveranlagung).</div>
+        <div id="weitMinijobDetails" style="display:none;margin-left:24px;margin-top:4px;margin-bottom:6px">
+          <div class="steuer-row">
+            <span class="steuer-row-label" style="font-size:0.82rem">Brutto (€/Monat)</span>
+            <input class="steuer-pflegegeld" id="weitMinijobBetrag" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
+          </div>
+        </div>
+        <!-- Teilzeit-Einkommen -->
+        <div class="steuer-row">
+          <label style="display:flex;align-items:center;gap:8px;color:var(--brown);font-size:0.88rem;font-weight:600;cursor:pointer">
+            <input type="checkbox" id="weitTeilzeitCheck" onchange="calcSteuer()" style="width:16px;height:16px;accent-color:var(--gold)"/>
+            🕐 Teilzeit-Einkommen
+          </label>
+        </div>
+        <div id="weitTeilzeitDetails" style="display:none;margin-left:24px;margin-top:4px;margin-bottom:6px">
+          <div class="steuer-row">
+            <span class="steuer-row-label" style="font-size:0.82rem">Brutto (€/Monat)</span>
+            <input class="steuer-pflegegeld" id="weitTeilzeitBetrag" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
+          </div>
+        </div>
+        <!-- Sonstige Tätigkeit -->
+        <div class="steuer-row">
+          <label style="display:flex;align-items:center;gap:8px;color:var(--brown);font-size:0.88rem;font-weight:600;cursor:pointer">
+            <input type="checkbox" id="weitSonstigeCheck" onchange="calcSteuer()" style="width:16px;height:16px;accent-color:var(--gold)"/>
+            📋 Sonstige Tätigkeit
+          </label>
+        </div>
+        <div id="weitSonstigeDetails" style="display:none;margin-left:24px;margin-top:4px;margin-bottom:6px">
+          <div class="steuer-row">
+            <span class="steuer-row-label" style="font-size:0.82rem">Brutto (€/Monat)</span>
+            <input class="steuer-pflegegeld" id="weitSonstigeBetrag" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
+          </div>
+        </div>
+        <div class="steuer-hint">Nur eigene Einkünfte angeben (bei Einzelveranlagung). Summe fließt sofort in die Jahresschätzung ein.</div>
       </div>
       <div class="steuer-card">
         <div class="steuer-title">⛪ Kirchensteuer (optional)</div>
@@ -1500,8 +1535,15 @@ function calcSteuer(){
   if(jugDetailsEl)jugDetailsEl.style.display=jugCheck?.checked?'block':'none';
   const jugFreiMonat=jugCheck?.checked?parseFloat(document.getElementById('jugendamtFrei')?.value||0):0;
   const jugFreiJahr=jugFreiMonat*12;
-  // Weitere Einkünfte
-  const andereMonat=parseFloat(document.getElementById('andereEinkuenfte')?.value||0);
+  // Weitere Einkünfte – Checkboxen (Minijob / Teilzeit / Sonstige)
+  const togDet=(checkId,detId)=>{const c=document.getElementById(checkId);const d=document.getElementById(detId);if(c&&d)d.style.display=c.checked?'block':'none';};
+  togDet('weitMinijobCheck','weitMinijobDetails');
+  togDet('weitTeilzeitCheck','weitTeilzeitDetails');
+  togDet('weitSonstigeCheck','weitSonstigeDetails');
+  const miniJob=document.getElementById('weitMinijobCheck')?.checked?parseFloat(document.getElementById('weitMinijobBetrag')?.value||0):0;
+  const teilzeit=document.getElementById('weitTeilzeitCheck')?.checked?parseFloat(document.getElementById('weitTeilzeitBetrag')?.value||0):0;
+  const weitSonst=document.getElementById('weitSonstigeCheck')?.checked?parseFloat(document.getElementById('weitSonstigeBetrag')?.value||0):0;
+  const andereMonat=miniJob+teilzeit+weitSonst;
   const andereJahr=andereMonat*12;
   // ZvE: Pflegegeld + Weitere Einkünfte - Jugendamt-Freistellung - Ausgaben
   const zvE=Math.max(0,jahresGross+andereJahr-jugFreiJahr-jahresAusgaben);
@@ -1531,6 +1573,8 @@ function calcSteuer(){
   const hint=document.getElementById('grundfreibetragHint');
   if(hint)hint.style.display=(zvE>0&&zvE<=11604)?'block':'none';
 }
+// Global machen damit onchange/oninput-Attribute im HTML funktionieren
+window.calcSteuer=calcSteuer;
 
 // ── Rechnungsgenerator ────────────────────────────────────
 window.rgUpdateBetrag=function(){
@@ -2615,21 +2659,25 @@ function _rechtsFooter(pdf){
 }
 
 async function _saveRechtsDoc(pdf,fname,docLabel){
-  const dataUrl=pdf.output('datauristring');
-  const today=new Date();
-  const date=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
-  // Altes Dokument gleichen Namens löschen
-  const existing=DOCS.filter(d=>d.recipient==='infomappe'&&d.kategorie==='rechtliches'&&d.name===fname);
-  for(const d of existing){
-    try{await deleteDoc(doc(db,'dokumente',d.id));}catch(e){}
-  }
-  await addDoc(collection(db,'dokumente'),{
-    name:fname,type:'⚖️',size:'PDF',date,dataUrl,
-    recipient:'infomappe',kategorie:'rechtliches',
-    elternSichtbar:true,archiviert:false,ts:Date.now()
-  });
+  // PDF zuerst herunterladen – unabhängig von Firestore
   pdf.save(fname);
-  showToast('✅ '+docLabel+' gespeichert!');
+  showToast('✅ '+docLabel+' heruntergeladen!');
+  // Dann versuchen in Firestore zu speichern (für Infomappe-Anzeige)
+  try{
+    const dataUrl=pdf.output('datauristring');
+    const today=new Date();
+    const date=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
+    // Altes Dokument gleichen Namens löschen
+    const existing=DOCS.filter(d=>d.recipient==='infomappe'&&d.kategorie==='rechtliches'&&d.name===fname);
+    for(const d of existing){
+      try{await deleteDoc(doc(db,'dokumente',d.id));}catch(e){}
+    }
+    await addDoc(collection(db,'dokumente'),{
+      name:fname,type:'⚖️',size:'PDF',date,dataUrl,
+      recipient:'infomappe',kategorie:'rechtliches',
+      elternSichtbar:true,archiviert:false,ts:Date.now()
+    });
+  }catch(e){console.warn('Infomappe-Speicherung fehlgeschlagen:',e);}
 }
 
 window.genRechtsDoc=async function(type){
