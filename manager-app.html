@@ -879,11 +879,12 @@ const ORDNER_DEFS=[
   {id:'sonstiges',     icon:'📁', label:'Sonstiges',         color:'#6c757d'},
 ];
 const INFOMAPPE_DEFS=[
-  {id:'speisekarte', icon:'🍽️', label:'Speisekarte',       color:'#c0392b'},
-  {id:'wochenplan',  icon:'📆', label:'Wochenplan',         color:'#2980b9'},
-  {id:'hausordnung', icon:'📜', label:'Hausordnung',        color:'#8e44ad'},
-  {id:'notfall',     icon:'🆘', label:'Notfallkontakte',    color:'#e74c3c'},
-  {id:'sonstiges',   icon:'📋', label:'Sonstiges',          color:'#7f8c8d'},
+  {id:'speisekarte', icon:'🍽️', label:'Speisekarte',                color:'#c0392b'},
+  {id:'wochenplan',  icon:'📆', label:'Wochenplan',                  color:'#2980b9'},
+  {id:'hausordnung', icon:'📜', label:'Hausordnung',                  color:'#8e44ad'},
+  {id:'notfall',     icon:'🆘', label:'Notfallkontakte',              color:'#e74c3c'},
+  {id:'rechtliches', icon:'⚖️', label:'Rechtliches & Datenschutz',   color:'#2c3e50'},
+  {id:'sonstiges',   icon:'📋', label:'Sonstiges',                    color:'#7f8c8d'},
 ];
 
 // ── Real-time listeners ────────────────────────────────────
@@ -1961,11 +1962,44 @@ function renderAktenInfomappeView(){
     const isOpen=AKTEN_OPEN_ORDNER===ord.id;
     let bodyHtml='';
     if(isOpen){
-      bodyHtml=`<div class="ak-ordner-body">
-        <button class="ak-upload-btn" onclick="window.aktenUpload(null,'${ord.id}',true)">📤 <span>Datei hochladen</span></button>`;
-      if(!count){bodyHtml+='<div class="ak-empty">Noch leer</div>';}
-      else ordDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=docRow(d,false);});
-      bodyHtml+='</div>';
+      if(ord.id==='rechtliches'){
+        // Spezielle Ansicht: Generator-Buttons + vorhandene Dokumente
+        bodyHtml=`<div class="ak-ordner-body">
+          <div style="font-size:0.78rem;color:#a07828;margin-bottom:10px;padding:8px 10px;background:rgba(44,62,80,0.06);border-radius:8px">⚖️ Klicke auf "Generieren" um das Dokument zu erstellen und in der Infomappe zu speichern.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+            <button onclick="window.genRechtsDoc('datenschutz')" style="display:flex;align-items:center;gap:10px;background:#f0f4f8;border:1px solid #ccd6e0;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
+              <span style="font-size:1.3rem">🔒</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Datenschutzerklärung</div><div style="font-size:0.73rem;color:#666">DSGVO Art. 13 – Was mit den Daten passiert</div></div>
+              <span style="background:#2c3e50;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+            </button>
+            <button onclick="window.genRechtsDoc('nutzung')" style="display:flex;align-items:center;gap:10px;background:#f0f4f8;border:1px solid #ccd6e0;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
+              <span style="font-size:1.3rem">📋</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Nutzungsbedingungen</div><div style="font-size:0.73rem;color:#666">Regeln für die App-Nutzung</div></div>
+              <span style="background:#2c3e50;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+            </button>
+            <button onclick="window.genRechtsDoc('einwilligung')" style="display:flex;align-items:center;gap:10px;background:#f0f4f8;border:1px solid #ccd6e0;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
+              <span style="font-size:1.3rem">✍️</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Einwilligungserklärung</div><div style="font-size:0.73rem;color:#666">Einwilligung der Eltern zur Datenverarbeitung</div></div>
+              <span style="background:#2c3e50;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+            </button>
+            <button onclick="window.genRechtsDoc('vvt')" style="display:flex;align-items:center;gap:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
+              <span style="font-size:1.3rem">📂</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#875E0A">VVT (intern)</div><div style="font-size:0.73rem;color:#666">Verzeichnis der Verarbeitungstätigkeiten · DSGVO Art. 30</div></div>
+              <span style="background:#ECA108;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+            </button>
+          </div>`;
+        if(count){
+          bodyHtml+=`<div style="font-size:0.75rem;font-weight:700;color:#a07828;margin-bottom:6px">GESPEICHERTE DOKUMENTE (${count})</div>`;
+          ordDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=docRow(d,false);});
+        }
+        bodyHtml+='</div>';
+      }else{
+        bodyHtml=`<div class="ak-ordner-body">
+          <button class="ak-upload-btn" onclick="window.aktenUpload(null,'${ord.id}',true)">📤 <span>Datei hochladen</span></button>`;
+        if(!count){bodyHtml+='<div class="ak-empty">Noch leer</div>';}
+        else ordDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=docRow(d,false);});
+        bodyHtml+='</div>';
+      }
     }
     h+=`<div class="ak-ordner-card">
       <div class="ak-ordner-header" onclick="window.toggleAktenOrdner('${ord.id}')">
@@ -2506,6 +2540,306 @@ window.exportDsgvoPdf=async function(kindId){
     const fname='DSGVO_'+c.name.replace(/\s/g,'_')+'_'+dateStr.replace(/\./g,'-')+'.pdf';
     pdf.save(fname);
     showToast('✅ DSGVO-Export heruntergeladen!');
+  }catch(e){showToast('❌ Fehler: '+e.message);console.error(e);}
+};
+
+// ── Rechtliche Dokumente Generator ─────────────────────────
+const RECHTS_INFO={
+  name:'Claudia Giehl',
+  betrieb:'Claudias Mäusenest',
+  typ:'Kindertagespflege',
+  adresse:'Burgerhofstr. 10, 91301 Forchheim (1. Stock)',
+  email:'claudia26.giehl@googlemail.com',
+  email2:'claudia@mausenest.de',
+};
+
+function _rechtsPdfHeader(pdf,titel,untertitel){
+  const PW=210,ML=18,MR=18;
+  const today=new Date();
+  const dateStr=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
+  pdf.setFillColor('#2c3e50');pdf.rect(0,0,PW,26,'F');
+  if(LOGO_B64)pdf.addImage(LOGO_B64,'PNG',ML,1,22,22);
+  const hx=ML+(LOGO_B64?26:0);
+  pdf.setFontSize(13);pdf.setFont('helvetica','bold');pdf.setTextColor('#ffffff');
+  pdf.text(RECHTS_INFO.betrieb.toUpperCase(),hx,10);
+  pdf.setFontSize(8);pdf.setFont('helvetica','normal');
+  pdf.text(RECHTS_INFO.typ+' · '+RECHTS_INFO.adresse,hx,17);
+  pdf.setFontSize(7.5);pdf.text('Stand: '+dateStr,PW-MR,10,{align:'right'});
+  pdf.text(RECHTS_INFO.email,PW-MR,16,{align:'right'});
+  let y=34;
+  pdf.setFontSize(18);pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');
+  pdf.text(titel,ML,y);y+=6;
+  if(untertitel){pdf.setFontSize(9);pdf.setFont('helvetica','normal');pdf.setTextColor('#555');pdf.text(untertitel,ML,y);y+=2;}
+  pdf.setDrawColor('#2c3e50');pdf.setLineWidth(0.5);pdf.line(ML,y+2,PW-MR,y+2);y+=8;
+  return{y,ML,MR,PW,dateStr,TW:PW-ML-MR};
+}
+
+function _rechtsSecTitle(pdf,t,y,ML,TW){
+  pdf.setFillColor('#2c3e50');pdf.roundedRect(ML,y,TW,8,2,2,'F');
+  pdf.setFontSize(10);pdf.setFont('helvetica','bold');pdf.setTextColor('#ffffff');
+  pdf.text(t,ML+4,y+5.5);return y+13;
+}
+
+function _rechtsText(pdf,text,y,ML,TW){
+  if(y>268){pdf.addPage();y=20;}
+  pdf.setFontSize(9);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+  const lines=pdf.splitTextToSize(text,TW);
+  lines.forEach(l=>{if(y>272){pdf.addPage();y=20;}pdf.text(l,ML,y);y+=5;});
+  return y+2;
+}
+
+function _rechtsBold(pdf,text,y,ML,TW){
+  if(y>268){pdf.addPage();y=20;}
+  pdf.setFontSize(9);pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');
+  const lines=pdf.splitTextToSize(text,TW);
+  lines.forEach(l=>{if(y>272){pdf.addPage();y=20;}pdf.text(l,ML,y);y+=5;});
+  pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+  return y+1;
+}
+
+function _rechtsFooter(pdf){
+  const pc=pdf.getNumberOfPages();
+  for(let i=1;i<=pc;i++){
+    pdf.setPage(i);pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#aaa');
+    pdf.text(RECHTS_INFO.betrieb+' · '+RECHTS_INFO.adresse+' · '+RECHTS_INFO.email,105,290,{align:'center'});
+    pdf.text('Seite '+i+' von '+pc,192,290,{align:'right'});
+  }
+}
+
+async function _saveRechtsDoc(pdf,fname,docLabel){
+  const dataUrl=pdf.output('datauristring');
+  const today=new Date();
+  const date=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
+  // Altes Dokument gleichen Namens löschen
+  const existing=DOCS.filter(d=>d.recipient==='infomappe'&&d.kategorie==='rechtliches'&&d.name===fname);
+  for(const d of existing){
+    try{await deleteDoc(doc(db,'dokumente',d.id));}catch(e){}
+  }
+  await addDoc(collection(db,'dokumente'),{
+    name:fname,type:'⚖️',size:'PDF',date,dataUrl,
+    recipient:'infomappe',kategorie:'rechtliches',
+    elternSichtbar:true,archiviert:false,ts:Date.now()
+  });
+  pdf.save(fname);
+  showToast('✅ '+docLabel+' gespeichert!');
+}
+
+window.genRechtsDoc=async function(type){
+  showToast('⏳ Dokument wird erstellt…',4000);
+  try{
+    const{jsPDF}=window.jspdf;
+
+    // ════════════════════════════════════════════════
+    if(type==='datenschutz'){
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      let{y,ML,MR,PW,TW,dateStr}=_rechtsPdfHeader(pdf,'Datenschutzerklärung','Gemäß Art. 13 DSGVO – Claudias Mäusenest, Kindertagespflege');
+
+      y=_rechtsSecTitle(pdf,'§ 1 Verantwortliche Person',y,ML,TW);
+      y=_rechtsText(pdf,'Verantwortlich für die Verarbeitung personenbezogener Daten ist:',y,ML,TW);
+      y=_rechtsBold(pdf,RECHTS_INFO.name+' · '+RECHTS_INFO.betrieb,y,ML,TW);
+      y=_rechtsText(pdf,RECHTS_INFO.adresse,y,ML,TW);
+      y=_rechtsText(pdf,'E-Mail: '+RECHTS_INFO.email+' · '+RECHTS_INFO.email2,y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 2 Welche Daten werden verarbeitet?',y,ML,TW);
+      y=_rechtsBold(pdf,'Daten des Kindes:',y,ML,TW);
+      y=_rechtsText(pdf,'Vor- und Nachname, Alter, Betreuungsbeginn, Anwesenheitszeiten (Ankunft, Schlafenszeit, Abholzeit), tägliche An- und Abwesenheit.',y,ML,TW);
+      y=_rechtsBold(pdf,'Daten der Erziehungsberechtigten:',y,ML,TW);
+      y=_rechtsText(pdf,'Name, E-Mail-Adresse, App-Zugangsdaten (Benutzername, Passwort), Kommunikation über den App-Chat.',y,ML,TW);
+      y=_rechtsBold(pdf,'Gesundheitsdaten:',y,ML,TW);
+      y=_rechtsText(pdf,'Krankmeldungen (Datum, Notiz), Unfallberichte (gemäß gesetzlicher Meldepflicht nach §§ 8a, 47 SGB VIII).',y,ML,TW);
+      y=_rechtsBold(pdf,'Abrechnungsdaten:',y,ML,TW);
+      y=_rechtsText(pdf,'Monatliche Betreuungsentgelte, Rechnungen, Zusatzkosten.',y,ML,TW);
+      y=_rechtsBold(pdf,'Dokumente:',y,ML,TW);
+      y=_rechtsText(pdf,'Betreuungsverträge, hochgeladene Dateien (z.B. Impfnachweise, Arztbriefe), allgemeine Infomappe-Dokumente.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 3 Zweck und Rechtsgrundlage',y,ML,TW);
+      y=_rechtsText(pdf,'Die Verarbeitung erfolgt auf Grundlage folgender Rechtsgrundlagen:',y,ML,TW);
+      y=_rechtsBold(pdf,'Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung):',y,ML,TW);
+      y=_rechtsText(pdf,'Zur Durchführung des Betreuungsvertrags und der damit verbundenen Kommunikation, Abrechnung und Dokumentation.',y,ML,TW);
+      y=_rechtsBold(pdf,'Art. 6 Abs. 1 lit. c DSGVO (Rechtliche Verpflichtung):',y,ML,TW);
+      y=_rechtsText(pdf,'Aufzeichnungspflichten gemäß SGB VIII, Unfallmeldepflicht, steuerliche Aufbewahrungspflichten (§ 147 AO).',y,ML,TW);
+      y=_rechtsBold(pdf,'Art. 9 Abs. 2 lit. b DSGVO (Gesundheitsdaten):',y,ML,TW);
+      y=_rechtsText(pdf,'Verarbeitung von Gesundheitsdaten (Krankmeldungen, Unfallberichte) zur Erfüllung arbeits- und sozialrechtlicher Pflichten.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 4 Speicherdauer',y,ML,TW);
+      y=_rechtsText(pdf,'Personenbezogene Daten werden nur so lange gespeichert, wie es für den jeweiligen Zweck erforderlich ist:',y,ML,TW);
+      [['Betreuungsdaten, Kommunikation','Dauer der Betreuung + 3 Jahre'],['Rechnungen, Abrechnungsunterlagen','10 Jahre (§ 147 AO)'],['Unfallberichte','30 Jahre (Verjährungsfristen)'],['Zugangsdaten','Bis zur Löschung des Elternzugangs']].forEach(([l,r])=>{
+        if(y>270){pdf.addPage();y=20;}
+        pdf.setFontSize(8.5);pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');pdf.text('· '+l+':',ML+2,y);
+        pdf.setFont('helvetica','normal');pdf.setTextColor('#222');pdf.text(r,ML+80,y);y+=6;
+      });y+=2;
+
+      y=_rechtsSecTitle(pdf,'§ 5 Dienstleister / Auftragsverarbeiter',y,ML,TW);
+      y=_rechtsText(pdf,'Für den Betrieb der App werden folgende Drittanbieter eingesetzt, mit denen ein Auftragsverarbeitungsvertrag (AV-Vertrag) gemäß Art. 28 DSGVO besteht oder abzuschließen ist:',y,ML,TW);
+      y=_rechtsBold(pdf,'Google Firebase (Firestore, Authentication):',y,ML,TW);
+      y=_rechtsText(pdf,'Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Datenspeicherung in europäischen Rechenzentren. Datenschutzbestimmungen: https://firebase.google.com/support/privacy',y,ML,TW);
+      y=_rechtsBold(pdf,'GitHub Pages (Hosting):',y,ML,TW);
+      y=_rechtsText(pdf,'GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Wird ausschließlich zur Auslieferung der App-Dateien genutzt, keine Nutzerdaten werden an GitHub übermittelt.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 6 Ihre Rechte als betroffene Person',y,ML,TW);
+      [['Auskunft (Art. 15 DSGVO)','Recht auf Auskunft über gespeicherte Daten (DSGVO-Export in der App verfügbar)'],['Berichtigung (Art. 16 DSGVO)','Recht auf Berichtigung unrichtiger Daten'],['Löschung (Art. 17 DSGVO)','Recht auf Löschung, sofern keine gesetzliche Aufbewahrungspflicht besteht'],['Einschränkung (Art. 18 DSGVO)','Recht auf Einschränkung der Verarbeitung'],['Datenübertragbarkeit (Art. 20 DSGVO)','Recht auf Erhalt Ihrer Daten in maschinenlesbarem Format'],['Widerspruch (Art. 21 DSGVO)','Recht auf Widerspruch gegen die Verarbeitung']].forEach(([t,b])=>{
+        if(y>265){pdf.addPage();y=20;}
+        y=_rechtsBold(pdf,t+':',y,ML,TW);
+        y=_rechtsText(pdf,b,y,ML,TW);
+      });
+
+      y=_rechtsSecTitle(pdf,'§ 7 Beschwerderecht',y,ML,TW);
+      y=_rechtsText(pdf,'Sie haben das Recht, sich bei der zuständigen Datenschutzaufsichtsbehörde zu beschweren:',y,ML,TW);
+      y=_rechtsBold(pdf,'Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)',y,ML,TW);
+      y=_rechtsText(pdf,'Promenade 18, 91522 Ansbach · Tel: +49 (0)981 180093-0 · www.lda.bayern.de',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 8 Datensicherheit',y,ML,TW);
+      y=_rechtsText(pdf,'Die App nutzt HTTPS-Verschlüsselung für alle Datenübertragungen. Der Zugriff auf personenbezogene Daten ist durch Firebase Authentication geschützt. Eltern können ausschließlich auf ihre eigenen Daten zugreifen. Claudia Giehl als Tagesmutter hat Zugriff auf alle Betreuungsdaten im Rahmen ihrer beruflichen Tätigkeit.',y,ML,TW);
+
+      _rechtsFooter(pdf);
+      await _saveRechtsDoc(pdf,'Datenschutzerklaerung_Maeusenest.pdf','Datenschutzerklärung');
+    }
+
+    // ════════════════════════════════════════════════
+    else if(type==='nutzung'){
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      let{y,ML,MR,PW,TW,dateStr}=_rechtsPdfHeader(pdf,'Nutzungsbedingungen','Für die Mäusenest App (Manager & Eltern-App)');
+
+      y=_rechtsSecTitle(pdf,'§ 1 Geltungsbereich',y,ML,TW);
+      y=_rechtsText(pdf,'Diese Nutzungsbedingungen gelten für die Nutzung der digitalen App "Claudias Mäusenest" (im Folgenden "App"), die von Claudia Giehl, '+RECHTS_INFO.adresse+', für die Verwaltung der Kindertagespflege betrieben wird.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 2 Zugang und Zugangsdaten',y,ML,TW);
+      y=_rechtsText(pdf,'Der Zugang zur Eltern-App erfolgt über individuelle Zugangsdaten (Benutzername und Passwort), die von der Tagesmutter vergeben werden.',y,ML,TW);
+      y=_rechtsBold(pdf,'Die Erziehungsberechtigten verpflichten sich:',y,ML,TW);
+      y=_rechtsText(pdf,'· Die Zugangsdaten vertraulich zu behandeln und sicher aufzubewahren.\n· Die Zugangsdaten nicht an Dritte weiterzugeben.\n· Bei Verlust oder Verdacht auf Missbrauch umgehend die Tagesmutter zu informieren.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 3 Zweck der App',y,ML,TW);
+      y=_rechtsText(pdf,'Die App dient ausschließlich der Kommunikation und Verwaltung im Rahmen des Betreuungsverhältnisses. Erlaubte Nutzung umfasst:',y,ML,TW);
+      y=_rechtsText(pdf,'· Einsicht in Dokumente (Verträge, Rechnungen, Informationen)\n· Krankmeldungen des betreuten Kindes\n· Kommunikation mit der Tagesmutter über den App-Chat\n· Einsicht in Ankündigungen und Schließtage',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 4 Pflichten der Nutzerinnen und Nutzer',y,ML,TW);
+      y=_rechtsText(pdf,'Die Nutzenden verpflichten sich, die App ausschließlich für die vorgesehenen Zwecke zu verwenden. Insbesondere ist untersagt:',y,ML,TW);
+      y=_rechtsText(pdf,'· Weitergabe von Zugangsdaten an nicht berechtigte Personen\n· Versuche, auf Daten anderer Eltern oder Kinder zuzugreifen\n· Missbrauch des Chat-Systems für unangemessene Inhalte\n· Automatisierte Abfragen oder technische Manipulationen',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 5 Verfügbarkeit',y,ML,TW);
+      y=_rechtsText(pdf,'Die Tagesmutter bemüht sich um eine möglichst unterbrechungsfreie Verfügbarkeit der App. Ein Rechtsanspruch auf ständige Verfügbarkeit besteht nicht. Technische Wartungsarbeiten oder unvorhergesehene Ausfälle können die Nutzung vorübergehend einschränken.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 6 Haftungsausschluss',y,ML,TW);
+      y=_rechtsText(pdf,'Die App wird als Hilfsmittel für die Verwaltung der Kindertagespflege bereitgestellt. Für technische Fehler, Datenverluste durch höhere Gewalt oder Ausfälle der genutzten Drittanbieter (Firebase, GitHub) wird keine Haftung übernommen, sofern diese nicht auf Vorsatz oder grober Fahrlässigkeit beruhen.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 7 Kündigung / Sperrung',y,ML,TW);
+      y=_rechtsText(pdf,'Mit Beendigung des Betreuungsverhältnisses wird der Elternzugang gesperrt. Die Tagesmutter ist berechtigt, den Zugang bei schwerwiegendem Missbrauch der App sofort zu sperren.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 8 Änderungen',y,ML,TW);
+      y=_rechtsText(pdf,'Diese Nutzungsbedingungen können bei Bedarf angepasst werden. Wesentliche Änderungen werden den Eltern über die App mitgeteilt.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'§ 9 Anwendbares Recht',y,ML,TW);
+      y=_rechtsText(pdf,'Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist Forchheim.',y,ML,TW);
+
+      _rechtsFooter(pdf);
+      await _saveRechtsDoc(pdf,'Nutzungsbedingungen_Maeusenest.pdf','Nutzungsbedingungen');
+    }
+
+    // ════════════════════════════════════════════════
+    else if(type==='einwilligung'){
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      let{y,ML,MR,PW,TW,dateStr}=_rechtsPdfHeader(pdf,'Einwilligungserklärung','Einwilligung zur Verarbeitung personenbezogener Daten · DSGVO Art. 7');
+
+      y=_rechtsSecTitle(pdf,'Einwilligungserklärung der Erziehungsberechtigten',y,ML,TW);
+      y=_rechtsText(pdf,'Hiermit erkläre/n ich/wir als Erziehungsberechtigte/r des betreuten Kindes meine/unsere Einwilligung zur Verarbeitung personenbezogener Daten durch:',y,ML,TW);
+      y=_rechtsBold(pdf,RECHTS_INFO.name+' · '+RECHTS_INFO.betrieb,y,ML,TW);
+      y=_rechtsText(pdf,RECHTS_INFO.adresse+' · '+RECHTS_INFO.email,y,ML,TW);
+      y+=3;
+
+      // Felder zum Ausfüllen
+      [['Name des Kindes',''],['Name der Erziehungsberechtigten',''],['Betreuungsbeginn','']].forEach(([label])=>{
+        if(y>270){pdf.addPage();y=20;}
+        pdf.setFontSize(8.5);pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');
+        pdf.text(label+':',ML,y);
+        pdf.setDrawColor('#aaa');pdf.setLineWidth(0.3);pdf.line(ML+55,y+1,PW-MR,y+1);
+        y+=9;
+      });y+=3;
+
+      y=_rechtsSecTitle(pdf,'Umfang der Einwilligung',y,ML,TW);
+      y=_rechtsText(pdf,'Ich willige ein, dass folgende personenbezogene Daten meines Kindes und meiner Person zum Zweck der Kindertagespflege-Verwaltung digital gespeichert und verarbeitet werden:',y,ML,TW);
+      ['✅ Name, Alter und Betreuungsdaten des Kindes','✅ Anwesenheits- und Abwesenheitszeiten','✅ Krankmeldungen und Gesundheitshinweise','✅ Unfallberichte (gesetzlich vorgeschrieben)','✅ Mein Name und meine E-Mail-Adresse als Erziehungsberechtigte/r','✅ Kommunikation über den App-Chat','✅ Rechnungen und Abrechnungsunterlagen','✅ Hochgeladene Dokumente (z.B. Verträge, Impfnachweise)'].forEach(t=>{
+        if(y>270){pdf.addPage();y=20;}
+        pdf.setFontSize(8.5);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+        pdf.text(t,ML+3,y);y+=6;
+      });y+=3;
+
+      y=_rechtsSecTitle(pdf,'Freiwilligkeit und Widerruf',y,ML,TW);
+      y=_rechtsText(pdf,'Diese Einwilligung ist freiwillig. Ich kann sie jederzeit ohne Angabe von Gründen für die Zukunft widerrufen, indem ich Claudia Giehl schriftlich oder per E-Mail informiere. Der Widerruf berührt nicht die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung.',y,ML,TW);
+      y=_rechtsText(pdf,'Ein Widerruf kann jedoch zur Folge haben, dass die Nutzung der App nicht mehr möglich ist, da die Datenverarbeitung für die Verwaltung des Betreuungsverhältnisses notwendig ist.',y,ML,TW);
+
+      y=_rechtsSecTitle(pdf,'Meine Rechte (Art. 15–21 DSGVO)',y,ML,TW);
+      y=_rechtsText(pdf,'Ich wurde darüber informiert, dass ich das Recht habe auf: Auskunft über gespeicherte Daten, Berichtigung unrichtiger Daten, Löschung (soweit keine gesetzliche Aufbewahrungspflicht besteht), Einschränkung der Verarbeitung, Datenübertragbarkeit sowie das Recht auf Beschwerde beim Bayerischen Landesamt für Datenschutzaufsicht (BayLDA), Promenade 18, 91522 Ansbach.',y,ML,TW);
+
+      // Unterschriften
+      y+=8;
+      if(y>245){pdf.addPage();y=20;}
+      pdf.setDrawColor('#aaa');pdf.setLineWidth(0.3);
+      pdf.line(ML,y+15,ML+75,y+15);pdf.line(ML+95,y+15,PW-MR,y+15);
+      pdf.setFontSize(8);pdf.setFont('helvetica','normal');pdf.setTextColor('#555');
+      pdf.text('Ort, Datum',ML,y+20);
+      pdf.text('Unterschrift Erziehungsberechtigte/r',ML+95,y+20);
+
+      _rechtsFooter(pdf);
+      await _saveRechtsDoc(pdf,'Einwilligungserklaerung_Maeusenest.pdf','Einwilligungserklärung');
+    }
+
+    // ════════════════════════════════════════════════
+    else if(type==='vvt'){
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      let{y,ML,MR,PW,TW,dateStr}=_rechtsPdfHeader(pdf,'Verzeichnis der Verarbeitungstätigkeiten (VVT)','Gemäß Art. 30 DSGVO – Intern · Nur für Claudia Giehl');
+
+      y=_rechtsText(pdf,'Verantwortliche: '+RECHTS_INFO.name+' · '+RECHTS_INFO.betrieb+' · '+RECHTS_INFO.adresse,y,ML,TW);
+      y=_rechtsText(pdf,'Tätigkeitsbereich: Kindertagespflege gemäß § 43 SGB VIII · Stand: '+dateStr,y,ML,TW);
+      y+=2;
+
+      const verarbeitungen=[
+        {nr:'1',name:'Betreuungsverwaltung',zweck:'Verwaltung des Betreuungsverhältnisses, Vertragsdokumentation',personen:'Kinder, Erziehungsberechtigte',daten:'Name, Alter, Betreuungsbeginn, Vertragsdaten',rl:'Art. 6 I b DSGVO',empf:'Keine Weitergabe',dauer:'Betreuungsdauer + 3 Jahre'},
+        {nr:'2',name:'Anwesenheitsdokumentation',zweck:'Dokumentation der täglichen Anwesenheit und Abwesenheit',personen:'Kinder',daten:'Name, An-/Abwesenheitszeiten, Ankunft, Schlaf, Abholung',rl:'Art. 6 I b+c DSGVO',empf:'Auf Verlangen: Jugendamt',dauer:'Betreuungsdauer + 3 Jahre'},
+        {nr:'3',name:'Krankmeldungen',zweck:'Dokumentation von Krankheitsfällen der Kinder',personen:'Kinder',daten:'Name, Datum der Krankmeldung, Notiz, meldende Person',rl:'Art. 9 II b DSGVO',empf:'Auf Verlangen: Jugendamt',dauer:'Betreuungsdauer + 3 Jahre'},
+        {nr:'4',name:'Unfallberichte',zweck:'Gesetzliche Unfallmeldepflicht gemäß §§ 8a, 47 SGB VIII',personen:'Kinder',daten:'Name, Unfallhergang, Verletzungsart, Ort, Zeugen, Maßnahmen',rl:'Art. 6 I c DSGVO, § 8a SGB VIII',empf:'Jugendamt, ggf. GUV/VBG',dauer:'30 Jahre'},
+        {nr:'5',name:'Abrechnung & Rechnungen',zweck:'Monatliche Abrechnung des Betreuungsentgelts',personen:'Erziehungsberechtigte',daten:'Name, Adresse, Betreuungsentgelt, Zahlungsdaten',rl:'Art. 6 I b+c DSGVO',empf:'Steuerberater (falls vorhanden)',dauer:'10 Jahre (§ 147 AO)'},
+        {nr:'6',name:'Kommunikation (Chat)',zweck:'Informationsaustausch zwischen Tagesmutter und Eltern',personen:'Erziehungsberechtigte',daten:'Name, Nachrichten-Inhalt, Zeitstempel',rl:'Art. 6 I b DSGVO',empf:'Keine Weitergabe',dauer:'Betreuungsdauer + 1 Jahr'},
+        {nr:'7',name:'Zugangsverwaltung',zweck:'Verwaltung der App-Zugänge für Eltern',personen:'Erziehungsberechtigte',daten:'Benutzername, E-Mail, Passwort (verschlüsselt), Kind-Zuordnung',rl:'Art. 6 I b DSGVO',empf:'Keine Weitergabe',dauer:'Bis Löschung des Zugangs'},
+      ];
+
+      verarbeitungen.forEach((v,i)=>{
+        if(y>240){pdf.addPage();y=20;}
+        // Box
+        pdf.setFillColor(i%2===0?'#f5f5f5':'#ffffff');
+        pdf.rect(ML,y,TW,36,'F');
+        pdf.setDrawColor('#ddd');pdf.setLineWidth(0.2);pdf.rect(ML,y,TW,36,'S');
+        // Nr + Name
+        pdf.setFontSize(9);pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');
+        pdf.text(v.nr+'. '+v.name,ML+3,y+6);
+        // Details
+        pdf.setFontSize(7.5);pdf.setFont('helvetica','normal');pdf.setTextColor('#333');
+        const cols=[[ML+3,'Zweck:',v.zweck],[ML+3,'Betroffene:',v.personen],[ML+3,'Daten:',v.daten],[ML+3,'Rechtsgrundl.:',v.rl]];
+        let dy=y+11;
+        cols.forEach(([x,lbl,val])=>{
+          pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');pdf.text(lbl,x,dy);
+          pdf.setFont('helvetica','normal');pdf.setTextColor('#333');
+          const vlines=pdf.splitTextToSize(val,TW-32);
+          pdf.text(vlines[0],x+28,dy);dy+=5;
+        });
+        pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');pdf.text('Speicherdauer:',ML+3,dy);
+        pdf.setFont('helvetica','normal');pdf.setTextColor('#c0392b');pdf.text(v.dauer,ML+31,dy);
+        y+=40;
+      });
+
+      y+=4;
+      y=_rechtsSecTitle(pdf,'Technische und Organisatorische Maßnahmen (TOMs)',y,ML,TW);
+      [['Verschlüsselung','HTTPS-Übertragung für alle Daten (TLS 1.3)'],['Zugriffskontrolle','Firebase Authentication, rollenbasierter Zugriff (Tagesmutter/Eltern)'],['Datensparsamkeit','Nur für Betreuung notwendige Daten werden erfasst'],['Auftragsverarbeitung','AV-Vertrag mit Google Firebase gemäß Art. 28 DSGVO'],['Backup','Automatisches Firebase-Backup in EU-Rechenzentren'],['Datenschutz-by-Design','Eltern sehen ausschließlich eigene Kind-Daten'],].forEach(([t,b])=>{
+        if(y>270){pdf.addPage();y=20;}
+        pdf.setFontSize(8.5);pdf.setFont('helvetica','bold');pdf.setTextColor('#2c3e50');
+        pdf.text('✓ '+t+':',ML+2,y);
+        pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+        pdf.text(b,ML+38,y);y+=6;
+      });
+
+      _rechtsFooter(pdf);
+      await _saveRechtsDoc(pdf,'VVT_Verarbeitungsverzeichnis_Maeusenest.pdf','VVT');
+    }
+
   }catch(e){showToast('❌ Fehler: '+e.message);console.error(e);}
 };
 
