@@ -1795,6 +1795,21 @@ function getKindDocs(kindId,ordnerId){
 
 function docRow(d,isArchived){
   const nm=d.name.replace(/'/g,"\\'");
+  // Rechtliches-Dokumente: kein dataUrl gespeichert → Sonderdarstellung
+  if(d.rechtsTyp){
+    const labels={datenschutz:'Datenschutzerklärung',nutzung:'Nutzungsbedingungen',einwilligung:'Einwilligungserklärung',vvt:'VVT'};
+    return`<div class="ak-doc-row" style="background:#f8f9fa">
+      <div class="ak-doc-icon">⚖️</div>
+      <div class="ak-doc-info">
+        <div class="ak-doc-name">${labels[d.rechtsTyp]||d.name}</div>
+        <div class="ak-doc-date">Generiert: ${d.date||'–'} · Klicke "🔄" für aktualisierte Version</div>
+      </div>
+      <div class="ak-doc-btns">
+        <button class="ak-doc-btn" title="Neu generieren & herunterladen" onclick="window.genRechtsDoc('${d.rechtsTyp}')">🔄</button>
+        ${!isArchived?`<button class="ak-doc-btn red" onclick="window.deleteDocItem('${d.id}','${nm}')">🗑️</button>`:''}
+      </div>
+    </div>`;
+  }
   return`<div class="ak-doc-row">
     <div class="ak-doc-icon">${d.type||'📄'}</div>
     <div class="ak-doc-info">
@@ -2015,36 +2030,47 @@ function renderAktenInfomappeView(){
     let bodyHtml='';
     if(isOpen){
       if(ord.id==='rechtliches'){
-        // Spezielle Ansicht: Generator-Buttons + vorhandene Dokumente
+        // Hilfsfunktion: Status-Badge für jeden Typ
+        const genStatus=(typ)=>{
+          const d=ordDocs.find(x=>x.rechtsTyp===typ);
+          return d?`<span style="background:#e8f5e9;color:#27ae60;padding:3px 8px;border-radius:20px;font-size:0.72rem;font-weight:700">✅ ${d.date}</span>`
+                  :`<span style="background:#f0f4f8;color:#888;padding:3px 8px;border-radius:20px;font-size:0.72rem">Noch nicht generiert</span>`;
+        };
+        const btnLabel=(typ)=>ordDocs.find(x=>x.rechtsTyp===typ)?'🔄 Neu':'📄 Generieren';
+        const genBtnStyle=(typ)=>ordDocs.find(x=>x.rechtsTyp===typ)
+          ?'background:#27ae60;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700'
+          :'background:#2c3e50;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700';
+        // Hochgeladene Zusatzdokumente (ohne rechtsTyp)
+        const uploadDocs=ordDocs.filter(d=>!d.rechtsTyp);
         bodyHtml=`<div class="ak-ordner-body">
-          <div style="font-size:0.78rem;color:#a07828;margin-bottom:10px;padding:8px 10px;background:rgba(44,62,80,0.06);border-radius:8px">⚖️ Klicke auf "Generieren" um das Dokument zu erstellen und in der Infomappe zu speichern.</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+          <div style="font-size:0.78rem;color:#2c3e50;margin-bottom:10px;padding:8px 10px;background:rgba(44,62,80,0.07);border-radius:8px;font-weight:600">
+            ⚖️ Generiere Dokumente oder lade eigene hoch. Bereits generierte Dokumente können jederzeit neu erstellt werden – immer auf dem aktuellen Stand.
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
             <button onclick="window.genRechtsDoc('datenschutz')" style="display:flex;align-items:center;gap:10px;background:#f0f4f8;border:1px solid #ccd6e0;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
               <span style="font-size:1.3rem">🔒</span>
-              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Datenschutzerklärung</div><div style="font-size:0.73rem;color:#666">DSGVO Art. 13 – Was mit den Daten passiert</div></div>
-              <span style="background:#2c3e50;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Datenschutzerklärung</div><div style="margin-top:2px">${genStatus('datenschutz')}</div></div>
+              <span style="${genBtnStyle('datenschutz')}">${btnLabel('datenschutz')}</span>
             </button>
             <button onclick="window.genRechtsDoc('nutzung')" style="display:flex;align-items:center;gap:10px;background:#f0f4f8;border:1px solid #ccd6e0;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
               <span style="font-size:1.3rem">📋</span>
-              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Nutzungsbedingungen</div><div style="font-size:0.73rem;color:#666">Regeln für die App-Nutzung</div></div>
-              <span style="background:#2c3e50;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Nutzungsbedingungen</div><div style="margin-top:2px">${genStatus('nutzung')}</div></div>
+              <span style="${genBtnStyle('nutzung')}">${btnLabel('nutzung')}</span>
             </button>
             <button onclick="window.genRechtsDoc('einwilligung')" style="display:flex;align-items:center;gap:10px;background:#f0f4f8;border:1px solid #ccd6e0;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
               <span style="font-size:1.3rem">✍️</span>
-              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Einwilligungserklärung</div><div style="font-size:0.73rem;color:#666">Einwilligung der Eltern zur Datenverarbeitung</div></div>
-              <span style="background:#2c3e50;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#2c3e50">Einwilligungserklärung</div><div style="margin-top:2px">${genStatus('einwilligung')}</div></div>
+              <span style="${genBtnStyle('einwilligung')}">${btnLabel('einwilligung')}</span>
             </button>
             <button onclick="window.genRechtsDoc('vvt')" style="display:flex;align-items:center;gap:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;width:100%">
               <span style="font-size:1.3rem">📂</span>
-              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#875E0A">VVT (intern)</div><div style="font-size:0.73rem;color:#666">Verzeichnis der Verarbeitungstätigkeiten · DSGVO Art. 30</div></div>
-              <span style="background:#ECA108;color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">Generieren</span>
+              <div style="flex:1"><div style="font-weight:800;font-size:0.88rem;color:#875E0A">VVT (intern, Art. 30)</div><div style="margin-top:2px">${genStatus('vvt')}</div></div>
+              <span style="${ordDocs.find(x=>x.rechtsTyp==='vvt')?'background:#27ae60':'background:#ECA108'};color:white;padding:4px 10px;border-radius:20px;font-size:0.73rem;font-weight:700">${btnLabel('vvt')}</span>
             </button>
-          </div>`;
-        if(count){
-          bodyHtml+=`<div style="font-size:0.75rem;font-weight:700;color:#a07828;margin-bottom:6px">GESPEICHERTE DOKUMENTE (${count})</div>`;
-          ordDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(d=>{bodyHtml+=docRow(d,false);});
-        }
-        bodyHtml+='</div>';
+          </div>
+          <button class="ak-upload-btn" onclick="window.aktenUpload(null,'rechtliches',true)" style="margin-bottom:${uploadDocs.length?'10px':'0'}">📤 <span>Zusatzdokument hochladen (z.B. AV-Vertrag)</span></button>
+          ${uploadDocs.length?`<div style="font-size:0.75rem;font-weight:700;color:#a07828;margin-bottom:6px">HOCHGELADENE DOKUMENTE (${uploadDocs.length})</div>`+uploadDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).map(d=>docRow(d,false)).join(''):''}
+        </div>`;
       }else{
         bodyHtml=`<div class="ak-ordner-body">
           <button class="ak-upload-btn" onclick="window.aktenUpload(null,'${ord.id}',true)">📤 <span>Datei hochladen</span></button>`;
@@ -2658,26 +2684,31 @@ function _rechtsFooter(pdf){
   }
 }
 
-async function _saveRechtsDoc(pdf,fname,docLabel){
-  // PDF zuerst herunterladen – unabhängig von Firestore
+// Speichert NUR Metadaten (kein dataUrl) → kein Firestore-Limit
+// rechtsTyp = 'datenschutz'|'nutzung'|'einwilligung'|'vvt'
+async function _saveRechtsDoc(pdf,fname,docLabel,rechtsTyp){
+  // 1. PDF sofort herunterladen
   pdf.save(fname);
-  showToast('✅ '+docLabel+' heruntergeladen!');
-  // Dann versuchen in Firestore zu speichern (für Infomappe-Anzeige)
+  // 2. Metadaten in Firestore speichern / aktualisieren (kein dataUrl!)
   try{
-    const dataUrl=pdf.output('datauristring');
     const today=new Date();
     const date=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
-    // Altes Dokument gleichen Namens löschen
-    const existing=DOCS.filter(d=>d.recipient==='infomappe'&&d.kategorie==='rechtliches'&&d.name===fname);
-    for(const d of existing){
-      try{await deleteDoc(doc(db,'dokumente',d.id));}catch(e){}
+    // Upsert: existierendes Dokument mit gleichem rechtsTyp aktualisieren
+    const existing=DOCS.find(d=>d.recipient==='infomappe'&&d.kategorie==='rechtliches'&&d.rechtsTyp===rechtsTyp);
+    if(existing){
+      await updateDoc(doc(db,'dokumente',existing.id),{name:fname,date,ts:Date.now()});
+    }else{
+      await addDoc(collection(db,'dokumente'),{
+        name:fname,type:'⚖️',size:'PDF',date,rechtsTyp,
+        recipient:'infomappe',kategorie:'rechtliches',
+        elternSichtbar:true,archiviert:false,ts:Date.now()
+      });
     }
-    await addDoc(collection(db,'dokumente'),{
-      name:fname,type:'⚖️',size:'PDF',date,dataUrl,
-      recipient:'infomappe',kategorie:'rechtliches',
-      elternSichtbar:true,archiviert:false,ts:Date.now()
-    });
-  }catch(e){console.warn('Infomappe-Speicherung fehlgeschlagen:',e);}
+    showToast('✅ '+docLabel+' gespeichert!');
+  }catch(e){
+    console.warn('Infomappe-Speicherung fehlgeschlagen:',e);
+    showToast('✅ '+docLabel+' heruntergeladen!');
+  }
 }
 
 window.genRechtsDoc=async function(type){
@@ -2748,7 +2779,7 @@ window.genRechtsDoc=async function(type){
       y=_rechtsText(pdf,'Die App nutzt HTTPS-Verschlüsselung für alle Datenübertragungen. Der Zugriff auf personenbezogene Daten ist durch Firebase Authentication geschützt. Eltern können ausschließlich auf ihre eigenen Daten zugreifen. Claudia Giehl als Tagesmutter hat Zugriff auf alle Betreuungsdaten im Rahmen ihrer beruflichen Tätigkeit.',y,ML,TW);
 
       _rechtsFooter(pdf);
-      await _saveRechtsDoc(pdf,'Datenschutzerklaerung_Maeusenest.pdf','Datenschutzerklärung');
+      await _saveRechtsDoc(pdf,'Datenschutzerklaerung_Maeusenest.pdf','Datenschutzerklärung','datenschutz');
     }
 
     // ════════════════════════════════════════════════
@@ -2788,7 +2819,7 @@ window.genRechtsDoc=async function(type){
       y=_rechtsText(pdf,'Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist Forchheim.',y,ML,TW);
 
       _rechtsFooter(pdf);
-      await _saveRechtsDoc(pdf,'Nutzungsbedingungen_Maeusenest.pdf','Nutzungsbedingungen');
+      await _saveRechtsDoc(pdf,'Nutzungsbedingungen_Maeusenest.pdf','Nutzungsbedingungen','nutzung');
     }
 
     // ════════════════════════════════════════════════
@@ -2836,7 +2867,7 @@ window.genRechtsDoc=async function(type){
       pdf.text('Unterschrift Erziehungsberechtigte/r',ML+95,y+20);
 
       _rechtsFooter(pdf);
-      await _saveRechtsDoc(pdf,'Einwilligungserklaerung_Maeusenest.pdf','Einwilligungserklärung');
+      await _saveRechtsDoc(pdf,'Einwilligungserklaerung_Maeusenest.pdf','Einwilligungserklärung','einwilligung');
     }
 
     // ════════════════════════════════════════════════
@@ -2893,7 +2924,7 @@ window.genRechtsDoc=async function(type){
       });
 
       _rechtsFooter(pdf);
-      await _saveRechtsDoc(pdf,'VVT_Verarbeitungsverzeichnis_Maeusenest.pdf','VVT');
+      await _saveRechtsDoc(pdf,'VVT_Verarbeitungsverzeichnis_Maeusenest.pdf','VVT','vvt');
     }
 
   }catch(e){showToast('❌ Fehler: '+e.message);console.error(e);}
