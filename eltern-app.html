@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="./logo.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1h0.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--gold:#ECA108;--brown:#875E0A;--cream:#FFF9EC;--white:#fff;--gray:#f5f5f5;--text:#2d2006;--radius:16px;--shadow:0 4px 20px rgba(135,94,10,0.12);--green:#28a745;--red:#dc3545;--blue:#007bff}
@@ -397,7 +397,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 // Für Push-Nachrichten (optional – benötigt VAPID Key in eltern-manifest.json und firebase-messaging-sw.js):
 // import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
@@ -462,6 +462,14 @@ if('serviceWorker' in navigator){
   });
 }
 
+// ── Passwort-Hashing (SHA-256 + Salt) ─────────────────────
+async function hashPass(username,password){
+  const encoder=new TextEncoder();
+  const data=encoder.encode(username.toLowerCase()+':'+password+':maeusenest-salt');
+  const buf=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
 // ── Login ──────────────────────────────────────────────────
 window.doLogin=async function(){
   const username=document.getElementById('loginUser').value.trim().toLowerCase();
@@ -469,15 +477,33 @@ window.doLogin=async function(){
   const errEl=document.getElementById('loginErr');
   if(!username||!pass){showToast('⚠️ Bitte alles ausfüllen');return;}
   try{
-    // Anonyme Firebase-Auth-Sitzung starten (für Firestore-Zugriffsregeln)
     await signInAnonymously(auth);
     const snap=await getDoc(doc(db,'eltern',username));
-    if(!snap.exists()||snap.data().pass!==pass){
+    if(!snap.exists()){
       errEl.textContent='❌ Benutzername oder Passwort falsch.';
       errEl.classList.add('show');
       signOut(auth);return;
     }
     const d=snap.data();
+    const storedPass=d.pass||'';
+    const hashedInput=await hashPass(username,pass);
+
+    let isValid=false;
+    if(storedPass===hashedInput){
+      // Passwort bereits gehasht – korrekt
+      isValid=true;
+    }else if(storedPass===pass){
+      // Altes Klartext-Passwort – automatisch auf Hash migrieren
+      isValid=true;
+      try{await updateDoc(doc(db,'eltern',username),{pass:hashedInput});}
+      catch(e){console.warn('Migration fehlgeschlagen:',e);}
+    }
+
+    if(!isValid){
+      errEl.textContent='❌ Benutzername oder Passwort falsch.';
+      errEl.classList.add('show');
+      signOut(auth);return;
+    }
     if(d.gesperrt){
       errEl.textContent='⛔ Zugang gesperrt. Bitte wende dich an die Tagesmutter.';
       errEl.classList.add('show');

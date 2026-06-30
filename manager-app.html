@@ -887,6 +887,14 @@ const INFOMAPPE_DEFS=[
   {id:'sonstiges',   icon:'📋', label:'Sonstiges',                    color:'#7f8c8d'},
 ];
 
+// ── Passwort-Hashing (SHA-256 + Salt) ─────────────────────
+async function hashPass(username,password){
+  const encoder=new TextEncoder();
+  const data=encoder.encode(username.toLowerCase()+':'+password+':maeusenest-salt');
+  const buf=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
 // ── Real-time listeners ────────────────────────────────────
 onSnapshot(collection(db,'kinder'),snap=>{
   CHILDREN={};snap.forEach(d=>{CHILDREN[d.id]={id:d.id,...d.data()};});
@@ -2883,7 +2891,8 @@ window.confirmAddKind=async function(){
   const fullName=vorname+' '+familienname;
   try{
     const kindRef=await addDoc(collection(db,'kinder'),{name:fullName,vorname,familienname,age:alter,emoji:newKindEmoji,color:newKindColor,status:'abwesend',arrivedAt:'',sleepAt:'',goneAt:'',present:[],absent:[],notes:'',betreuungsBeginn:beginn,ts:Date.now()});
-    await setDoc(doc(db,'eltern',username),{name:elternName,email,pass:passwort,kind:kindRef.id,kindName:fullName,ts:Date.now()});
+    const hashedPass=await hashPass(username,passwort);
+    await setDoc(doc(db,'eltern',username),{name:elternName,email,pass:hashedPass,kind:kindRef.id,kindName:fullName,ts:Date.now()});
     window.closeAddKindModal();
     showToast(`✅ ${fullName} wurde hinzugefügt!`);
     setTimeout(()=>{
