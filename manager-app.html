@@ -1942,7 +1942,7 @@ function renderAktenKindView(){
   // Topbar
   document.getElementById('aktenTopbarTitle').textContent=c.name;
   document.getElementById('aktenTopbarLeft').innerHTML=`<button class="topbar-back" onclick="window.aktenBack()">←</button>`;
-  document.getElementById('aktenTopbarRight').innerHTML=`<div style="display:flex;gap:6px"><button onclick="window.exportDsgvoPdf('${c.id}')" style="background:rgba(236,161,8,0.12);border:1px solid rgba(236,161,8,0.3);padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">📄 DSGVO</button><button onclick="window.downloadKindZip('${c.id}','${nm}')" style="background:var(--cream);border:none;padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">⬇️ ZIP</button></div>`;
+  document.getElementById('aktenTopbarRight').innerHTML=`<div style="display:flex;gap:6px"><button onclick="window.exportBehoerdePdf('${c.id}')" style="background:rgba(236,161,8,0.12);border:1px solid rgba(236,161,8,0.3);padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">🏛️ Nachweis</button><button onclick="window.downloadKindZip('${c.id}','${nm}')" style="background:var(--cream);border:none;padding:6px 10px;border-radius:10px;color:var(--brown);cursor:pointer;font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;white-space:nowrap">⬇️ ZIP</button></div>`;
 
   let h=`<div class="ak-kind-hdr">
     <div class="ak-kind-avatar" style="background:${c.color||'#ffe599'}">${c.emoji||'🐭'}</div>
@@ -2445,9 +2445,9 @@ window.downloadInfomappeZip=async function(){
   }catch(e){showToast('❌ Fehler: '+e.message);}
 };
 
-// ── DSGVO Daten-Export PDF ──────────────────────────────────
-window.exportDsgvoPdf=async function(kindId){
-  showToast('⏳ DSGVO-Export wird erstellt…',5000);
+// ── Behörden-Nachweis PDF (Jobcenter / Jugendamt) ──────────
+window.exportBehoerdePdf=async function(kindId){
+  showToast('⏳ Betreuungsnachweis wird erstellt…',5000);
   try{
     const c=CHILDREN[kindId];
     if(!c){showToast('❌ Kind nicht gefunden');return;}
@@ -2456,168 +2456,280 @@ window.exportDsgvoPdf=async function(kindId){
     const kindDocs=DOCS.filter(d=>d.recipient===kindId);
     const kms=KRANKMELDUNGEN.filter(k=>k.kindId===kindId).sort((a,b)=>(b.datum||'').localeCompare(a.datum||''));
 
-    // Nachrichten live aus Firestore holen
-    let msgs=[];
+    // Unfallberichte aus Firestore holen
+    let unfallBerichte=[];
     try{
-      const msgSnap=await getDocs(query(collection(db,'nachrichten'),where('kind','==',kindId)));
-      msgSnap.forEach(d=>msgs.push(d.data()));
-      msgs.sort((a,b)=>(b.ts||0)-(a.ts||0));
+      const uSnap=await getDocs(collection(db,'unfallberichte'));
+      uSnap.forEach(d=>{const data=d.data();if(data.kindId===kindId)unfallBerichte.push({id:d.id,...data});});
+      unfallBerichte.sort((a,b)=>(b.erstelltAm||'').localeCompare(a.erstelltAm||''));
     }catch(e){}
 
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const PW=210,ML=18,MR=18,TW=PW-ML-MR;
+    const PW=210,PH=297,ML=18,MR=18,TW=PW-ML-MR;
     const today=new Date();
     const dateStr=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
     let y=0;
 
     // Hilfsfunktionen
-    const checkPage=()=>{if(y>270){pdf.addPage();y=20;}};
-    const hLine=()=>{pdf.setDrawColor('#ECA108');pdf.setLineWidth(0.4);pdf.line(ML,y,PW-MR,y);y+=5;};
+    const checkPage=(needed=15)=>{if(y>PH-25-needed){pdf.addPage();y=28;}};
+    const hLine=()=>{pdf.setDrawColor('#875E0A');pdf.setLineWidth(0.4);pdf.line(ML,y,PW-MR,y);y+=5;};
     const secTitle=(t)=>{
-      checkPage();
-      pdf.setFillColor('#ECA108');pdf.roundedRect(ML,y,TW,8,2,2,'F');
-      pdf.setFontSize(10);pdf.setFont('helvetica','bold');pdf.setTextColor('#ffffff');
+      checkPage(20);
+      pdf.setFillColor('#875E0A');pdf.roundedRect(ML,y,TW,8,2,2,'F');
+      pdf.setFontSize(9.5);pdf.setFont('helvetica','bold');pdf.setTextColor('#ffffff');
       pdf.text(t,ML+4,y+5.5);y+=12;
     };
-    const row=(label,val)=>{
-      checkPage();
+    const row=(label,val,labelW=58)=>{
+      checkPage(8);
       pdf.setFontSize(8.5);pdf.setFont('helvetica','bold');pdf.setTextColor('#875E0A');
       pdf.text(label,ML,y);
       pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
-      const lines=pdf.splitTextToSize(val||'—',TW-42);
-      pdf.text(lines,ML+42,y);
-      y+=Math.max(5,lines.length*5);
+      const lines=pdf.splitTextToSize(String(val||'—'),TW-labelW);
+      pdf.text(lines,ML+labelW,y);
+      y+=Math.max(5.5,lines.length*5.5);
+    };
+    const small=(t,color='#666')=>{
+      checkPage(6);
+      pdf.setFontSize(8);pdf.setFont('helvetica','italic');pdf.setTextColor(color);
+      const lines=pdf.splitTextToSize(t,TW);
+      pdf.text(lines,ML,y);y+=lines.length*4.8;
+    };
+    const tblHdr=(cols)=>{
+      checkPage(12);
+      pdf.setFillColor('#FFF3DC');pdf.rect(ML,y,TW,6.5,'F');
+      pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.setTextColor('#875E0A');
+      cols.forEach(([txt,x])=>pdf.text(txt,ML+x,y+4.5));
+      y+=7.5;
     };
 
-    // ── Header ──
-    pdf.setFillColor('#ECA108');pdf.rect(0,0,PW,26,'F');
-    if(LOGO_B64)pdf.addImage(LOGO_B64,'PNG',ML,1,22,22);
-    const hx=ML+(LOGO_B64?26:0);
+    // ═══════════════════════════════════════════════
+    // HEADER
+    // ═══════════════════════════════════════════════
+    pdf.setFillColor('#875E0A');pdf.rect(0,0,PW,26,'F');
+    if(LOGO_B64)pdf.addImage(LOGO_B64,'PNG',ML,2,20,20);
+    const hx=ML+(LOGO_B64?25:0);
     pdf.setFontSize(13);pdf.setFont('helvetica','bold');pdf.setTextColor('#ffffff');
     pdf.text('CLAUDIAS MÄUSENEST',hx,10);
     pdf.setFontSize(8);pdf.setFont('helvetica','normal');
-    pdf.text('Kindertagespflege · claudia26.giehl@googlemail.com',hx,17);
-    pdf.setFontSize(7.5);pdf.text('Erstellt: '+dateStr,PW-MR,10,{align:'right'});
-    pdf.text('DSGVO Datenauskunft',PW-MR,16,{align:'right'});
-    y=34;
+    pdf.text('Kindertagespflege gemäß § 43 SGB VIII',hx,17);
+    pdf.setFontSize(7.5);
+    pdf.text('Ausstellungsdatum: '+dateStr,PW-MR,10,{align:'right'});
+    pdf.text('Vertraulich',PW-MR,17,{align:'right'});
+    y=32;
 
     // ── Titel ──
     pdf.setFontSize(18);pdf.setFont('helvetica','bold');pdf.setTextColor('#875E0A');
-    pdf.text('DSGVO-Datenauskunft',ML,y);y+=5;
+    pdf.text('BETREUUNGSNACHWEIS',ML,y);y+=7;
     pdf.setFontSize(9);pdf.setFont('helvetica','normal');pdf.setTextColor('#555');
-    pdf.text('Alle gespeicherten personenbezogenen Daten gemäß Art. 15 DSGVO',ML,y);y+=3;
+    pdf.text('Nachweis über das Kindertagespflegeverhältnis · für Jobcenter / Jugendamt',ML,y);y+=4;
     hLine();
 
-    // ── 1. Kind-Stammdaten ──
-    secTitle('👶 1. Kind-Stammdaten');
-    row('Name:',c.name);
-    row('Alter:',c.age?c.age+' Jahre':'—');
+    // ═══════════════════════════════════════════════
+    // 1. TAGESPFLEGEPERSON
+    // ═══════════════════════════════════════════════
+    secTitle('1. Tagespflegeperson (Betreuerin)');
+    row('Name:','Claudia Giehl');
+    row('Betrieb:','Claudias Mäusenest – Kindertagespflege');
+    row('Anschrift:','Burgerhofstr. 10, 91301 Forchheim (1. Stock)');
+    row('E-Mail:','claudia26.giehl@googlemail.com');
+    row('Website / App:','claudia@mausenest.de');
+    row('Rechtsgrundlage:','Kindertagespflegeperson gemäß §§ 22 ff. und 43 SGB VIII');
+    row('Art der Tätigkeit:','Selbstständige Kindertagespflege (gewerblich)');
+    y+=3;
+
+    // ═══════════════════════════════════════════════
+    // 2. KIND-STAMMDATEN
+    // ═══════════════════════════════════════════════
+    secTitle('2. Betreutes Kind');
+    row('Name des Kindes:',c.name);
+    row('Alter:',c.age?c.age+' Jahr'+(c.age==1?'':'e'):'—');
     row('Betreuungsbeginn:',c.betreuungsBeginn?c.betreuungsBeginn.split('-').reverse().join('.'):'—');
-    row('Emoji / Farbe:',`${c.emoji||'🐭'}`);
-    row('Status:',c.archiviert?'Archiviert (inaktiv)':'Aktiv');
-    if(c.archiviertAm){row('Archiviert am:',c.archiviertAm.split('T')[0].split('-').reverse().join('.'));}
-    y+=2;
+    row('Betreuungsstatus:',c.archiviert?'Betreuung beendet (archiviert)':'Aktiv betreut');
+    if(c.archiviertAm){row('Betreuungsende:',c.archiviertAm.split('T')[0].split('-').reverse().join('.'));}
+    y+=3;
 
-    // ── 2. Eltern-/Kontaktdaten ──
-    secTitle('👪 2. Eltern-/Kontaktdaten');
+    // ═══════════════════════════════════════════════
+    // 3. ERZIEHUNGSBERECHTIGTE
+    // ═══════════════════════════════════════════════
+    secTitle('3. Erziehungsberechtigte / Eltern');
     if(ed.name||ed.email){
-      row('Name Erziehungsber.:',ed.name||'—');
+      row('Name:',ed.name||'—');
       row('E-Mail:',ed.email||'—');
-      row('Benutzername:',eu||'—');
-      row('Konto-Status:',ed.gesperrt?'Gesperrt':'Aktiv');
     }else{
-      pdf.setFontSize(8.5);pdf.setFont('helvetica','italic');pdf.setTextColor('#888');
-      pdf.text('Keine Elterndaten vorhanden.',ML,y);y+=7;
+      small('Keine Erziehungsberechtigten-Daten hinterlegt.');
     }
-    y+=2;
+    y+=3;
 
-    // ── 3. Dokumente ──
-    secTitle('📁 3. Gespeicherte Dokumente');
-    if(kindDocs.length){
-      // Tabellen-Header
-      checkPage();
-      pdf.setFillColor('#FFF9EC');pdf.rect(ML,y,TW,6,'F');
-      pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.setTextColor('#875E0A');
-      pdf.text('Dateiname',ML+2,y+4);
-      pdf.text('Kategorie',ML+90,y+4);
-      pdf.text('Datum',ML+130,y+4);
-      pdf.text('Sichtbarkeit',ML+155,y+4);
-      y+=7;
-      kindDocs.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach((d,i)=>{
-        checkPage();
+    // ═══════════════════════════════════════════════
+    // 4. BETREUUNGSKOSTEN
+    // ═══════════════════════════════════════════════
+    secTitle('4. Betreuungskosten');
+    const pgMonat=parseFloat(c.pflegegeld)||0;
+    if(pgMonat>0){
+      row('Monatl. Entgelt:',pgMonat.toFixed(2).replace('.',',')+' € / Monat (brutto)');
+      row('Jahresschätzung:','ca. '+(pgMonat*12).toFixed(2).replace('.',',')+' € (12 × '+pgMonat.toFixed(2).replace('.',',')+' €)');
+    }else{
+      small('Betreuungsentgelt nicht hinterlegt. Bitte in den Einstellungen ergänzen.');
+    }
+    // Rechnungen auflisten
+    const rechnungen=kindDocs.filter(d=>d.kategorie==='rechnung').sort((a,b)=>(b.ts||0)-(a.ts||0));
+    if(rechnungen.length){
+      y+=3;
+      pdf.setFontSize(8);pdf.setFont('helvetica','bold');pdf.setTextColor('#875E0A');
+      pdf.text('Abgerechnete Monate ('+rechnungen.length+' Rechnungen):',ML,y);y+=5;
+      tblHdr([['Rechnungsdatei',2],['Ausgestellt am',120]]);
+      rechnungen.forEach((d,i)=>{
+        checkPage(7);
         if(i%2===0){pdf.setFillColor('#FAFAFA');pdf.rect(ML,y-1,TW,6,'F');}
         pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
-        const nm=pdf.splitTextToSize(d.name||'Unbekannt',85);
-        pdf.text(nm[0],ML+2,y+3);
-        pdf.text(d.kategorie||'sonstiges',ML+90,y+3);
-        pdf.text(d.date||'—',ML+130,y+3);
-        pdf.text(d.elternSichtbar?'Eltern sichtbar':'Privat',ML+155,y+3);
+        pdf.text((d.name||'—').substring(0,65),ML+2,y+3.5);
+        pdf.text(d.date||'—',ML+120,y+3.5);
+        y+=6;
+      });
+    }
+    y+=3;
+
+    // ═══════════════════════════════════════════════
+    // 5. VERTRÄGE & DOKUMENTE
+    // ═══════════════════════════════════════════════
+    const vertraege=kindDocs.filter(d=>d.kategorie==='vertrag'||d.kategorie==='login');
+    const sonstigeDoks=kindDocs.filter(d=>d.kategorie!=='rechnung'&&d.kategorie!=='vertrag'&&d.kategorie!=='login'&&d.kategorie!=='rechtliches').sort((a,b)=>(b.ts||0)-(a.ts||0));
+    secTitle('5. Verträge & Vereinbarungen ('+vertraege.length+' Dokument'+(vertraege.length===1?'':'e')+')');
+    if(vertraege.length){
+      tblHdr([['Dokument',2],['Kategorie',100],['Datum',140]]);
+      vertraege.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach((d,i)=>{
+        checkPage(7);
+        if(i%2===0){pdf.setFillColor('#FAFAFA');pdf.rect(ML,y-1,TW,6,'F');}
+        pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+        pdf.text((d.name||'—').substring(0,55),ML+2,y+3.5);
+        pdf.text(d.kategorie||'—',ML+100,y+3.5);
+        pdf.text(d.date||'—',ML+140,y+3.5);
         y+=6;
       });
     }else{
-      pdf.setFontSize(8.5);pdf.setFont('helvetica','italic');pdf.setTextColor('#888');
-      pdf.text('Keine Dokumente vorhanden.',ML,y);y+=7;
+      small('Noch keine Verträge hinterlegt.');
     }
-    y+=2;
+    y+=3;
 
-    // ── 4. Krankmeldungen ──
-    secTitle('🤒 4. Krankmeldungen');
+    // ═══════════════════════════════════════════════
+    // 6. KRANKMELDUNGEN / FEHLZEITEN
+    // ═══════════════════════════════════════════════
+    secTitle('6. Krankmeldungen / Fehlzeiten ('+kms.length+' Eintra'+(kms.length===1?'g':'ge')+')');
     if(kms.length){
+      tblHdr([['Datum',2],['Notiz / Grund',40],['Gemeldet von',135]]);
       kms.forEach((k,i)=>{
-        checkPage();
+        checkPage(7);
         if(i%2===0){pdf.setFillColor('#FAFAFA');pdf.rect(ML,y-1,TW,6,'F');}
-        pdf.setFontSize(7.5);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+        pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
         const dat=k.datum?k.datum.split('-').reverse().join('.'):'?';
-        pdf.text(`${dat}  ·  ${k.notiz||'Keine Notiz'}  ·  Gemeldet von: ${k.erstelltVon||'—'}`,ML+2,y+3);
+        const notiz=(k.notiz||'—').substring(0,55);
+        const von=(k.erstelltVon||'—').substring(0,28);
+        pdf.text(dat,ML+2,y+3.5);
+        pdf.text(notiz,ML+40,y+3.5);
+        pdf.text(von,ML+135,y+3.5);
         y+=6;
       });
     }else{
-      pdf.setFontSize(8.5);pdf.setFont('helvetica','italic');pdf.setTextColor('#888');
-      pdf.text('Keine Krankmeldungen.',ML,y);y+=7;
+      small('Keine Krankmeldungen im System eingetragen.');
     }
-    y+=2;
+    y+=3;
 
-    // ── 5. Nachrichten (letzte 20) ──
-    secTitle('💬 5. Nachrichtenverlauf (letzte 20 Einträge)');
-    const recentMsgs=msgs.slice(0,20);
-    if(recentMsgs.length){
-      recentMsgs.forEach((m,i)=>{
-        checkPage();
+    // ═══════════════════════════════════════════════
+    // 7. UNFALLBERICHTE
+    // ═══════════════════════════════════════════════
+    secTitle('7. Unfallberichte gemäß § 45 SGB VII ('+unfallBerichte.length+' Bericht'+(unfallBerichte.length===1?'':'e')+')');
+    if(unfallBerichte.length){
+      unfallBerichte.forEach((u,i)=>{
+        checkPage(18);
+        const bY=y;
+        if(i%2===0){pdf.setFillColor('#FFF8F8');pdf.rect(ML,bY-1,TW,14,'F');}
+        pdf.setFontSize(8);pdf.setFont('helvetica','bold');pdf.setTextColor('#c0392b');
+        const uDat=u.datum?u.datum.split('-').reverse().join('.'):'?';
+        pdf.text('Unfall vom '+uDat,ML+2,bY+4);
+        pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+        const hergang=pdf.splitTextToSize((u.hergang||u.beschreibung||'Keine Beschreibung').substring(0,140),TW-6);
+        pdf.text(hergang[0],ML+2,bY+9);
+        if(u.verletzung){
+          pdf.setTextColor('#555');
+          pdf.text('Verletzung: '+(u.verletzung||'—').substring(0,80),ML+2,bY+13.5);
+        }
+        y=bY+16;
+      });
+    }else{
+      small('Keine Unfallberichte vorhanden. ✓');
+    }
+    y+=3;
+
+    // ═══════════════════════════════════════════════
+    // 8. WEITERE UNTERLAGEN (sonstige Dokumente)
+    // ═══════════════════════════════════════════════
+    if(sonstigeDoks.length){
+      secTitle('8. Weitere hinterlegte Unterlagen ('+sonstigeDoks.length+')');
+      tblHdr([['Dateiname',2],['Typ',100],['Datum',140]]);
+      sonstigeDoks.forEach((d,i)=>{
+        checkPage(7);
         if(i%2===0){pdf.setFillColor('#FAFAFA');pdf.rect(ML,y-1,TW,6,'F');}
-        pdf.setFontSize(7);pdf.setFont('helvetica','bold');pdf.setTextColor(m.dir==='claudia'?'#875E0A':'#004085');
-        pdf.text(m.from||'—',ML+2,y+3);
-        pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
-        const txt=pdf.splitTextToSize(m.text||'',TW-45);
-        pdf.text(txt[0],ML+30,y+3);
-        pdf.setTextColor('#aaa');
-        pdf.text(m.time||'',PW-MR,y+3,{align:'right'});
+        pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#222');
+        pdf.text((d.name||'—').substring(0,55),ML+2,y+3.5);
+        pdf.text((d.kategorie||'—'),ML+100,y+3.5);
+        pdf.text(d.date||'—',ML+140,y+3.5);
         y+=6;
       });
-    }else{
-      pdf.setFontSize(8.5);pdf.setFont('helvetica','italic');pdf.setTextColor('#888');
-      pdf.text('Keine Nachrichten vorhanden.',ML,y);y+=7;
+      y+=3;
     }
-    y+=4;
 
-    // ── Footer ──
-    checkPage();
-    hLine();
-    pdf.setFontSize(7.5);pdf.setFont('helvetica','italic');pdf.setTextColor('#888');
-    pdf.text('Dieses Dokument wurde gemäß Art. 15 DSGVO (Auskunftsrecht) erstellt. Erstellt am '+dateStr+' durch Claudias Mäusenest.',ML,y);y+=5;
-    pdf.text('Kindertagespflege Claudia Giehl · claudia26.giehl@googlemail.com',ML,y);
+    // ═══════════════════════════════════════════════
+    // 9. BESTÄTIGUNG & UNTERSCHRIFTEN
+    // ═══════════════════════════════════════════════
+    checkPage(60);
+    secTitle('9. Bestätigung & Unterschriften');
+    small('Hiermit bestätige ich, Claudia Giehl, die Richtigkeit der oben gemachten Angaben nach bestem Wissen und Gewissen. Dieses Dokument dient als offizieller Betreuungsnachweis gegenüber Jobcenter und Jugendamt.');
+    y+=10;
 
-    // Seitenzahlen
+    // Unterschriftslinie – Tagespflegeperson
+    pdf.setDrawColor('#875E0A');pdf.setLineWidth(0.4);
+    pdf.line(ML,y,ML+60,y);
+    pdf.line(ML+70,y,ML+TW-10,y);
+    pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#777');
+    pdf.text('Datum',ML,y+4);
+    pdf.text('Unterschrift Tagespflegeperson (Claudia Giehl)',ML+70,y+4);
+    y+=18;
+
+    // Unterschriftslinie – Erziehungsberechtigte
+    checkPage(20);
+    pdf.setDrawColor('#875E0A');pdf.setLineWidth(0.4);
+    pdf.line(ML,y,ML+60,y);
+    pdf.line(ML+70,y,ML+TW-10,y);
+    pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#777');
+    pdf.text('Datum',ML,y+4);
+    pdf.text('Unterschrift Erziehungsberechtigte/r',ML+70,y+4);
+    y+=16;
+
+    // Stempelfeld rechts unten
+    checkPage(36);
+    pdf.setDrawColor('#ccc');pdf.setLineWidth(0.3);
+    pdf.rect(PW-MR-52,y,52,32);
+    pdf.setFontSize(7);pdf.setTextColor('#bbb');
+    pdf.text('Stempel / Dienststelle',PW-MR-26,y+17,{align:'center'});
+
+    // ═══════════════════════════════════════════════
+    // FOOTER (alle Seiten)
+    // ═══════════════════════════════════════════════
     const pageCount=pdf.getNumberOfPages();
     for(let i=1;i<=pageCount;i++){
       pdf.setPage(i);
-      pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.setTextColor('#aaa');
-      pdf.text('Seite '+i+' von '+pageCount,PW-MR,290,{align:'right'});
+      pdf.setFillColor('#F5EFE0');pdf.rect(0,PH-11,PW,11,'F');
+      pdf.setDrawColor('#D4B86A');pdf.setLineWidth(0.3);pdf.line(0,PH-11,PW,PH-11);
+      pdf.setFontSize(6.5);pdf.setFont('helvetica','normal');pdf.setTextColor('#a07828');
+      pdf.text('Claudias Mäusenest · Claudia Giehl · Burgerhofstr. 10, 91301 Forchheim · claudia26.giehl@googlemail.com',PW/2,PH-6.5,{align:'center'});
+      pdf.text('Seite '+i+' von '+pageCount,PW-MR,PH-6.5,{align:'right'});
+      pdf.text('Erstellt: '+dateStr,ML,PH-6.5);
     }
 
-    const fname='DSGVO_'+c.name.replace(/\s/g,'_')+'_'+dateStr.replace(/\./g,'-')+'.pdf';
+    const fname='Betreuungsnachweis_'+c.name.replace(/\s/g,'_')+'_'+dateStr.replace(/\./g,'-')+'.pdf';
     pdf.save(fname);
-    showToast('✅ DSGVO-Export heruntergeladen!');
+    showToast('✅ Betreuungsnachweis heruntergeladen!');
   }catch(e){showToast('❌ Fehler: '+e.message);console.error(e);}
 };
 
