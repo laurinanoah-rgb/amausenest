@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Hilfsfunktionen ────────────────────────────────────────
+    // Manager = eingeloggt mit Claudias E-Mail-Adresse
+    function isManager() {
+      return request.auth != null &&
+             request.auth.token.email == 'claudia26.giehl@googlemail.com';
+    }
+
+    // Eingeloggt = Manager ODER anonyme Eltern-Sitzung
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // ── Kinder ────────────────────────────────────────────────
+    // Nur Manager darf Kinder-Daten sehen und bearbeiten
+    match /kinder/{id} {
+      allow read, write: if isManager();
+      allow read: if isAuth(); // Eltern dürfen ihr eigenes Kind-Dokument lesen
+    }
+
+    // ── Eltern ────────────────────────────────────────────────
+    // Manager: alles
+    // Eltern: eigenes Dokument lesen (für Login-Verifizierung nach anonymer Auth)
+    match /eltern/{id} {
+      allow read: if isAuth();
+      allow write: if isManager();
+    }
+
+    // ── Dokumente / Akten ─────────────────────────────────────
+    // Manager: alles
+    // Eltern: nur für Eltern freigegebene Dokumente lesen
+    match /dokumente/{id} {
+      allow read, write: if isManager();
+      allow read: if isAuth() && resource.data.elternSichtbar == true;
+    }
+
+    // ── Nachrichten ───────────────────────────────────────────
+    // Manager: alles
+    // Eltern: lesen & schreiben (eigenes Kind, geprüft über SESSION in App)
+    match /nachrichten/{id} {
+      allow read, write: if isManager();
+      allow read, write: if isAuth();
+    }
+
+    // ── Ankündigungen ─────────────────────────────────────────
+    // Manager schreibt; Eltern lesen
+    match /ankuendigungen/{id} {
+      allow read: if isAuth();
+      allow write: if isManager();
+    }
+
+    // ── Krankmeldungen ────────────────────────────────────────
+    // Manager: alles; Eltern: lesen & schreiben
+    match /krankmeldungen/{id} {
+      allow read, write: if isManager();
+      allow read, write: if isAuth();
+    }
+
+    // ── Schließtage ───────────────────────────────────────────
+    // Manager schreibt; Eltern lesen
+    match /schlisstage/{id} {
+      allow read: if isAuth();
+      allow write: if isManager();
+    }
+
+    // ── Unfallberichte ────────────────────────────────────────
+    // Manager: alles; Eltern: lesen
+    match /unfallberichte/{id} {
+      allow read, write: if isManager();
+      allow read: if isAuth();
+    }
+
+    // ── Tipp-Indikator & Lesebestätigungen ───────────────────
+    // Manager & Eltern: lesen & schreiben (für claudiaTyping, parentTyping, lastRead-Timestamps)
+    match /typing/{id} {
+      allow read, write: if isAuth();
+    }
+
+    // ── Alles andere sperren ──────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -84,12 +84,25 @@
     .quick-icon{font-size:2.2rem;margin-bottom:8px}
     .quick-label{font-weight:800;color:var(--brown);font-size:0.88rem}
     .quick-sub{font-size:0.72rem;color:#a07828;margin-top:2px}
-    /* NACHRICHTEN */
-    .chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
-    .msg-bubble{max-width:80%;padding:11px 15px;border-radius:18px;font-size:0.93rem;line-height:1.55}
-    .msg-bubble.claudia{background:var(--gold);color:white;border-bottom-left-radius:4px;align-self:flex-start}
-    .msg-bubble.parent{background:var(--white);color:var(--text);border-bottom-right-radius:4px;align-self:flex-end;box-shadow:var(--shadow)}
-    .msg-meta{font-size:0.7rem;opacity:.65;margin-top:4px}
+    /* NACHRICHTEN – WhatsApp-Style */
+    .chat-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:2px;background:#f0e8d0}
+    .msg-row{display:flex;align-items:flex-end;gap:7px;margin-bottom:6px}
+    .msg-row.claudia{flex-direction:row}
+    .msg-row.parent{flex-direction:row-reverse}
+    .chat-avatar-msg{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;background:var(--white);box-shadow:0 1px 4px rgba(0,0,0,0.12)}
+    .msg-bubble{max-width:76%;padding:8px 12px 5px;border-radius:18px;font-size:0.9rem;line-height:1.45;position:relative;word-break:break-word}
+    .msg-bubble.claudia{background:var(--gold);color:white;border-bottom-left-radius:5px}
+    .msg-bubble.parent{background:var(--white);color:var(--text);border-bottom-right-radius:5px;box-shadow:0 1px 4px rgba(135,94,10,0.12)}
+    .msg-meta{font-size:0.62rem;opacity:0.75;margin-top:3px;display:flex;align-items:center;justify-content:flex-end;gap:4px}
+    .msg-checks{font-size:0.72rem;color:rgba(135,94,10,0.4);letter-spacing:-1px;line-height:1}
+    .msg-checks.read{color:var(--gold)}
+    .typing-row{display:flex;align-items:flex-end;gap:7px;margin-bottom:8px}
+    .typing-bubble{background:var(--white);border-radius:18px;border-bottom-left-radius:5px;padding:10px 14px;box-shadow:0 1px 4px rgba(135,94,10,0.12)}
+    .typing-dots{display:flex;gap:5px;align-items:center;height:14px}
+    .typing-dot{width:7px;height:7px;border-radius:50%;background:#bbb;animation:tDot 1.4s infinite ease-in-out}
+    .typing-dot:nth-child(2){animation-delay:.22s}
+    .typing-dot:nth-child(3){animation-delay:.44s}
+    @keyframes tDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-7px);opacity:1;background:var(--gold)}}
     .chat-input-area{background:var(--white);padding:12px 14px;display:flex;gap:10px;align-items:center;border-top:1px solid rgba(236,161,8,0.15);flex-shrink:0}
     .chat-input{flex:1;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:24px;font-family:'Nunito',sans-serif;font-size:0.93rem;outline:none;background:var(--cream)}
     .chat-input:focus{border-color:var(--gold)}
@@ -340,11 +353,17 @@
     <div class="topbar"><div class="topbar-title">💬 Claudia</div><div style="width:38px"></div></div>
     <div class="chat-messages" id="chatMessages">
       <div class="empty-state"><div class="empty-state-icon">💬</div>Noch keine Nachrichten</div>
+      <div id="typingIndicator" style="display:none">
+        <div class="typing-row">
+          <div class="chat-avatar-msg">👩‍💼</div>
+          <div class="typing-bubble"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+        </div>
+      </div>
     </div>
     <div class="chat-input-area">
       <input type="file" id="chatFileInput" accept="image/*,.pdf,.doc,.docx" style="display:none" onchange="window.sendFileMsg(this)"/>
       <button class="chat-attach-btn" onclick="document.getElementById('chatFileInput').click()" title="Datei senden">📎</button>
-      <input class="chat-input" id="chatInput" type="text" placeholder="Nachricht an Claudia…" onkeydown="if(event.key==='Enter')sendMsg()"/>
+      <input class="chat-input" id="chatInput" type="text" placeholder="Nachricht an Claudia…" onkeydown="if(event.key==='Enter')sendMsg()" oninput="window.onChatInput()"/>
       <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
     <div class="bottom-nav">
@@ -402,7 +421,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, collection, onSnapshot, query, where, addDoc, getDoc, getDocs, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 // Für Push-Nachrichten (optional – benötigt VAPID Key in eltern-manifest.json und firebase-messaging-sw.js):
 // import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
@@ -618,30 +637,71 @@ function renderCal(){
   document.getElementById('csWorkdays').textContent=wdCount;
 }
 
-// ── Chat ───────────────────────────────────────────────────
+// ── Chat WhatsApp-Style ────────────────────────────────────
+let typingTimer=null,typingUnsub=null,_claudiaLastRead=0;
+async function _markChatRead(kindId){
+  try{await setDoc(doc(db,'typing',kindId),{parentLastRead:Date.now()},{merge:true});}catch(e){}
+}
+function _startTypingListener(kindId){
+  if(typingUnsub)typingUnsub();
+  typingUnsub=onSnapshot(doc(db,'typing',kindId),snap=>{
+    const d=snap.data()||{};
+    _claudiaLastRead=d.claudiaLastRead||0;
+    const isTyping=Date.now()-(d.claudiaTyping||0)<4000;
+    const ind=document.getElementById('typingIndicator');
+    if(ind)ind.style.display=isTyping?'block':'none';
+    document.querySelectorAll('.msg-checks[data-ts]').forEach(el=>{
+      if(parseInt(el.dataset.ts||0)<=_claudiaLastRead)el.classList.add('read');else el.classList.remove('read');
+    });
+    const cm=document.getElementById('chatMessages');if(cm)cm.scrollTop=cm.scrollHeight;
+  });
+}
+window.onChatInput=function(){
+  if(!SESSION||!SESSION.kindId)return;
+  setDoc(doc(db,'typing',SESSION.kindId),{parentTyping:Date.now()},{merge:true}).catch(()=>{});
+  clearTimeout(typingTimer);
+  typingTimer=setTimeout(()=>{setDoc(doc(db,'typing',SESSION.kindId),{parentTyping:0},{merge:true}).catch(()=>{});},3000);
+};
+function _renderMsgs(msgs){
+  const childEmoji=KIND_DATA?.emoji||'🐭';
+  return msgs.map(m=>{
+    const isCl=m.dir==='claudia';
+    let content='';
+    if(m.type==='file'){
+      if(m.fileType&&m.fileType.startsWith('image/')){
+        content=`<img src="${m.fileData}" alt="${escHtml(m.fileName||'Bild')}"/><div style="font-size:0.72rem;opacity:0.7;margin-top:2px">📎 ${escHtml(m.fileName||'Bild')}</div>`;
+      }else{
+        content=`<a class="msg-file-link" href="${m.fileData}" download="${escHtml(m.fileName||'Datei')}">📎 ${escHtml(m.fileName||'Datei')}</a>`;
+      }
+    }else{content=escHtml(m.text||'');}
+    const checks=!isCl?`<span class="msg-checks${(m.ts||0)<=_claudiaLastRead?' read':''}" data-ts="${m.ts||0}">✓✓</span>`:'';
+    const avatar=`<div class="chat-avatar-msg">${isCl?'👩‍💼':childEmoji}</div>`;
+    const bubble=`<div class="msg-bubble ${m.dir||'parent'}">${content}<div class="msg-meta">${m.time||''}${checks}</div></div>`;
+    return`<div class="msg-row ${m.dir||'parent'}">${isCl?avatar+bubble:bubble+avatar}</div>`;
+  }).join('');
+}
 function startChatListener(){
   if(chatUnsub)chatUnsub();
+  _markChatRead(SESSION.kindId);
+  _startTypingListener(SESSION.kindId);
   chatUnsub=onSnapshot(query(collection(db,'nachrichten'),where('kind','==',SESSION.kindId)),snap=>{
     const msgs=[];snap.forEach(d=>msgs.push(d.data()));msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
-    const el=document.getElementById('chatMessages');
-    if(!msgs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">💬</div>Noch keine Nachrichten</div>';return;}
-    el.innerHTML=msgs.map(m=>{
-      let content='';
-      if(m.type==='file'){
-        if(m.fileType&&m.fileType.startsWith('image/')){
-          content=`<img src="${m.fileData}" alt="${escHtml(m.fileName||'Bild')}"/><div style="font-size:0.72rem;opacity:0.7;margin-top:2px">📎 ${escHtml(m.fileName||'Bild')}</div>`;
-        }else{
-          content=`<a class="msg-file-link" href="${m.fileData}" download="${escHtml(m.fileName||'Datei')}">📎 ${escHtml(m.fileName||'Datei')}</a>`;
-        }
-      }else{content=escHtml(m.text||'');}
-      return`<div class="msg-bubble ${m.dir||'parent'}">${content}<div class="msg-meta">${escHtml(m.from||'')} · ${m.time||''}</div></div>`;
-    }).join('');
-    el.scrollTop=el.scrollHeight;
+    const cm=document.getElementById('chatMessages');
+    const ti=document.getElementById('typingIndicator');
+    const tiHtml=ti?ti.outerHTML:'';
+    if(!msgs.length){
+      cm.innerHTML='<div class="empty-state"><div class="empty-state-icon">💬</div>Noch keine Nachrichten</div>'+(tiHtml||'');
+      return;
+    }
+    cm.innerHTML=_renderMsgs(msgs)+(tiHtml||'');
+    cm.scrollTop=cm.scrollHeight;
   });
 }
 window.sendMsg=async function(){
   const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;
   const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  clearTimeout(typingTimer);
+  setDoc(doc(db,'typing',SESSION.kindId),{parentTyping:0},{merge:true}).catch(()=>{});
   await addDoc(collection(db,'nachrichten'),{kind:SESSION.kindId,from:SESSION.elternName,text,time:t,dir:'parent',ts:Date.now()});
   input.value='';
 };
