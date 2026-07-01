@@ -589,6 +589,13 @@
           <input class="steuer-pflegegeld" id="steuerSonstige" type="number" min="0" step="1" placeholder="0" oninput="calcSteuer()"/>
         </div>
         <div class="steuer-hint">💡 <strong>Sachkostenpauschale</strong>: Typischerweise 300% des Mindeststundensatzes × Betreuungsstunden. Abstimmung mit Steuerberater empfohlen.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:11px 14px;background:rgba(220,53,69,0.07);border:1.5px solid rgba(220,53,69,0.28);border-radius:12px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:1rem">📉</span>
+            <span style="font-weight:700;color:#dc3545;font-size:0.88rem">Gesamt Ausgaben / Monat</span>
+          </div>
+          <span id="ausgabenTotal" style="font-family:'Chelsea Market',cursive;font-size:1.15rem;color:#dc3545;letter-spacing:0.5px">– 0,00 €</span>
+        </div>
       </div>
       <div class="steuer-card">
         <div class="steuer-title">🏛️ Jugendamt-Zahlung (optional)</div>
@@ -1527,6 +1534,9 @@ function calcSteuer(){
   if(skpEl&&skpEl.value!=='')localStorage.setItem('mausenest_skp',skpEl.value);
   if(sonstEl&&sonstEl.value!=='')localStorage.setItem('mausenest_sonstige',sonstEl.value);
   const monthlyAusgaben=skp+sonstige;
+  // Visuelles Gesamt-Ausgaben-Feld aktualisieren
+  const ausgabenTotalEl=document.getElementById('ausgabenTotal');
+  if(ausgabenTotalEl)ausgabenTotalEl.textContent='– '+monthlyAusgaben.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
   const jahresGross=monthlyGross*12;
   const jahresAusgaben=monthlyAusgaben*12;
   // Jugendamt steuerfreier Anteil
