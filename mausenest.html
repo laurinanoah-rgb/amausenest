@@ -111,6 +111,10 @@
     .room-card-img{width:100%;height:170px;object-fit:contain;padding:20px 20px 0;display:block;transition:transform .4s}
     .room-card:hover .room-card-img{transform:scale(1.06) rotate(-2deg)}
     .room-card-emoji{width:100%;height:160px;display:flex;align-items:center;justify-content:center;font-size:4.5rem;background:linear-gradient(135deg,#fff3c2,var(--cream))}
+    .room-card-photo{width:100%;height:210px;object-fit:cover;display:block;transition:transform .55s cubic-bezier(.25,.8,.25,1)}
+    .room-card:hover .room-card-photo{transform:scale(1.07)}
+    .room-card-sticker-badge{position:absolute;top:12px;right:12px;width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 4px 14px rgba(0,0,0,0.3));transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:2;pointer-events:none}
+    .room-card:hover .room-card-sticker-badge{transform:scale(1.22) rotate(10deg)}
     .room-card-body{padding:18px 22px 24px}
     .room-card-body h3{font-family:'Chelsea Market',cursive;font-size:1.15rem;color:var(--brown);margin-bottom:8px}
     .room-card-body p{font-size:0.88rem;color:#6b4c12;line-height:1.65}
@@ -140,6 +144,10 @@
     .kontakt-item span{font-size:0.95rem;color:#5a3e06;line-height:1.5}
     .phone-sticker-wrap{margin-top:20px;display:flex;justify-content:flex-start}
     .phone-sticker{max-width:220px;filter:drop-shadow(0 8px 20px rgba(135,94,10,0.2));animation:floatHero 4.5s ease-in-out infinite;transform-origin:center}
+    .kontakt-photo-wrap{margin-top:24px;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);border:4px solid rgba(236,161,8,0.35);position:relative}
+    .kontakt-photo-wrap::after{content:'💛 Claudias Mäusenest';position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(90,62,6,0.75),transparent);color:white;font-family:'Chelsea Market',cursive;font-size:1rem;padding:18px 16px 12px;pointer-events:none}
+    .kontakt-photo{width:100%;height:240px;object-fit:cover;display:block;transition:transform .4s}
+    .kontakt-photo-wrap:hover .kontakt-photo{transform:scale(1.04)}
     .kontakt-form{background:white;border-radius:var(--radius-lg);padding:38px 36px;box-shadow:var(--shadow-lg)}
     .kontakt-form h3{font-family:'Chelsea Market',cursive;font-size:1.5rem;color:var(--brown);margin-bottom:24px}
     .form-group{margin-bottom:18px}
@@ -345,52 +353,56 @@
       </p>
     </div>
     <div class="nestbau-grid">
-      <!-- Karte 1: Spiel & Kreativität -->
+      <!-- Karte 1: Spielwiese – echtes Raumfoto + Sticker-Badge -->
       <div class="room-card" data-anim="pop-in" data-delay="0">
-        <img class="room-card-img" src="sticker-spiel%20u.%20kreativit%C3%A4t.avif" alt="Spiel & Kreativität" onerror="this.parentElement.querySelector('.room-card-img').style.display='none';this.parentElement.insertAdjacentHTML('afterbegin','<div class=\'room-card-emoji\'>🛝</div>')"/>
+        <img class="room-card-photo" src="M%C3%A4use%20Spielwise.avif" alt="Mäuse-Spielwiese" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\'room-card-emoji\'>🛝</div>')"/>
+        <img class="room-card-sticker-badge" src="sticker-spiel%20u.%20kreativit%C3%A4t.avif" alt="" onerror="this.style.display='none'"/>
         <div class="room-card-body">
           <h3>🛝 Mäuse-Spielwiese</h3>
           <p>Hier dürfen die kleinen Mäuse lachen, toben und ihrer Fantasie freien Lauf lassen. Alles ist weich, sicher und lädt zum Spielen und Entdecken ein.</p>
         </div>
       </div>
-      <!-- Karte 2: Essenzeit -->
+      <!-- Karte 2: Küche – echtes Raumfoto + Sticker-Badge -->
       <div class="room-card" data-anim="pop-in" data-delay=".1">
-        <img class="room-card-img" src="sticker-essenzeit.avif" alt="Essenzeit" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('afterbegin','<div class=\'room-card-emoji\'>🍳</div>')"/>
+        <img class="room-card-photo" src="M%C3%A4use-k%C3%BCche.avif" alt="Mäuse-Küche" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\'room-card-emoji\'>🍳</div>')"/>
+        <img class="room-card-sticker-badge" src="sticker-essenzeit.avif" alt="" onerror="this.style.display='none'"/>
         <div class="room-card-body">
           <h3>🍳 Mäuse-Küche</h3>
           <p>Hier wird gemeinsam geschnippelt, gekocht und probiert. Die Mäuse lernen spielerisch mit Lebensmitteln umzugehen – Essen macht Spaß!</p>
         </div>
       </div>
-      <!-- Karte 3: Ruhezeit -->
+      <!-- Karte 3: Traumnest – echtes Raumfoto + Sticker-Badge -->
       <div class="room-card" data-anim="pop-in" data-delay=".2">
-        <img class="room-card-img" src="Sticker-%20Ruhezeit.avif" alt="Ruhezeit" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('afterbegin','<div class=\'room-card-emoji\'>🛏️</div>')"/>
+        <img class="room-card-photo" src="Traumnest.avif" alt="Traum-Nest" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\'room-card-emoji\'>🛏️</div>')"/>
+        <img class="room-card-sticker-badge" src="Sticker-%20Ruhezeit.avif" alt="" onerror="this.style.display='none'"/>
         <div class="room-card-body">
           <h3>🛏️ Traum-Nest</h3>
           <p>Wenn die Mäuse müde sind, können sie sich hier ausruhen. Warm, leise und beschützt – wie ein echtes, kuscheliges Nest.</p>
         </div>
       </div>
-      <!-- Karte 4: Geborgen & Sicher -->
+      <!-- Karte 4: Geschichtenhöhle – echtes Raumfoto + Sticker-Badge -->
       <div class="room-card" data-anim="pop-in" data-delay=".3">
-        <img class="room-card-img" src="sticker-geborgen%20und%20Sicher.avif" alt="Geborgen und Sicher" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('afterbegin','<div class=\'room-card-emoji\'>🏠</div>')"/>
+        <img class="room-card-photo" src="Geschichten%20H%C3%B6hle.avif" alt="Geschichten-Höhle" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\'room-card-emoji\'>📚</div>')"/>
+        <img class="room-card-sticker-badge" src="sticker-geborgen%20und%20Sicher.avif" alt="" onerror="this.style.display='none'"/>
         <div class="room-card-body">
-          <h3>💚 Geborgen &amp; Sicher</h3>
-          <p>Kleine Strukturen, feste Rituale und ein liebevolles Umfeld geben jedem Kind das Gefühl von Sicherheit und Vertrauen.</p>
+          <h3>📚 Geschichten-Höhle</h3>
+          <p>Bücher anschauen, Geschichten hören und träumen. Ein gemütlicher Ort zum Kuscheln, Abschalten und gemeinsamen Entdecken.</p>
         </div>
       </div>
-      <!-- Karte 5: Geschichtenhöhle (Emoji) -->
+      <!-- Karte 5: Draußen-Abenteuer (Emoji) -->
       <div class="room-card" data-anim="pop-in" data-delay=".4">
-        <div class="room-card-emoji">📚</div>
+        <div class="room-card-emoji">🌳</div>
         <div class="room-card-body">
-          <h3>📚 Geschichtenhöhle</h3>
-          <p>Bücher anschauen, Geschichten hören und träumen. Ein gemütlicher Ort zum Kuscheln, Abschalten und Entdecken.</p>
+          <h3>🌳 Draußen-Abenteuer</h3>
+          <p>Frische Luft, Natur und Bewegung. Die kleinen Mäuse erkunden mit neugierigen Pfoten die Welt draußen – Abenteuer inklusive!</p>
         </div>
       </div>
-      <!-- Karte 6: Frische Pfoten (Emoji) -->
+      <!-- Karte 6: Pfoten-Frischebad (Emoji) -->
       <div class="room-card" data-anim="pop-in" data-delay=".5">
-        <div class="room-card-emoji">🚿</div>
+        <div class="room-card-emoji">🫧</div>
         <div class="room-card-body">
           <h3>🚿 Pfoten-Frischebad</h3>
-          <p>Hände, Gesicht und Pfoten waschen. Alles ist kindgerecht, sauber und hilft beim Wohlfühlen nach dem Spielen.</p>
+          <p>Hände, Gesicht und Pfoten waschen. Alles ist kindgerecht und einladend gestaltet – sauber fühlt sich gut an!</p>
         </div>
       </div>
     </div>
@@ -409,30 +421,50 @@
       <p class="section-sub" data-anim="fade-up" data-delay=".2" style="margin:0 auto">Ein kleiner Blick in unseren bunten Alltag.</p>
     </div>
     <div class="galerie-masonry">
-      <div class="gal-item" data-anim="zoom-in" data-delay="0">
-        <img src="sticker-sch%C3%B6n%20das%20sie%20da%20sind.avif" alt="Schön dass ihr da seid" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\'>🐭</div>'"/>
+      <!-- Raumfoto 1: Spielwiese (groß) -->
+      <div class="gal-item tall" data-anim="zoom-in" data-delay="0">
+        <img src="M%C3%A4use%20Spielwise.avif" alt="Mäuse-Spielwiese" style="object-fit:cover;width:100%;min-height:260px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji tall\' style=\'background:linear-gradient(135deg,#d4f5d4,#a8e6a8)\'>🛝</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Mäuse-Spielwiese</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">🛝 Mäuse-Spielwiese</span></div>
+      </div>
+      <!-- Sticker: Schön dass ihr da seid -->
+      <div class="gal-item" data-anim="zoom-in" data-delay=".1" style="background:linear-gradient(135deg,#fff9e0,#ffe8a0);display:flex;align-items:center;justify-content:center;min-height:200px">
+        <img src="sticker-sch%C3%B6n%20das%20sie%20da%20sind.avif" alt="Schön dass ihr da seid" style="max-width:85%;max-height:200px;object-fit:contain;padding:16px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\'>🐭</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Schön, dass ihr da seid!</span></div>'"/>
         <div class="gal-item-overlay"><span class="gal-item-label">Schön, dass ihr da seid!</span></div>
       </div>
-      <div class="gal-item" data-anim="zoom-in" data-delay=".1">
-        <img src="sticker-spiel%20u.%20kreativit%C3%A4t.avif" alt="Spiel & Kreativität" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#d4edda,#a8d5b5)\'>🎨</div>'"/>
-        <div class="gal-item-overlay"><span class="gal-item-label">Spiel &amp; Kreativität</span></div>
-      </div>
+      <!-- Raumfoto 2: Geschichtenhöhle -->
       <div class="gal-item" data-anim="zoom-in" data-delay=".2">
-        <img src="sticker-essenzeit.avif" alt="Essenzeit" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji tall\' style=\'background:linear-gradient(135deg,#ffd6cc,#ffb3a0)\'>🍎</div>'"/>
-        <div class="gal-item-overlay"><span class="gal-item-label">Leckere Essenzeit</span></div>
+        <img src="Geschichten%20H%C3%B6hle.avif" alt="Geschichten-Höhle" style="object-fit:cover;width:100%;min-height:210px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#ffe4b5,#ffd080)\'>📚</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Geschichten-Höhle</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">📚 Geschichten-Höhle</span></div>
       </div>
-      <div class="gal-item" data-anim="zoom-in" data-delay=".3">
-        <img src="Sticker-%20Ruhezeit.avif" alt="Ruhezeit" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#cce5ff,#99caff)\'>😴</div>'"/>
-        <div class="gal-item-overlay"><span class="gal-item-label">Träumende Ruhezeit</span></div>
+      <!-- Sticker: Spiel & Kreativität -->
+      <div class="gal-item" data-anim="zoom-in" data-delay=".3" style="background:linear-gradient(135deg,#e8f5e8,#c8e8c8);display:flex;align-items:center;justify-content:center;min-height:180px">
+        <img src="sticker-spiel%20u.%20kreativit%C3%A4t.avif" alt="Spiel & Kreativität" style="max-width:85%;max-height:180px;object-fit:contain;padding:12px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#d4edda,#a8d5b5)\'>🎨</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Spiel &amp; Kreativität</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">🎨 Spiel &amp; Kreativität</span></div>
       </div>
+      <!-- Raumfoto 3: Traumnest (groß) -->
+      <div class="gal-item tall" data-anim="zoom-in" data-delay=".2">
+        <img src="Traumnest.avif" alt="Traum-Nest" style="object-fit:cover;width:100%;min-height:280px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji tall\' style=\'background:linear-gradient(135deg,#cce5ff,#99caff)\'>🛏️</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Traum-Nest</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">🛏️ Traum-Nest</span></div>
+      </div>
+      <!-- Sticker: Essenzeit -->
+      <div class="gal-item" data-anim="zoom-in" data-delay=".3" style="background:linear-gradient(135deg,#fff0e0,#ffe0b5);display:flex;align-items:center;justify-content:center;min-height:190px">
+        <img src="sticker-essenzeit.avif" alt="Essenzeit" style="max-width:85%;max-height:190px;object-fit:contain;padding:12px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#ffd6cc,#ffb3a0)\'>🍎</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Essenzeit</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">🍳 Leckere Essenzeit</span></div>
+      </div>
+      <!-- Raumfoto 4: Mäuse-Küche -->
       <div class="gal-item" data-anim="zoom-in" data-delay=".4">
-        <img src="sticker-geborgen%20und%20Sicher.avif" alt="Geborgen & Sicher" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#f5ccff,#dba8ff)\'>💚</div>'"/>
-        <div class="gal-item-overlay"><span class="gal-item-label">Geborgen &amp; Sicher</span></div>
+        <img src="M%C3%A4use-k%C3%BCche.avif" alt="Mäuse-Küche" style="object-fit:cover;width:100%;min-height:220px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#ffd6cc,#ffb3a0)\'>🍳</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Mäuse-Küche</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">🍳 Mäuse-Küche</span></div>
       </div>
-      <!-- Platzhalter -->
-      <div class="gal-item" data-anim="zoom-in" data-delay=".5">
-        <div class="gal-emoji" style="min-height:180px;background:linear-gradient(135deg,#ffe0b2,#ffca80)">🏡</div>
-        <div class="gal-item-overlay"><span class="gal-item-label">Unser Mäusenest</span></div>
+      <!-- Sticker: Geborgen & Sicher -->
+      <div class="gal-item" data-anim="zoom-in" data-delay=".5" style="background:linear-gradient(135deg,#f0e8ff,#ddc8ff);display:flex;align-items:center;justify-content:center;min-height:180px">
+        <img src="sticker-geborgen%20und%20Sicher.avif" alt="Geborgen & Sicher" style="max-width:85%;max-height:180px;object-fit:contain;padding:12px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#f5ccff,#dba8ff)\'>💚</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Geborgen &amp; Sicher</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">💚 Geborgen &amp; Sicher</span></div>
+      </div>
+      <!-- Sticker: Ruhezeit -->
+      <div class="gal-item" data-anim="zoom-in" data-delay=".5" style="background:linear-gradient(135deg,#e8f0ff,#c8d8ff);display:flex;align-items:center;justify-content:center;min-height:185px">
+        <img src="Sticker-%20Ruhezeit.avif" alt="Ruhezeit" style="max-width:85%;max-height:185px;object-fit:contain;padding:12px" onerror="this.parentElement.innerHTML='<div class=\'gal-emoji\' style=\'background:linear-gradient(135deg,#cce5ff,#99caff)\'>😴</div><div class=\'gal-item-overlay\'><span class=\'gal-item-label\'>Ruhige Auszeit</span></div>'"/>
+        <div class="gal-item-overlay"><span class="gal-item-label">😴 Ruhige Auszeit</span></div>
       </div>
     </div>
     <div class="wave-divider" style="margin-top:60px">
@@ -462,8 +494,8 @@
             <div><strong>E-Mail</strong><span>claudia26.giehl@googlemail.com</span></div>
           </div>
         </div>
-        <div class="phone-sticker-wrap" data-anim="pop-in" data-delay=".3">
-          <img class="phone-sticker" src="%F0%9F%93%9E%200176%20%20XXXXXXX_edited.avif" alt="Telefon" onerror="this.style.display='none'"/>
+        <div class="kontakt-photo-wrap" data-anim="zoom-in" data-delay=".3">
+          <img class="kontakt-photo" src="Kontakt.avif" alt="Claudias Mäusenest" onerror="this.style.display='none';this.parentElement.style.display='none'"/>
         </div>
       </div>
       <div class="kontakt-form" data-anim="fade-right" data-delay=".2">
