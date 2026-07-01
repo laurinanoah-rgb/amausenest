@@ -2687,23 +2687,28 @@ function _rechtsFooter(pdf){
 // Speichert NUR Metadaten (kein dataUrl) → kein Firestore-Limit
 // rechtsTyp = 'datenschutz'|'nutzung'|'einwilligung'|'vvt'
 async function _saveRechtsDoc(pdf,fname,docLabel,rechtsTyp){
-  // 1. PDF sofort herunterladen
+  // 1. PDF sofort herunterladen – passiert IMMER, unabhängig von Firestore
   pdf.save(fname);
-  // 2. Metadaten in Firestore speichern / aktualisieren (kein dataUrl!)
+  // 2. Metadaten mit FESTER ID speichern → setDoc überschreibt immer, kein Duplikat möglich
   try{
     const today=new Date();
     const date=today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
-    // Upsert: existierendes Dokument mit gleichem rechtsTyp aktualisieren
-    const existing=DOCS.find(d=>d.recipient==='infomappe'&&d.kategorie==='rechtliches'&&d.rechtsTyp===rechtsTyp);
-    if(existing){
-      await updateDoc(doc(db,'dokumente',existing.id),{name:fname,date,ts:Date.now()});
-    }else{
-      await addDoc(collection(db,'dokumente'),{
-        name:fname,type:'⚖️',size:'PDF',date,rechtsTyp,
-        recipient:'infomappe',kategorie:'rechtliches',
-        elternSichtbar:true,archiviert:false,ts:Date.now()
-      });
+    // Feste ID: 'rechtliches_datenschutz' etc. → exakt ein Eintrag pro Typ, für immer
+    const fixedId='rechtliches_'+rechtsTyp;
+    // Alte Einträge mit anderen IDs bereinigen (falls vorhanden von früheren Versionen)
+    const oldEntries=DOCS.filter(d=>
+      d.recipient==='infomappe'&&d.kategorie==='rechtliches'&&
+      (d.rechtsTyp===rechtsTyp||d.name===fname)&&d.id!==fixedId
+    );
+    for(const d of oldEntries){
+      try{await deleteDoc(doc(db,'dokumente',d.id));}catch(e){}
     }
+    // setDoc mit fester ID: erstellt ODER überschreibt – nie doppelt
+    await setDoc(doc(db,'dokumente',fixedId),{
+      name:fname,type:'⚖️',size:'PDF',date,rechtsTyp,
+      recipient:'infomappe',kategorie:'rechtliches',
+      elternSichtbar:true,archiviert:false,ts:Date.now()
+    });
     showToast('✅ '+docLabel+' gespeichert!');
   }catch(e){
     console.warn('Infomappe-Speicherung fehlgeschlagen:',e);
