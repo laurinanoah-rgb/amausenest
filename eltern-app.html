@@ -94,6 +94,9 @@
     .chat-input{flex:1;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:24px;font-family:'Nunito',sans-serif;font-size:0.93rem;outline:none;background:var(--cream)}
     .chat-input:focus{border-color:var(--gold)}
     .send-btn{width:42px;height:42px;border-radius:50%;background:var(--gold);border:none;color:white;cursor:pointer;font-size:1.1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .chat-attach-btn{width:38px;height:38px;border-radius:50%;background:var(--cream);border:1.5px solid rgba(236,161,8,0.3);color:var(--brown);cursor:pointer;font-size:1.1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .msg-bubble img{max-width:200px;border-radius:10px;display:block;margin-bottom:4px}
+    .msg-file-link{display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(255,255,255,0.25);border-radius:8px;text-decoration:none;color:inherit;font-size:0.85rem;font-weight:700}
     /* KALENDER */
     .section-title{font-family:'Chelsea Market',cursive;font-size:1.1rem;color:var(--brown);margin-bottom:12px;display:flex;align-items:center;gap:8px}
     .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -339,6 +342,8 @@
       <div class="empty-state"><div class="empty-state-icon">💬</div>Noch keine Nachrichten</div>
     </div>
     <div class="chat-input-area">
+      <input type="file" id="chatFileInput" accept="image/*,.pdf,.doc,.docx" style="display:none" onchange="window.sendFileMsg(this)"/>
+      <button class="chat-attach-btn" onclick="document.getElementById('chatFileInput').click()" title="Datei senden">📎</button>
       <input class="chat-input" id="chatInput" type="text" placeholder="Nachricht an Claudia…" onkeydown="if(event.key==='Enter')sendMsg()"/>
       <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
@@ -620,7 +625,17 @@ function startChatListener(){
     const msgs=[];snap.forEach(d=>msgs.push(d.data()));msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
     const el=document.getElementById('chatMessages');
     if(!msgs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">💬</div>Noch keine Nachrichten</div>';return;}
-    el.innerHTML=msgs.map(m=>`<div class="msg-bubble ${m.dir||'parent'}">${escHtml(m.text)}<div class="msg-meta">${m.from||''} · ${m.time||''}</div></div>`).join('');
+    el.innerHTML=msgs.map(m=>{
+      let content='';
+      if(m.type==='file'){
+        if(m.fileType&&m.fileType.startsWith('image/')){
+          content=`<img src="${m.fileData}" alt="${escHtml(m.fileName||'Bild')}"/><div style="font-size:0.72rem;opacity:0.7;margin-top:2px">📎 ${escHtml(m.fileName||'Bild')}</div>`;
+        }else{
+          content=`<a class="msg-file-link" href="${m.fileData}" download="${escHtml(m.fileName||'Datei')}">📎 ${escHtml(m.fileName||'Datei')}</a>`;
+        }
+      }else{content=escHtml(m.text||'');}
+      return`<div class="msg-bubble ${m.dir||'parent'}">${content}<div class="msg-meta">${escHtml(m.from||'')} · ${m.time||''}</div></div>`;
+    }).join('');
     el.scrollTop=el.scrollHeight;
   });
 }
@@ -630,7 +645,18 @@ window.sendMsg=async function(){
   await addDoc(collection(db,'nachrichten'),{kind:SESSION.kindId,from:SESSION.elternName,text,time:t,dir:'parent',ts:Date.now()});
   input.value='';
 };
-
+window.sendFileMsg=async function(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>700*1024){showToast('⚠️ Datei zu groß! Max. 700 KB');input.value='';return;}
+  showToast('⏳ Datei wird gesendet…',4000);
+  try{
+    const dataUrl=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});
+    const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    await addDoc(collection(db,'nachrichten'),{kind:SESSION.kindId,from:SESSION.elternName,type:'file',fileData:dataUrl,fileName:file.name,fileType:file.type,time:t,dir:'parent',ts:Date.now()});
+    showToast('✅ Datei gesendet!');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+  input.value='';
+};
 // ── Akten ──────────────────────────────────────────────────
 function startDocsListener(){
   if(docsUnsub)docsUnsub();

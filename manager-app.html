@@ -91,6 +91,9 @@
     .chat-input{flex:1;padding:11px 14px;border:2px solid rgba(236,161,8,0.25);border-radius:24px;font-family:'Nunito',sans-serif;font-size:0.93rem;outline:none;background:var(--cream)}
     .chat-input:focus{border-color:var(--gold)}
     .send-btn{width:42px;height:42px;border-radius:50%;background:var(--gold);border:none;color:white;cursor:pointer;font-size:1.1rem;flex-shrink:0}
+    .chat-attach-btn{width:38px;height:38px;border-radius:50%;background:var(--cream);border:1.5px solid rgba(236,161,8,0.3);color:var(--brown);cursor:pointer;font-size:1.1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .msg-bubble img{max-width:200px;border-radius:10px;display:block;margin-bottom:4px}
+    .msg-file-link{display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(255,255,255,0.25);border-radius:8px;text-decoration:none;color:inherit;font-size:0.85rem;font-weight:700}
     .upload-zone{border:2px dashed rgba(236,161,8,0.4);border-radius:var(--radius);padding:28px;text-align:center;background:rgba(236,161,8,0.04);cursor:pointer;margin-bottom:18px;transition:all .2s}
     .upload-zone:hover{border-color:var(--gold);background:rgba(236,161,8,0.08)}
     .doc-item{background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;cursor:pointer;transition:background .15s}
@@ -136,10 +139,22 @@
     .kind-acc-arrow.open{transform:rotate(180deg)}
     .kind-acc-body{padding:0 16px 16px;border-top:1px solid rgba(236,161,8,0.12)}
     .kind-acc-section{font-weight:800;font-size:0.78rem;color:var(--brown);letter-spacing:.5px;margin:14px 0 8px;text-transform:uppercase}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-    .cal-day-name{text-align:center;font-size:0.68rem;font-weight:800;color:var(--gold);padding:4px 0}
-    .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:0.8rem;font-weight:700;color:#5a3e06}
-    .cal-day.present{background:#d4edda;color:#155724}.cal-day.absent{background:#f8d7da;color:#721c24}.cal-day.today{background:var(--gold);color:white}
+    .cal-wrapper{background:var(--white);border-radius:var(--radius);padding:14px 12px 10px;box-shadow:var(--shadow);margin-bottom:2px}
+    .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .cal-nav-btn{background:var(--cream);border:1.5px solid rgba(236,161,8,0.3);width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--brown);font-size:1.1rem;display:flex;align-items:center;justify-content:center;font-weight:800;line-height:1}
+    .cal-nav-title{font-family:'Chelsea Market',cursive;font-size:0.95rem;color:var(--brown);letter-spacing:.3px}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+    .cal-day-name{text-align:center;font-size:0.63rem;font-weight:800;color:var(--gold);padding:3px 0;letter-spacing:.3px}
+    .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:0.78rem;font-weight:700;color:#8a6710;background:rgba(236,161,8,0.05);transition:transform .15s}
+    .cal-day.weekend{color:#bbb;background:transparent}
+    .cal-day.future{color:#ccc;background:transparent}
+    .cal-day.empty{background:transparent}
+    .cal-day.present{background:linear-gradient(135deg,#34d399,#10b981);color:white;box-shadow:0 2px 8px rgba(16,185,129,0.35)}
+    .cal-day.absent{background:#fee2e2;color:#dc2626}
+    .cal-day.today{background:linear-gradient(135deg,var(--gold),#f59e0b);color:white;box-shadow:0 3px 12px rgba(236,161,8,0.45);transform:scale(1.08);font-weight:900}
+    .cal-legend{display:flex;gap:14px;justify-content:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(236,161,8,0.1)}
+    .cal-legend-item{display:flex;align-items:center;gap:5px;font-size:0.7rem;color:#888;font-weight:700}
+    .cal-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
     .sync-badge{font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;background:#d4edda;color:#155724}
     .sync-badge.offline{background:#f8d7da;color:#721c24}
     .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:0.88rem;font-weight:700;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw}
@@ -393,8 +408,19 @@
       </div>
       <div id="timeRows"></div>
       <div class="section-title mt-12">📅 Anwesenheit</div>
-      <div class="cal-grid" id="childCalGrid"></div>
-      <div style="display:flex;gap:10px;margin-top:10px;font-size:0.75rem;flex-wrap:wrap"><span>🟢 Anwesend</span><span>🔴 Gefehlt</span><span>🟡 Heute</span></div>
+      <div class="cal-wrapper">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="window.calNav(-1)">‹</button>
+          <span class="cal-nav-title" id="calNavTitle">–</span>
+          <button class="cal-nav-btn" onclick="window.calNav(1)">›</button>
+        </div>
+        <div class="cal-grid" id="childCalGrid"></div>
+        <div class="cal-legend">
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:linear-gradient(135deg,#34d399,#10b981)"></div>Anwesend</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:linear-gradient(135deg,var(--gold),#f59e0b)"></div>Heute</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fee2e2;border:1px solid #fca5a5"></div>Krank/Fehlt</div>
+        </div>
+      </div>
       <div class="section-title mt-12">📝 Notizen</div>
       <textarea class="notes-area" id="childNotes" rows="4" placeholder="Notizen…" oninput="saveNote()"></textarea>
       <div class="section-title mt-12">🚨 Unfallberichte</div>
@@ -500,6 +526,8 @@
     </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
+      <input type="file" id="chatFileInput" accept="image/*,.pdf,.doc,.docx" style="display:none" onchange="window.sendFileMsg(this)"/>
+      <button class="chat-attach-btn" onclick="document.getElementById('chatFileInput').click()" title="Datei senden">📎</button>
       <input class="chat-input" id="chatInput" type="text" placeholder="Nachricht schreiben…" onkeydown="if(event.key==='Enter')sendMsg()"/>
       <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
@@ -1230,18 +1258,53 @@ window.openChild=function(id){
   document.getElementById('childDetailName').textContent=c.name;
   document.getElementById('childDetailAge').textContent=(c.age||'?')+' Jahre alt';
   document.getElementById('childNotes').value=c.notes||'';
+  // Kalender auf aktuellen Monat zurücksetzen bei Kind-Wechsel
+  calYear=new Date().getFullYear();calMonth=new Date().getMonth();
   updateStatusBtns(c.status);renderTimeRows(c);renderChildCal(c);showScreen('childScreen');loadUnfallberichte(id);
 };
 function updateStatusBtns(s){['anwesend','schlaeft','gegangen'].forEach(x=>{const b=document.getElementById('btn-'+x);b.className='status-btn';if(x===s)b.classList.add('active-'+x);});}
 function renderTimeRows(c){document.getElementById('timeRows').innerHTML=[{l:'🟢 Angekommen',v:c.arrivedAt||'–'},{l:'😴 Schlafen seit',v:c.sleepAt||'–'},{l:'🏠 Gegangen',v:c.goneAt||'–'}].map(r=>`<div class="time-row"><span class="time-label">${r.l}</span><span class="time-val">${r.v}</span></div>`).join('');}
+const MONATSNAMEN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+window.calNav=function(dir){
+  calMonth+=dir;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(CHILDREN[currentChildId])renderChildCal(CHILDREN[currentChildId]);
+};
 function renderChildCal(c){
+  // Monat auf aktuell zurücksetzen wenn Kind wechselt
+  const now=new Date();
   const g=document.getElementById('childCalGrid');
-  const now=new Date(),yr=now.getFullYear(),mo=now.getMonth();
-  const dim=new Date(yr,mo+1,0).getDate(),fd=new Date(yr,mo,1).getDay(),off=fd===0?6:fd-1;
-  g.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="cal-day-name">${d}</div>`).join('');
-  for(let i=0;i<off;i++)g.innerHTML+='<div class="cal-day"></div>';
-  const td=now.getDate();
-  for(let d=1;d<=dim;d++){let cls='cal-day';if(d===td)cls+=' today';else if(c.present&&c.present.includes(d))cls+=' present';else if(c.absent&&c.absent.includes(d))cls+=' absent';g.innerHTML+=`<div class="${cls}">${d}</div>`;}
+  const navTitle=document.getElementById('calNavTitle');
+  if(navTitle)navTitle.textContent=MONATSNAMEN[calMonth]+' '+calYear;
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  const fd=new Date(calYear,calMonth,1).getDay();
+  const off=fd===0?6:fd-1;
+  const isCurrentMonth=calYear===now.getFullYear()&&calMonth===now.getMonth();
+  const isFutureMonth=calYear>now.getFullYear()||(calYear===now.getFullYear()&&calMonth>now.getMonth());
+  const today=now.getDate();
+  // Anwesenheits-Daten: neues 'attendance'-Objekt ODER altes 'present'-Array (Rückwärtskompatibilität)
+  const key=calYear+'-'+String(calMonth+1).padStart(2,'0');
+  let presentDays=[];
+  if(c.attendance&&Array.isArray(c.attendance[key])){presentDays=c.attendance[key];}
+  else if(isCurrentMonth&&Array.isArray(c.present)){presentDays=c.present;}
+  let html=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  for(let i=0;i<off;i++)html+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const dow=(new Date(calYear,calMonth,d).getDay()+6)%7; // 0=Mo…6=So
+    const isWeekend=dow>=5;
+    const isToday=isCurrentMonth&&d===today;
+    const isPresent=presentDays.includes(d);
+    const dayInFuture=isFutureMonth||(isCurrentMonth&&d>today);
+    let cls='cal-day';
+    if(isToday)cls+=' today';
+    else if(isPresent)cls+=' present';
+    else if(dayInFuture)cls+=' future';
+    else if(isWeekend)cls+=' weekend';
+    html+=`<div class="${cls}">${d}</div>`;
+  }
+  if(g)g.innerHTML=html;
 }
 window.setStatus=async function(status){
   const c=CHILDREN[currentChildId];const now=new Date();
@@ -1249,7 +1312,20 @@ window.setStatus=async function(status){
   const u={status};
   if(status==='anwesend')u.arrivedAt=t;
   if(status==='schlaeft')u.sleepAt=t;
-  if(status==='gegangen'){u.goneAt=t;const p=Array.isArray(c.present)?[...c.present]:[];const td=now.getDate();if(!p.includes(td))p.push(td);u.present=p;}
+  if(status==='gegangen'){
+    u.goneAt=t;
+    // Neues attendance-Objekt (YYYY-MM → [Tage]) + altes present-Array für Rückwärtskompatibilität
+    const yr=now.getFullYear(),mo=String(now.getMonth()+1).padStart(2,'0');
+    const attKey=yr+'-'+mo;
+    const att=c.attendance&&typeof c.attendance==='object'?{...c.attendance}:{};
+    if(!Array.isArray(att[attKey]))att[attKey]=[];
+    const td=now.getDate();
+    if(!att[attKey].includes(td))att[attKey].push(td);
+    u.attendance=att;
+    // Altes Array weiter befüllen (Kompatibilität)
+    const p=Array.isArray(c.present)?[...c.present]:[];
+    if(!p.includes(td))p.push(td);u.present=p;
+  }
   await updateDoc(doc(db,'kinder',currentChildId),u);Object.assign(CHILDREN[currentChildId],u);
   updateStatusBtns(status);renderTimeRows(CHILDREN[currentChildId]);showToast('✅ Status gespeichert!');
 };
@@ -1267,7 +1343,17 @@ window.openChat=function(id){
   if(chatUnsub)chatUnsub();
   chatUnsub=onSnapshot(query(collection(db,'nachrichten'),where('kind','==',id)),snap=>{
     const msgs=[];snap.forEach(d=>msgs.push(d.data()));msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
-    document.getElementById('chatMessages').innerHTML=msgs.map(m=>`<div class="msg-bubble ${m.dir}">${m.text}<div class="msg-meta">${m.time||''}</div></div>`).join('');
+    document.getElementById('chatMessages').innerHTML=msgs.map(m=>{
+      let content='';
+      if(m.type==='file'){
+        if(m.fileType&&m.fileType.startsWith('image/')){
+          content=`<img src="${m.fileData}" alt="${m.fileName||'Bild'}"/><div style="font-size:0.72rem;opacity:0.7;margin-top:2px">📎 ${m.fileName||'Bild'}</div>`;
+        }else{
+          content=`<a class="msg-file-link" href="${m.fileData}" download="${m.fileName||'Datei'}">📎 ${m.fileName||'Datei'}</a>`;
+        }
+      }else{content=m.text||'';}
+      return`<div class="msg-bubble ${m.dir||'claudia'}">${content}<div class="msg-meta">${m.time||''}</div></div>`;
+    }).join('');
     const el=document.getElementById('chatMessages');el.scrollTop=el.scrollHeight;
   });showScreen('chatScreen');
 };
@@ -1275,6 +1361,18 @@ window.sendMsg=async function(){
   const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;
   const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   await addDoc(collection(db,'nachrichten'),{kind:currentChatId,from:'Claudia',text,time:t,dir:'claudia',ts:Date.now()});input.value='';
+};
+window.sendFileMsg=async function(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>700*1024){showToast('⚠️ Datei zu groß! Max. 700 KB');input.value='';return;}
+  showToast('⏳ Datei wird gesendet…',4000);
+  try{
+    const dataUrl=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});
+    const now=new Date();const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    await addDoc(collection(db,'nachrichten'),{kind:currentChatId,from:'Claudia',type:'file',fileData:dataUrl,fileName:file.name,fileType:file.type,time:t,dir:'claudia',ts:Date.now()});
+    showToast('✅ Datei gesendet!');
+  }catch(e){showToast('❌ Fehler: '+e.message);}
+  input.value='';
 };
 
 // ── Dokumente ──────────────────────────────────────────────
@@ -3155,25 +3253,25 @@ window.submitUnfall=async function(){
   };
   try{
     const unfallRef=await addDoc(collection(db,'unfallberichte'),data);
-    // PDF generieren und dauerhaft im Kind-Akten-Ordner ablegen
+    // Metadaten in Akten speichern (KEIN dataUrl – zu groß für Firestore)
+    // PDF wird on-demand via downloadUnfallPDF(unfallberichtId) regeneriert
     try{
-      const {dataUrl,fname}=generateUnfallPDF({...data,id:unfallRef.id},true);
       const df=data.datum?data.datum.split('-').reverse().join('.'):'';
+      const fname='Unfallbericht_'+((data.kindName||'Kind').replace(/ /g,'_'))+'_'+((data.datum||'').replace(/-/g,''))+'.pdf';
       await addDoc(collection(db,'dokumente'),{
         name:fname,
-        type:'📋',
+        type:'🚨',
         size:'PDF',
         date:df,
-        dataUrl,
         recipient:data.kindId,
         kindName:data.kindName,
-        elternSichtbar:true,
+        elternSichtbar:false,
         archiviert:false,
         kategorie:'unfallbericht',
         unfallberichtId:unfallRef.id,
         ts:Date.now()
       });
-    }catch(pdfErr){console.warn('PDF-Archivierung fehlgeschlagen:',pdfErr);}
+    }catch(pdfErr){console.warn('Akten-Speicherung fehlgeschlagen:',pdfErr);}
     window.closeUnfallModal();
     showToast('✅ Unfallbericht gespeichert & in Akten hinterlegt!');
     loadUnfallberichte(currentChildId);
